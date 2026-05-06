@@ -1,0 +1,101 @@
+We begin our preliminary analysis by breaking down the structure of a general ATFP solution to a flat structure of cyclic routes.
+
+For a ATFP solution $\solution = (\fleetAssignVar, \shareVar, \outsideShareVar)$, we can define its corresponding routing plan $\routingPlan(\solution)$ or $\routingPlan(\fleetAssignVar)$ as follows:
+\[
+    \routingPlan(\solution) = \{\route{f}\mid\forall f\in\fleetSet\}
+\]
+which represents the routing plan for each resource type, where $\route{f}$ is defined as follows for any resource type $f\in\fleetSet$ denoting its routes:
+\[
+    \route{f} = \{\pathInRoute{f}{k}, \routeAmount{\pathInRoute{f}{k}}\mid k=1,2,\ldots,K\}
+\]
+\[
+    \pathInRoute{f}{k} = [a_1, a_2, \ldots, a_{\lvert \pathInRoute{f}{k} \rvert}]
+    \subseteq \{a\in\arcSet\mid \fleetAssignVar_{af}>0\}
+    \qquad
+    \sum_{k=1}^{\fleetAvail_f}\routeAmount{\pathInRoute{f}{k}}\mathbf{1}(a\in\pathInRoute{f}{k}) = \fleetAssignVar_{af}
+    \qquad \forall a\in\arcSet
+\]
+\[
+    \pathInRoute{f}{k}(\servingArc) = \{a\in\servingArc\mid a\in\pathInRoute{f}{k}\}
+    ,\qquad
+    \pathInRoute{f}{k}(\positionArc) = \{a\in\positionArc\mid a\in\pathInRoute{f}{k}\}
+\]
+$\pathInRoute{f}{k}$ denotes the $k$-th route of resource type $f$. $\routeAmount{\pathInRoute{f}{k}}$ denotes how many times $\pathInRoute{f}{k}$ happens in the solution. Note that $\routeAmount{\pathInRoute{f}{k}}$ does not refer to the number of resource units assigned to this route, but the number of times this route is used in the solution. We define $\wrapnum_{fk}$ as the number of wraps of route $\pathInRoute{f}{k}$, i.e., how many times the route crosses the planning horizon. Therefore, the number of resource units assigned to route $\pathInRoute{f}{k}$ is $\routeAmount{\pathInRoute{f}{k}} \cdot \wrapnum_{fk}$.
+
+% ========================
+
+Then, we establish the core properties of the aggregation mapping $\Phi$.
+\input{thm/valid_relaxation/aggregation_properties.tex}
+
+Next, we introduce the routing existence lemma, which guarantees that any flow-balanced resource type assignment can be disaggregated into concrete cyclic routes.
+\input{thm/pro_exist_routing_plan.tex}
+\input{thm/pro_exist_routing_plan_proof.tex}
+
+With the routing decomposition established, we define several auxiliary relations and sets to facilitate the subsequent evaluation of resource counts across time sections.
+
+\subparagraph*{Pre-image notation induced by $\Phi_{\arcSet}$.}
+Let $\Phi_{\arcSet}:\full{\arcSet}\to\widetilde{\arcSet}$ denote the arc mapping constructed when defining the relaxation solution.
+For $\forall \mathcal{B}\subseteq\arcSet$ write
+\[
+    \Phi_{\arcSet}^{-1}(\mathcal{B})
+        := \biguplus_{a\in\mathcal{B}}\Phi_{\arcSet}^{-1}(a)
+        \subseteq \full{\arcSet}.
+\]
+Obviously,
+\[
+    a'\in\Phi_{\arcSet}^{-1}(\mathcal{B})
+        \iff \Phi_{\arcSet}(a')\in\mathcal{B}.
+\]
+
+\subparagraph*{Auxiliary sets.}
+Anticipating the mapping from a full-network solution $\bar{\fleetAssignVar}$ to the relaxed solution $\fleetAssignVar$, consider the aggregation formula:
+\[
+    \fleetAssignVar_{af}
+        = \sum_{a'\in\Phi_{\arcSet}^{-1}(a)}\bar{\fleetAssignVar}_{a'f},
+    \qquad
+    x_{af}\ge0,
+    \label{eq:fleet_avail.aggregate}
+\]
+By the routing existence lemma established above, the full-network flow $\bar{\fleetAssignVar}_{\cdot f}$ admits a route decomposition:
+\[
+    \bar{\fleetAssignVar}_{a'f}
+        = \sum_{k\in K_f}
+          \routeAmount{\pathInRoute{f}{k}}\,
+          \nu_{fk}(a'),
+    \label{eq:fleet_avail.route_decomp}
+\]
+where $\pathInRoute{f}{k}=(a'_{k,1},\ldots,a'_{k,q_k})$ denotes the $k$-th closed walk of resource type $f$ in chronological order and
+$\nu_{fk}(a')=\#\{r\mid a'_{k,r}=a'\}$.
+Applying $\Phi_{\arcSet}$ componentwise yields the cyclic sequence of partial arcs $\widetilde{\pathInRoute{f}{k}}=(a_{k,1},\ldots,a_{k,Q_k})$ with $a_{k,r}=\Phi_{\arcSet}(a'_{k,r})$ whenever the image is not $\bot$.
+For every $k$ define:
+\begin{equation}
+\label{eq:aux_sets_def}
+\begin{aligned}
+    \wrapSet_{fk}
+        &:= \left\{a_{k,r}\in\widetilde{\pathInRoute{f}{k}}
+            \mid t_o(a_{k,r})+\travelTime_{a_{k,r}}\ge \planningEnd\right\},\\
+    \arcPosi
+        &:= \left\{a_{k,r}\in\widetilde{\pathInRoute{f}{k}}
+            \mid t_o(a_{k,r})\preceq_{t_o(a_{k,r})} \checkTime
+                 \prec_{t_o(a_{k,r})} t_d(a_{k,r})\right\},\\
+    \arcNega
+        &:= \left\{a_{k,r}\in\widetilde{\pathInRoute{f}{k}}
+            \mid t_d(a_{k,r})\preceq_{t_d(a_{k,r})} \checkTime
+                 \prec_{t_d(a_{k,r})} t_o(a_{k,r}),\;
+                 t_o(a_{k,r})+\travelTime_{a_{k,r}} < \planningEnd\right\},
+\end{aligned}
+\end{equation}
+and denote $\wrapnum_{fk}=|\wrapSet_{fk}|$.
+Let $H:=\planningEnd-\planningStart$ be the horizon length.
+For every pivot $u$ define circular relations on $[0,H)$ by
+\begin{equation*}
+\begin{aligned}
+    \text{(earlier)}\qquad t_1\prec_u t_2 &\iff t_1-u < t_2-u \pmod{H},\\
+    \text{(not later)}\qquad t_1\preceq_u t_2 &\iff t_1-u \le t_2-u \pmod{H},\\
+    \text{(later)}\qquad t_1\succ_u t_2 &\iff t_1-u > t_2-u \pmod{H},\\
+    \text{(not earlier)}\qquad t_1\succeq_u t_2 &\iff t_1-u \ge t_2-u \pmod{H}.
+\end{aligned}
+\end{equation*}
+
+\input{thm/valid_relaxation/fleet_avail_lem_expand.tex}
+\input{thm/valid_relaxation/fleet_avail_lem_wrap.tex}

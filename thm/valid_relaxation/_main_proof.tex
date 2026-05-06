@@ -1,0 +1,30 @@
+\begin{proof}
+We need to show that any feasible solution to the full model $\model{\discretizationFull}$
+is also feasible to the relaxation model $\model{\discretization, \itinSetSuper}$, and that the objective value is no worse in the relaxation.
+
+The proof proceeds in three main steps. First, we prepare the necessary definitions and essential analytical tools. This includes introducing a routing existence lemma that disaggregates macroscopic flows into individual cyclic routes, and analyzing the core properties of the aggregation mapping $\Phi$ that globally govern the structural relationship between the original and partial time-space networks. Additionally, specific auxiliary sets and relations are defined to specifically tackle the intricacies of the resource availability constraints. Second, we explicitly construct a solution for the relaxation model $\model{\discretization, \itinSetSuper}$ from an arbitrary feasible solution of the full model $\model{\discretizationFull}$ by the mapping mentioned in the theorem statement \eqref{eq:map_ori2rel}. Finally, equipped with the preliminary tools, we verify that the constructed solution is feasible to $\model{\discretization, \itinSetSuper}$ and yields a non-worse objective value by examining each constraint and the objective function systematically.
+
+\input{thm/valid_relaxation/prepare.tex}
+
+With the preliminary tools in place, we now formally map an arbitrary feasible solution from the full model to the relaxed model.
+Let $\bar{\solution}=(\bar{\fleetAssignVar}, \bar{\shareVar}, \bar{\outsideShareVar})$ be any feasible solution to $\model{\discretizationFull}$.
+
+\paragraph*{Constructing solution in relaxation model}
+We construct a solution $\solution = (\fleetAssignVar, \shareVar, \outsideShareVar)$ for $\model{\discretization, \itinSetSuper}$ from $\bar{\solution}$ by the mapping mentioned in the theorem statement \eqref{eq:map_ori2rel}. 
+By construction $\fleetAssignVar_{af}\in\mathbb{Z}_{\ge0}$,
+so the domain condition~\eqref{constr:relax.domain.x.flight} is satisfied.
+All other variable-domain requirements remain unchanged and therefore continue to hold.
+
+It remains to verify that this constructed solution satisfies all operational and choice constraints of $\model{\discretization, \itinSetSuper}$ and maintains a valid lower bound for the objective function. We evaluate these requirements systematically below.
+\input{thm/valid_relaxation/assign_flow.tex}
+\input{thm/valid_relaxation/assign_fleet_available.tex}
+\input{thm/valid_relaxation/assign_cooldown.tex}
+\input{thm/valid_relaxation/assign_seg_freq.tex}
+\input{thm/valid_relaxation/choice_ratio.tex}
+\input{thm/valid_relaxation/choice_limit.tex}
+\input{thm/valid_relaxation/choice_capacity.tex}
+\input{thm/valid_relaxation/choice_covering.tex}
+\input{thm/valid_relaxation/revenue_preserve.tex}
+
+Therefore for any feasible solution of the full model, there exists a feasible solution in the aggregated model with a non-inferior objective value, $\model{\discretization, \itinSetSuper}$ provides a valid lower bound.
+\end{proof}

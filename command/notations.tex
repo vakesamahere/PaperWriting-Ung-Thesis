@@ -1,0 +1,383 @@
+% ========== Sets ==========
+
+% Planning horizon start
+\newcommand{\planningStart}{\alpha}
+
+% Planning horizon end
+\newcommand{\planningEnd}{\beta}
+
+% Time discretization step
+\newcommand{\discretizationStep}{\Delta}
+
+% Airport-specific initial discretization step (travel-time based)
+\newcommand{\initStep}{s} % _{i}
+
+% Check time
+\newcommand{\checkTime}{t_c}
+
+% Time discretization set
+\newcommand{\discretization}{\mathcal{T}}
+
+% Full time discretization set
+\newcommand{\discretizationFull}{\hat{\discretization}}
+
+%  ----------------- Network -------------------
+
+% Flat Network $\netFlat=(\airportSet, \segSet)$
+\newcommand{\netFlat}{\mathscr{G}}
+
+% Set of airports
+\newcommand{\airportSet}{\mathcal{I}}
+
+% Set of segments indexed by $s$
+\newcommand{\segSet}{\mathcal{S}}
+
+% Distance for segment s
+\newcommand{\distance}{D} % _{s}
+
+% Time-Expanded Network $\net{\discretization}=(\nodeSet, \arcSet)$
+\newcommand{\net}{\mathcal{G}} % {\discretization}
+
+% Required frequency for segment s
+\newcommand{\freq}{n} % _{s}
+
+% Travel time for segment
+\newcommand{\travelTime}{\tau} % _{s}
+
+% Minimum interdeparture time
+\newcommand{\minInterdepTime}{g} % _{s}
+
+% Set of nodes
+\newcommand{\nodeSet}{\mathcal{N}}
+
+% Set of arcs
+\newcommand{\arcSet}{\mathcal{A}}
+
+% Flight arcs set notation
+\newcommand{\flightArc}[1][{}]{{\arcSet^F_{#1}}}
+
+% Departure arcs set notation
+\newcommand{\departArc}{{\mathcal{D}}}
+
+% Holding arcs set notation
+\newcommand{\holdingArc}[1][{}]{{\arcSet^H_{#1}}}
+
+% Holding incoming arcs
+\newcommand{\holdingArcIn}{\mathcal{H}_{in}}
+
+% Holding outcoming arcs
+\newcommand{\holdingArcOut}{\mathcal{H}_{out}}
+
+% Impossible departure numbers
+\newcommand{\impDeparts}{Q}
+
+% Red-eye arcs set notation
+\newcommand{\redArc}{{\arcSet^R}}
+
+% Serving arcs set notation
+\newcommand{\servingArc}{{\arcSet^{S}}}
+
+% Positioning arcs set notation
+\newcommand{\positionArc}{{\arcSet^{P}}}
+
+% Set of outgoing arcs from node (i,t)
+\newcommand{\outArcSet}[1]{{\arcSet^{+}_{#1}}} % {i,t}
+
+% Set of incoming arcs to node (i,t)
+\newcommand{\inArcSet}[1]{{\arcSet^{-}_{#1}}} % {i,t}
+
+% Set of flight arcs from node (i, $\cdot$) and fleet type is $f$
+\newcommand{\outArcSetByF}[1]{{\arcSet^{+}_{#1}}} % {i,f}
+
+% Set of flight arcs to node (i, $\cdot$) and fleet type is $f$
+\newcommand{\inArcSetByF}[1]{{\arcSet^{-}_{#1}}} % {i,f}
+
+% Set of holding arcs at time tc
+\newcommand{\holdingArcTc}[1]{{\arcSet^H(#1)}} % {t_c}
+
+% Set of flight arcs at time tc
+\newcommand{\flightArcTc}[1]{{\arcSet^F(#1)}} % {t_c}
+
+% Set of invert arcs at time tc
+\newcommand{\invertArcTc}[1]{\overleftarrow{\arcSet}(#1)} % {t_c}
+
+% Set of arcs for segment s at time t
+\newcommand{\arcDuringSepTime}{D} % _{ijt}
+
+% Aggregated departure flow in a separation window for segment (i,j) starting at t
+\newcommand{\arcDepartFlow}{F^{\text{dep}}} % _{ijt}
+
+% Number of flights which can depart in the interval $[t, t+\minInterdepTime_{ij})$
+\newcommand{\departLimit}{\xi} % _{ijt}
+
+% Combined Limit
+\newcommand{\combLimit}{\bar{\xi}} % _{R}
+
+% Set of arcs for segment s
+\newcommand{\segArcSet}[1]{\arcSet(#1)} % {s}
+
+% Segment of arc a
+\newcommand{\sfa}[1]{s({#1})} % {a}
+
+% Separation Violation Amount
+\newcommand{\sepViolAmount}{V^{\text{sep}}} % _{ij}(t)
+
+% Separation Violation Flow
+\newcommand{\sepViolFlow}{N} % _{ijt}
+
+% summation of the separation violation amount $\sepViolAmount_{ijt}$ and the illegal departure quantities $\impDeparts(i,t,f)$ and $\impDeparts(j,t,f)$
+\newcommand{\sepInterViolAmount}{\mathscr{V}} % _{ijt}
+
+% Cumulative Departures
+\newcommand{\cumDepart}{D} % _{jf}(t)
+
+% Cumulative Real Arrivals
+\newcommand{\cumArrReal}{A^{\text{real}}} % _{jf}(t)
+
+% Late Arrival Set
+\newcommand{\lateArrSet}{\mathcal{A}_{\text{late}}}
+
+% Discreted Path Signature of itinerary r
+\newcommand{\pathSig}[1]{\pi({#1})} % {r}
+
+% Equivalence class of itineraries by discreted path signature
+\newcommand{\eqClassByPathSig}{S} % _{(R)}
+
+% Equivalence relation by discreted path signature
+\newcommand{\eqRelByPathSig}{\sim}
+
+% Original Path of itinerary r
+\newcommand{\origPath}[1]{\hat{\pi}({#1})} % {r}
+
+% Equivalence class of itineraries by original path signature
+\newcommand{\eqClassByOrigPath}{\mathscr{O}} % _{r'}^{r}
+
+% Equivalence relation by original path signature
+\newcommand{\eqRelByOrigPath}{\hat{\sim}}
+
+% Itinerary Combination Set
+\newcommand{\itinCombSet}{\mathscr{I}}
+
+% Max Attraction Combination Set
+\newcommand{\maxAttrCombSet}{\itinCombSet^{*}} % _{rp\ell}
+
+%  ----------------- Market -------------------
+
+% Set of markets
+\newcommand{\marketSet}{\mathcal{M}}
+
+% Set of passenger types
+\newcommand{\psgTypeSet}{\mathcal{P}}
+
+% Set of fare classes
+\newcommand{\fareClassSet}{\mathcal{L}}
+
+% Set of itineraries
+\newcommand{\itinSet}{\mathcal{R}}
+
+% Set of super-itineraries
+\newcommand{\itinSetSuper}{\itinSet^{*}}
+
+% Set of remaining super-itineraries
+\newcommand{\remainingItienSetSuper}{\bar{\itinSetSuper}}
+
+% Set of itineraries in market m
+\newcommand{\itinInMarket}{R} % _{m}
+
+% Set of super-itineraries in market m
+\newcommand{\itinSuperInMarket}{R^{*}} % _{m}
+
+% Set of itineraries in market m that use arc a
+\newcommand{\itinUsingArc}[2]{R_{#1}(#2)} % {m}{a}
+
+% Set of super-itineraries in market m that use arc a
+\newcommand{\itinSuperUsingArc}[2]{R^{*}_{#1}(#2)} % {m}{a}
+
+% Demand for market m and passenger type p
+\newcommand{\demand}{D} % _{mp}
+
+% Fare for itinerary r and fare class l
+\newcommand{\fare}{TP} % _{r\ell}
+
+% Outside attraction for market m and passenger type p
+\newcommand{\outAttr}{\alpha^0} % _{mp}
+
+% Attraction for itinerary r, passenger type p, fare class l
+\newcommand{\attr}{\alpha} % _{rp\ell}
+
+% Attraction for super-itinerary r, passenger type p, fare class l
+\newcommand{\attrSuper}{\beta} % _{rp\ell}
+
+% Adjusted attraction for outside option
+\newcommand{\adjOutAttr}{\bar{\alpha}^0} % _{mp}
+
+% Adjusted attraction for itinerary product
+\newcommand{\adjAttr}{\bar{\attr}} % _{rp\ell}
+
+% Adjusted attraction for super-itinerary product
+\newcommand{\adjAttrSuper}{\bar{\attrSuper}} % _{rp\ell}
+
+% Shadow attraction for outside option
+\newcommand{\shadowOutAttr}{\omega^0} % _{mp}
+
+% Shadow attraction for itinerary product
+\newcommand{\shadowAttr}{\omega} % _{rp\ell}
+
+% Minimum non-zero attraction value in market m for passenger type p
+\newcommand{\attrMin}{\attr^{\min}} % _{mp}
+
+% Scaling factor for attraction parameters in market m for passenger type p
+\newcommand{\attrScale}{\sigma} % _{mp}
+
+% ------------------ Supply--------------
+
+% Set of fleets
+\newcommand{\fleetSet}{\mathcal{F}}
+
+% Fleet capacity
+\newcommand{\fleetCap}{Q} % _{f}
+
+% Operating cost for arc a and fleet f
+\newcommand{\cost}{C} % _{af}
+
+% Fleet availability
+\newcommand{\fleetAvail}{\kappa} % _{f}
+
+% % \textbf{Decision}: Passenger flow variable on itinerary network
+% \newcommand{\psgFlowVar}{\rho} % _{rp\ell}^{a}
+
+% % ========== Notation Helpers ==========
+
+% % Time node representation
+% \newcommand{\timeNode}[2]{(#1, #2)} % {i}{t}
+
+% % Segment representation
+% \newcommand{\seg}[2]{(#1, #2)} % {i}{j}
+
+% % Time arc representation
+% \newcommand{\timeArc}[4]{(#1, #2, #3, #4)} % {i}{t}{j}{t'}
+
+% % Market-passenger key
+% \newcommand{\marketPsgKey}[2]{(#1, #2)} % {m}{p}
+
+% % Itinerary-passenger-fare key
+% \newcommand{\itinPsgFareKey}[3]{(#1, #2, #3)} % {r}{p}{\ell}
+
+% ------------------------- Modeling -------------------------
+
+% Problem abbreviation
+\newcommand{\problemName}{SN-PC\xspace}
+
+% Problem abbreviation
+\newcommand{\problemNotation}{\textbf{\problemName}}
+
+% Algorithm abbreviation
+\newcommand{\algoNotation}{IAA\xspace}
+
+% Problem model in discretization $\discretization$
+\newcommand{\model}[1]{\problemNotation({#1})} % {\discretization}
+
+% FDM model
+\newcommand{\fdm}{\textbf{FDM}}
+
+% UBM model
+\newcommand{\ubm}{\textbf{UBM}}
+
+% % DPD model as a LBM of network $\full{\net}$
+% \newcommand{\dpd}{\textbf{DPD}}
+
+% % DPD fix model: re-positioning
+% \newcommand{\dpdFix}[1]{\textbf{DPD-RP}({#1})} % {\solution, \positionArc, \holdingArc}
+
+% solution
+\newcommand{\solution}{\mathcal{X}}
+
+% the big M
+\newcommand{\bigMNotation}{M}
+
+% the small value
+\newcommand{\smallValue}{\epsilon}
+
+% Routing plan of $\solution$
+\newcommand{\routingPlan}{\mathscr{P}}
+
+% route in fleet f
+\newcommand{\route}[1]{\mathbf{p}^{#1}} % {f}
+
+% route in fleet f index k
+\newcommand{\pathInRoute}[2]{p_{#2}^{#1}} % {f}{k}
+
+% how many planes using route $\pathInRoute{f}{k}$
+\newcommand{\routeAmount}[1]{\Omega({#1})} % {\pathInRoute{f}{k}}
+
+% Wrap number for route $\pathInRoute{f}{k}$
+\newcommand{\wrapnum}{\varpi} % _{fk}
+
+% Fleet count in the start of planning horizon at airport $i$ for fleet $f$
+\newcommand{\fleetCountStartByI}{\lambda} % _{if}
+
+% -------------------- Decision Variables --------------------
+
+% \textbf{Decision}: Fleet assignment variable for arc $a$ and fleet $f$
+\newcommand{\fleetAssignVar}{x} % _{af}
+
+% \textbf{Decision}: Outside option market share variable
+\newcommand{\outsideShareVar}{{w^0}} % _{mp}
+
+% \textbf{Decision}: Itinerary-fare market share variable
+\newcommand{\shareVar}{w} % _{rp\ell}
+
+% \textbf{Decision}: Itinerary-fare market share bound variable
+\newcommand{\shareSVar}{sw} % _{rp\ell}
+
+% % \textbf{Decision}: Fleet assignment indicator variable for arc $a$ and fleet $f$
+% \newcommand{\assignIndVar}{y} % _{af}
+
+% % \textbf{Decision}: Time potential variable for node $(i,t)$ and fleet $f$
+% \newcommand{\timePotVar}{u} % _{it}^f
+
+% % \textbf{Decision}: Loop indicator variable for arc $a$ and fleet $f$
+% \newcommand{\loopIndVar}{s} % _{a,f}
+
+% % \textbf{Decision}: Number of idle flights for fleet $f$
+% \newcommand{\idleFleetVar}{\hat{\kappa}} % _{f}
+
+% -------------------- FDM --------------------
+
+% \textbf{Decision}: Margin flight indicator variable for arc $a$ and airport $i$
+\newcommand{\marginVar}{y} % _{ia}
+
+% \textbf{Decision}: Connection indicator variable for arc $a$ and $a'$
+\newcommand{\connectionVar}{z} % _{aa'}
+
+% \textbf{Decision}: Actual depart time for arc $a$
+\newcommand{\departTimeVar}{\gamma} % _{a}
+
+% ignore 8
+\newcommand{\full}[1]{%
+  \begingroup % 开启一个局部作用域
+    \renewcommand{\nodeSet}{\hat{\mathcal{N}}}
+    \renewcommand{\arcSet}{\hat{\mathcal{A}}}
+    \renewcommand{\net}{\hat{\mathcal{G}}}
+    #1% 处理传入的内容
+  \endgroup % 作用域结束，\node 自动变回原样
+}
+
+% ignore 14
+\newcommand{\innerSetNotationFont}{\mathrm}
+\newcommand{\innerArcSetNotation}{\innerSetNotationFont{A}}
+\newcommand{\wrapSet}{\innerSetNotationFont{W}}
+\newcommand{\wrapTc}{\innerSetNotationFont{H}}
+
+\newcommand{\arcPosi}{{\innerArcSetNotation_{fk}^{\checkTime,+}}}
+\newcommand{\arcNega}{{\innerArcSetNotation_{fk}^{\checkTime,-}}}
+\newcommand{\arcNorm}{{\innerArcSetNotation_{fk}^{\checkTime,0}}}
+\newcommand{\sign}{\varsigma}
+\newcommand{\signPropositionConnectionNotation}{}
+\newcommand{\slr}[1]{\textbf{0$\signPropositionConnectionNotation$1}({#1})}
+\newcommand{\srl}[1]{\textbf{1$\signPropositionConnectionNotation$0}({#1})}
+\newcommand{\srr}[1]{\textbf{1$\signPropositionConnectionNotation$1}({#1})}
+\newcommand{\sll}[1]{\textbf{0$\signPropositionConnectionNotation$0}({#1})}
+
+% ignore 1
+\newcommand{\TBD}{\textbf{\color{red}To Be Done in future work.}}

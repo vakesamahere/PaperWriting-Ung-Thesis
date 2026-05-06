@@ -1,0 +1,22 @@
+\paragraph*{Flow-balance constraints \eqref{constr:relax.flow}.}
+For any node $(i,t)\in\nodeSet$, the outgoing arc set
+$\outArcSet{(i,t)}$ is the image of $\biguplus_{(i,\tau)\in\Phi_{\nodeSet}^{-1}(i,t)}\outArcSet{(i,\tau)}$ and the ingoing arc set
+$\inArcSet{(i,t)}$ is the image of $\biguplus_{(i,\tau)\in\Phi_{\nodeSet}^{-1}(i,t)}\inArcSet{(i,\tau)}$.
+Hence,
+\begin{equation*}
+\begin{aligned}
+    \sum_{a\in\outArcSet{(i,t)}}\fleetAssignVar_{af}
+    &= \sum_{a\in\outArcSet{(i,t)}}\ \sum_{a'\in\Phi_{\arcSet}^{-1}(a)}\bar{\fleetAssignVar}_{a'f}\\
+    &= \sum_{(i,\tau)\in\Phi_{\nodeSet}^{-1}(i,t)}\ \sum_{a'\in\outArcSet{(i,\tau)}}\bar{\fleetAssignVar}_{a'f},\\
+    \sum_{a\in\inArcSet{(i,t)}}\fleetAssignVar_{af}
+    &= \sum_{a\in\inArcSet{(i,t)}}\ \sum_{a'\in\Phi_{\arcSet}^{-1}(a)}\bar{\fleetAssignVar}_{a'f}\\
+    &= \sum_{(i,\tau)\in\Phi_{\nodeSet}^{-1}(i,t)}\ \sum_{a'\in\inArcSet{(i,\tau)}}\bar{\fleetAssignVar}_{a'f}.
+\end{aligned}
+\end{equation*}
+Each node $(i,\tau)\in\full{\nodeSet}$ satisfies the full-model
+flow balance, so summing over $\Phi_{\nodeSet}^{-1}(i,t)$ yields zero.
+The arcs in $\Phi_{\arcSet}^{-1}(\bot)$ start and end within the same set $\Phi_{\nodeSet}^{-1}(i,t)$, hence their contributions cancel out, ensuring that no residual flow remains.
+\[
+\sum_{a\in\outArcSet{(i,t)}}\fleetAssignVar_{af} - \sum_{a\in\inArcSet{(i,t)}}\fleetAssignVar_{af} = \sum_{(i,\tau)\in\Phi_{\nodeSet}^{-1}(i,t)} (\sum_{a'\in\outArcSet{(i,\tau)}}\bar{\fleetAssignVar}_{a'f} - \sum_{a'\in\inArcSet{(i,\tau)}}\bar{\fleetAssignVar}_{a'f}) = 0.
+\]
+Therefore \eqref{constr:relax.flow} holds in $\model{\discretization, \itinSetSuper}$.

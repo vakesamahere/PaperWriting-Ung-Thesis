@@ -1,0 +1,192 @@
+
+\begin{lemma}\label{lem:fleet_avail.wrap}
+For every resource type $f$ and route $\pathInRoute{f}{k}$,
+$|\arcPosi|-|\arcNega|=\wrapnum_{fk}$.
+\end{lemma}
+\begin{proof}
+
+We only consider a fixed $k\in K_f$ in the following proof and omit the subscript $k$ for brevity. Denote $\widetilde{\pathInRoute{f}{k}}$ as $(a_{1},a_{2},\ldots,a_{Q})$. Denote $\wrapSet = \wrapSet_{fk}$.
+Define operations $\oplus,\,\ominus$ for indexes as follows:
+\[
+    a\oplus b := a+b \mod Q,
+    \qquad
+    a\ominus b := a-b \mod Q.
+\]
+
+Define the sign profile recording the position of the departure time of arc $a_{r}$ relative to the cut at $\checkTime$:
+\[
+    \sign_{r} :=
+    \begin{cases}
+        0, & t_o(a_{r})\le\checkTime,\\
+        1, & \text{otherwise}
+    \end{cases}
+    \qquad r=1,\ldots,Q.
+\]
+
+Because the route is continuous, $t_o(a_{r})$ and $t_d(a_{r\ominus1})$ must be equal at the cut. Consider the combination of two consecutive signs, by definitions above, define:
+\[
+    \slr{r} := (\sign_{r\ominus1},\sign_{r}) = (0,1)\qquad( \iff t_o(a_r)\le\checkTime < t_d(a_r))
+\]
+\[
+    \srl{r} := (\sign_{r\ominus1},\sign_{r}) = (1,0)\qquad( \iff t_d(a_r)\le\checkTime < t_o(a_r))
+\]
+% \[
+%     \sll{r} := (\sign_{r\ominus1},\sign_{r}) = (0,0) \iff t_o(a_r)\le\checkTime \cap t_d(a_r)\le\checkTime
+% \]
+% \[
+%     \srr{r} := (\sign_{r\ominus1},\sign_{r}) = (1,1) \iff t_o(a_r)>\checkTime \cap t_d(a_r)>\checkTime
+% \]
+\[
+    a_r\in\arcPosi \iff \slr{r} \vee (\srr{r} \wedge a_r\in\wrapSet)
+\]
+\[
+    a_r\in\wrapSet \iff (\srr{r} \wedge a_r\in\arcPosi) \vee (\srl{r} \wedge \neg a_r\in\arcNega)
+\]
+\[
+    a_r\in\arcNega \iff \srl{r} \wedge \neg(a_r\in\wrapSet)
+\]
+
+Define set $\wrapTc = \arcPosi \cap \wrapSet$. Therefore, we can derive the following equations.
+First, we derive that $a_r\in\arcPosi\setminus\wrapTc$ is equivalent to $\slr{r}$:
+\begin{equation*}
+\begin{aligned}
+    a_r\in\arcPosi\setminus\wrapTc
+    & \iff a_r\in\arcPosi\setminus\wrapSet \\
+    & \iff a_r\in\arcPosi - a_r\in\wrapSet \\
+    & \iff a_r\in\arcPosi - ((\srr{r} \wedge a_r\in\arcPosi) \vee (\srl{r} \wedge a_r\in\arcNega)) \\
+    & \iff
+    (a_r\in\arcPosi - (\srr{r} \wedge a_r\in\arcPosi))
+    % \underbrace{
+    %     (a_r\in\arcPosi - (\srr{r} \wedge a_r\in\arcPosi))
+    % }_{
+    %     \boxed{\begin{aligned}
+    %         &\iff a_r\in\arcPosi \wedge (\neg\srr{r} \vee \neg a_r\in\arcPosi) \\
+    %         &\iff a_r\in\arcPosi \wedge \neg\srr{r} \\
+    %         &\iff (\slr{r} \vee (\srr{r} \wedge a_r\in\wrapSet)) \wedge \neg\srr{r} \\
+    %         &\iff (\slr{r} \wedge \neg\srr{r}) \vee \mathbf{0} \\
+    %         &\iff \slr{r}
+    %     \end{aligned}}
+    % }
+    \wedge
+    (a_r\in\arcPosi - (\srl{r} \wedge a_r\in\arcNega))
+    % \underbrace{
+    %     (a_r\in\arcPosi - (\srl{r} \wedge a_r\in\arcNega))
+    % }_{
+    %     \boxed{\begin{aligned}
+    %         &\iff a_r\in\arcPosi \wedge (\neg\srl{r} \vee \neg a_r\in\arcNega) \\
+    %         &\iff (a_r\in\arcPosi \wedge \neg\srl{r}) \vee \mathbf{0} \\
+    %         &\iff a_r\in\arcPosi
+    %     \end{aligned}}
+    % }
+    \\
+    &
+    % \iff
+    \overset{\text{(*)}}{\iff}
+    \slr{r} \wedge a_r\in\arcPosi \\
+    & \iff \slr{r}
+\end{aligned}
+\end{equation*}
+The equivalence marked with $(*)$ holds because:
+\begin{equation*}
+\begin{aligned}
+    a_r\in\arcPosi - (\srr{r} \wedge a_r\in\arcPosi) 
+    &\iff a_r\in\arcPosi \wedge (\neg\srr{r} \vee \neg a_r\in\arcPosi) \\
+    &\iff a_r\in\arcPosi \wedge \neg\srr{r} \\
+    &\iff (\slr{r} \vee (\srr{r} \wedge a_r\in\wrapSet)) \wedge \neg\srr{r} \\
+    &\iff (\slr{r} \wedge \neg\srr{r}) \vee \mathbf{0} \\
+    &\iff \slr{r}
+\end{aligned}
+\end{equation*}
+and
+\begin{equation*}
+\begin{aligned}
+    a_r\in\arcPosi - (\srl{r} \wedge a_r\in\arcNega)
+    &\iff a_r\in\arcPosi \wedge (\neg\srl{r} \vee \neg a_r\in\arcNega) \\
+    &\iff (a_r\in\arcPosi \wedge \neg\srl{r}) \vee \mathbf{0} \\
+    &\iff a_r\in\arcPosi
+\end{aligned}
+\end{equation*}
+
+Second, we derive that $a_r\in(\wrapSet\setminus\wrapTc)\cup\arcNega$ is equivalent to $\srl{r}$:
+\begin{equation*}
+\begin{aligned}
+    a_r\in\wrapSet\setminus\wrapTc
+    & \iff a_r\in\wrapSet\setminus\arcPosi \\
+    & \iff a_r\in\wrapSet - a_r\in\arcPosi \\
+    & \iff ((\srr{r} \wedge a_r\in\arcPosi) \vee (\srl{r} \wedge \neg a_r\in\arcNega)) - a_r\in\arcPosi \\
+    & \iff \underbrace{((\srr{r} \wedge a_r\in\arcPosi) - a_r\in\arcPosi)}_{\mathbf{0}} \vee ((\srl{r} \wedge \neg a_r\in\arcNega) - a_r\in\arcPosi) \\
+    & \iff \srl{r} \wedge \neg a_r\in\arcNega \wedge \neg a_r\in\arcPosi \\
+    & \iff \srl{r} \wedge \neg a_r\in\arcNega
+\end{aligned}
+\end{equation*}
+
+Thus,
+\begin{equation*}
+\begin{aligned}
+    a_r\in(\wrapSet\setminus\wrapTc)\cup\arcNega
+    & \iff (\srl{r} \wedge \neg a_r\in\arcNega) \vee a_r\in\arcNega \\
+    & \iff \srl{r} \quad (\because a_r\in\arcNega \implies \srl{r})
+\end{aligned}
+\end{equation*}
+
+Now we have two important results:
+\[
+    a_r\in\arcPosi\setminus\wrapTc \iff \slr{r}
+\]
+\[
+    a_r\in(\wrapSet\setminus\wrapTc)\cup\arcNega \iff \srl{r}
+\]
+
+Because the route is cyclic and continuous, the number of $\slr{r}$ equals the number of $\srl{r}$ when scanning through the sequence:
+\[
+    \#\{r\mid \slr{r}\} = \#\{r\mid \srl{r}\}
+\]
+
+which means $\lvert\arcPosi\setminus\wrapTc\rvert = \lvert(\wrapSet\setminus\wrapTc)\cup\arcNega\rvert$
+
+Therefore, we have:
+\[
+\begin{array}{rl}
+\because & \wrapTc = \arcPosi \cap \wrapSet,\; \wrapSet \cap \arcNega = \emptyset \\ [4pt]
+\therefore & \wrapTc \cap \arcNega = \emptyset \\ [4pt]
+\therefore & (\wrapSet \setminus \wrapTc) \cup \arcNega = \emptyset \\ [4pt]
+\therefore & \lvert\wrapSet\setminus\wrapTc\cup\arcNega\rvert = \lvert\wrapSet\setminus\wrapTc\biguplus\arcNega\rvert = \lvert\wrapSet\setminus\wrapTc\rvert + \lvert\arcNega\rvert \\ [4pt]
+\because & \lvert\arcPosi\setminus\wrapTc\rvert = \lvert(\wrapSet\setminus\wrapTc)\cup\arcNega\rvert \\ [4pt]
+\therefore & \lvert\wrapSet\setminus\wrapTc\rvert + \lvert\arcNega\rvert = \lvert\arcPosi\setminus\wrapTc\rvert \\ [4pt]
+\because & \begin{cases}
+    \wrapSet = \wrapTc \biguplus (\wrapSet\setminus\wrapTc) \implies \lvert\wrapSet\rvert = \lvert\wrapTc\rvert + \lvert\wrapSet\setminus\wrapTc\rvert \\
+    \arcPosi = \wrapTc \biguplus (\arcPosi\setminus\wrapTc) \implies \lvert\arcPosi\rvert = \lvert\wrapTc\rvert + \lvert\arcPosi\setminus\wrapTc\rvert
+\end{cases} \\ [14pt]
+\therefore & (\lvert\wrapSet\setminus\wrapTc\rvert + \lvert\arcNega\rvert) + \lvert\wrapTc\rvert = (\lvert\arcPosi\setminus\wrapTc\rvert) + \lvert\wrapTc\rvert \quad\text{(add $\lvert\arcNega\rvert$ in both sides)}\\ [4pt]
+\implies & \lvert\wrapSet\rvert + \lvert\arcNega\rvert = \lvert\arcPosi\rvert \\ [4pt]
+\implies & \lvert\arcPosi\rvert = \lvert\arcNega\rvert + \wrapnum_{fk} \\ [4pt]
+\end{array}
+\]
+The conclusion follows
+
+% Traverse $\widetilde{\pathInRoute{f}{k}}$ once in its chronological order and record the binary sequence
+% \[
+%     \sign_r :=
+%     \begin{cases}
+%         1, & t_o(a_{k,r})\succ_{t_o(a_{k,r})}\checkTime,\\
+%         0, & \text{otherwise},
+%     \end{cases}
+% \qquad r=1,\ldots,Q_k.
+% \]
+% Because consecutive arcs share endpoints, $t_o(a_{k,r\oplus1})=t_d(a_{k,r})$ (with indices modulo $Q_k$), hence a change in $\sign_r$ occurs exactly when the interval traced by $a_{k,r}$ crosses $t_c$ in the forward direction of time measured from $t_o(a_{k,r})$.
+% If $a_{k,r}\in\arcPosi\setminus\wrapSet_{fk}$ then $t_o(a_{k,r})\le t_c < t_d(a_{k,r})$ and the arc does not wrap around the horizon, which implies $\sign_r=0$ and $\sign_{r\oplus1}=1$.
+% If $a_{k,r}\in\arcNega$ then $t_d(a_{k,r})\le t_c < t_o(a_{k,r})$ so $\sign_r=1$ and $\sign_{r\oplus1}=0$.
+% In every remaining case--including wrap-around arcs in $\wrapSet_{fk}$--the cut is not crossed in this sense and $\sign_r=\sign_{r\oplus1}$.
+% Consequently, for each $r$ we have
+% \[
+%     \sign_{r\oplus1}-\sign_r
+%     = \begin{cases}
+%         +1, & a_{k,r}\in\arcPosi\setminus\wrapSet_{fk},\\
+%         -1, & a_{k,r}\in\arcNega,\\
+%         0,  & \text{otherwise}.
+%     \end{cases}
+% \]
+% Summing these identities over $r=1,\ldots,Q_k$ gives
+% $0 = |\arcPosi\setminus\wrapSet_{fk}|-|\arcNega|$, so that $|\arcPosi|=|\arcNega|+|\wrapSet_{fk}|$.
+% The conclusion follows because $|\wrapSet_{fk}|=\wrapnum_{fk}$ by definition.
+\end{proof}

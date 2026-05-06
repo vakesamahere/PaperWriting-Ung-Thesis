@@ -1,0 +1,12 @@
+\begin{theorem}
+\label{thm:relax_illegal}
+A solution $\solution = (\fleetAssignVar^*, \shareVar^*, \outsideShareVar^*)$ to the relaxation model $\model{\discretization}$ is illegal in the original model $\model{\discretizationFull}$ if and only if one of the following three conditions holds:
+\begin{enumerate}
+    % \textbf{Impossible Departure}: 
+    \item There exists at least one node $(i, t)$ and resource type $f$ such that the departure demand at $(i, t)$ for resource type $f$ exceeds the available supply, i.e., $\impDeparts(i,t,f) > 0$.
+    % \textbf{Inter Departure}: 
+    \item There exist a segment $(i,j)$ and departure time $t$ such that more than one service departs from node $i$ to $j$ within the minimum turn-around time, i.e., $\arcDepartFlow_{ijt} > 1$.
+    % \textbf{Phantom Revenue}: 
+    \item There exists a super itinerary in the solution whose revenue contribution cannot be achieved by any combination of original itineraries, i.e., $RFS(\solution) > 0$.
+\end{enumerate}
+\end{theorem}

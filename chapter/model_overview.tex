@@ -1,0 +1,149 @@
+\chapter{Problem Description}\label{sec:model_overview}
+
+This study addresses a service network design problem that simultaneously considers service scheduling, resource assignment, and passenger choice behavior. Before presenting the mathematical formulations, we formally introduce the core terminology and parameters characterizing the problem.
+
+\section{Concepts and Parameters}
+
+A spatial origin-destination (OD) pair and its associated demand characterization define a market, denoted by the set $m \in \marketSet$. Within each market, the total passenger demand is initially given as $\demand_{mp}$ for different passenger types $p \in \psgTypeSet$ (e.g., business or leisure), representing differing utility preferences and travel urgencies. Furthermore, ticket offerings are divided into fare classes $\ell \in \fareClassSet$, capturing pricing structures.
+
+The physical, time-independent trajectory between two nodes in the network is termed a spatial segment $s \in \segSet$. For each segment $s$, the operator typically dictates a predetermined number of required service operations $\freq_s$ across the planning horizon to maintain market presence. Additionally, to ensure stable operations, services departing on the same segment $s=(i,j)$ must obey a minimum separation time; we define $\arcDuringSepTime_{ijt}$ as the set of service arcs departing on segment $s$ within this separation interval starting from time $t$. The operator deploys a set of service resource types $f \in \fleetSet$. Each resource type has a restricted maximum available number of units $\fleetAvail_f$, alongside specific capacities $\fleetCap_{f}$ and operating costs.
+
+To schedule services precisely, we represent the operation over a time-space network. While the time domain is continuous in reality, we computationally structure it using a discretization $\discretization$. A discretization defines a finite (and not necessarily uniform) set of time nodes for each spatial node in the network. Given a discretization $\discretization$, we establish a specific time-space network $\net = (\nodeSet, \arcSet)$ where $\nodeSet$ denotes the set of all time-space nodes and $\arcSet$ denotes the set of all time-space arcs under this temporal granularity. We respectively define $\outArcSet{i,t}$ and $\inArcSet{i,t}$ as the sets of time-space arcs departing from and arriving at a specific time-space node $(i, t)$. A time-space service arc $a \in \flightArc$ defines a specific service operation executed on a spatial segment $s$ with exact departure and arrival times drawn from the nodes in $\discretization$. The set of all service arcs associated with a segment $s$ is denoted as $\segArcSet{s}$. Similarly, resources remaining idle at a node between services are modeled by time-space holding arcs $a \in \holdingArc$. The total arc set $\arcSet$ is the union of service arcs and holding arcs, i.e., $\arcSet = \flightArc \uplus \holdingArc$. Finally, to monitor resource utilization, we track resources across the timeline: by picking an arbitrary snapshot count time $\checkTime$, we define $\flightArcTc{\checkTime}$ and $\holdingArcTc{\checkTime}$ as the respective sets of service arcs and holding arcs that cross this specific moment as follows:
+\begin{equation}
+    \flightArcTc{\checkTime} = 
+    \{a=((i,t)\rightarrow(j,t^\prime))\;\forall a\in\flightArc\mid t\leq t_c<t^\prime\cup t^\prime<t\leq t_c<\beta\leq t+\travelTime_{ij}\}
+    \label{def:main.flightArcTc}
+\end{equation}
+\begin{equation}
+    \holdingArcTc{\checkTime} = 
+    \{a=((i,t)\rightarrow(i,t^\prime))\;\forall a\in\holdingArc\mid t\leq t_c<t^\prime\cup t^\prime<t\leq t_c\}
+    \label{def:main.holdingArcTc}
+\end{equation}
+
+The full discretization, denoted as $\discretizationFull$, represents the complete timeline formulated with a minimum standard temporal resolution $\discretizationStep$ (e.g., 5 minutes), containing every conceivable operational timing. The sets of graphs, nodes and arcs generated over this complete timeline represent the true, unrelaxed full problem space. By convention in this paper, when we discuss time-space networks, nodes or arcs (like $\net$, $\nodeSet$ or $\flightArc$) without a hat notation, they usually belong to a general, potentially reduced discretization $\discretization$. When we explicitly wish to refer to the sets under the full discretization $\discretizationFull$, we add a hat notation to the sets (e.g., $\full{\net}$, $\full{\flightArc}$ or $\full{\segArcSet{s}}$) to clearly differentiate the exact, original problem domain from any working subsets.
+
+Passengers accomplish their travel by selecting an itinerary $r \in \itinSet$. Instead of being merely a series of spatial segments, an itinerary in our model is strictly defined as a chronological, connectable sequence of service arcs established over the full discretization $\discretizationFull$. The set of all valid itineraries serving market $m$ is denoted as $\itinInMarket_m$. If the operator's schedule provides no attractive or feasible itineraries, passengers drop out of the system by choosing the outside option.
+
+To endogenously capture passenger choice behavior within the optimization framework, we adopt the Sales-Based Linear Program (SBLP) based on the General Attraction Model (GAM) proposed by \cite{gallego2015general}. In this context, the preference of a passenger type $p$ in market $m$ for a specific itinerary-fare combination $(r, \ell)$ is quantified by a deterministic nominal attraction parameter, denoted as $\attr_{rp\ell}$. Similarly, the outside option is assigned a nominal attraction value $\outAttr_{mp}$. These parameters are typically derived from discrete choice models, such as the Multinomial Logit (MNL) model, where $\attr_{rp\ell} = \exp(V_{rp\ell})$ where $V_{rp\ell}$ is the systematic utility of itinerary $r$ under fare class $\ell$ for passenger type $p$ in market $m$.
+
+As demonstrated by \cite{gallego2015general}, standard attraction models (such as the Basic Attraction Model and the Multinomial
+Logit Model) often overestimate the recapture rate when preferred options are unavailable. To address this, the GAM framework introduces the concept of shadow attractions to provide a more flexible representation of substitution behavior.
+Following this framework, we define $\adjAttr_{rp\ell}$ as the adjusted attraction for itinerary $r$ under fare $\ell$, and $\adjOutAttr_{mp}$ as the adjusted attraction for the outside option.
+
+According to the GAM definition, the adjusted attraction $\adjAttr_{rp\ell}$ represents the nominal attraction reduced by the corresponding shadow attraction $\shadowAttr_{rp\ell}$, i.e., $\adjAttr_{rp\ell} = \attr_{rp\ell} - \shadowAttr_{rp\ell}$. Therefore $0 \le \adjAttr_{rp\ell} \le \attr_{rp\ell}$. Conversely, the adjusted outside attraction $\adjOutAttr_{mp} = \outAttr_{mp} + \sum_{r\in \itinSet}\sum_{\ell\in \fareClassSet} \shadowAttr_{rp\ell}$, satisfying $\adjOutAttr_{mp} \ge \outAttr_{mp}$. These adjusted parameters are then directly employed in the demand balance constraints of the SBLP formulation to accurately model spill and recapture effects.
+
+\section{Baseline Mathematical Model}
+
+To formulate the problem mathematically, we introduce the following main decision variables representing service operations and passenger choices.
+
+The primary operational decision captures the assignment of service resources over the time-space network. We define $\fleetAssignVar_{af}$ as the number of type-$f$ resources ($f \in \fleetSet$) assigned to traverse arc $a \in \arcSet$. For a service arc $a \in \flightArc$, $\fleetAssignVar_{af} \in \{0, 1\}$ acts as a binary variable indicating whether that specific service is operated by resource type $f$. For a holding arc $a \in \holdingArc$, $\fleetAssignVar_{af} \ge 0$ is a continuous variable representing the number of idle resources waiting at a node.
+
+Additionally, to capture market demand fulfillment, we define $\shareVar_{rp\ell} \ge 0$ as the number of passengers of type $p \in \psgTypeSet$ within market $m$ that book itinerary $r \in \itinInMarket_{m}$ under fare class $\ell \in \fareClassSet$. Correspondingly, $\outsideShareVar_{mp} \ge 0$ represents the volume of passengers of type $p$ in market $m$ selecting the ``outside option'' (i.e., not purchasing any service from the operator).
+
+\section{Mathematical Formulation}
+
+We adopt the mathematical formulation $\model{\discretizationFull}$ proposed by \citet{wei2020airline} for the integrated service network design problem with passenger choice. This model simultaneously optimizes resource assignment decisions and passenger demand allocation under a discrete-choice framework, capturing the interdependencies between operational scheduling and revenue generation.
+
+\full{
+\noindent\textbf{Objective Function}
+\begin{equation}
+    \min \;\; 
+    \sum_{a\in \flightArc}\sum_{f\in \fleetSet} \cost_{af}\, \fleetAssignVar_{af}
+    \;-\;
+    \sum_{m\in \marketSet}\sum_{p\in \psgTypeSet}\sum_{r\in \itinInMarket_{m}}\sum_{\ell\in \fareClassSet} 
+    \demand_{mp}\,\fare_{r\ell}\, \shareVar_{rp\ell}
+    % temp-command \tag{1a}
+    \label{objfun:main}
+\end{equation}
+\noindent\textbf{Resource Assignment Constraints}
+\begin{equation}
+  \sum_{a\in \outArcSet{i,t}} \fleetAssignVar_{af} - \sum_{a\in \inArcSet{i,t}} \fleetAssignVar_{af} = 0 
+  \quad \forall (i,t)\in \nodeSet,\; \forall f\in \fleetSet
+  % temp-command \tag{1b}
+  \label{constr:main.flow}
+\end{equation}
+\begin{equation}
+    \sum_{a\in \holdingArcTc{\checkTime}} \fleetAssignVar_{af} + \sum_{a\in \flightArcTc{\checkTime}} \fleetAssignVar_{af} \le \fleetAvail_{f}
+    \quad \forall f\in \fleetSet
+    % temp-command \tag{1c}
+    \label{constr:main.fleet_available}
+\end{equation}
+\noindent\textbf{Service Frequency Constraints}
+\begin{equation}
+    \sum_{f\in \fleetSet}\sum_{a\in \arcDuringSepTime_{ijt}} \fleetAssignVar_{af} \le 1 
+    \quad \forall (i,j)\in \segSet,\; \forall t \in \discretization_i
+    % temp-command \tag{1d}
+    \label{constr:main.cooldown}
+\end{equation}
+\begin{equation}
+    \sum_{f\in \fleetSet}\sum_{a\in \segArcSet{s}} \fleetAssignVar_{af} = \freq_{s}
+    \quad \forall s\in \segSet
+    % temp-command \tag{1e}
+    \label{constr:main.seg_freq}
+\end{equation}
+\noindent\textbf{Passenger Choice Constraints}
+\begin{equation}
+    \outAttr_{mp}\, \shareVar_{rp\ell} \;\le\; \attr_{rp\ell}\, \outsideShareVar_{mp}
+    \quad \forall m\in \marketSet,\, \forall p\in \psgTypeSet,\, \forall r\in \itinInMarket_{m},\, \forall \ell\in \fareClassSet
+    % temp-command \tag{1f}
+    \label{constr:main.choice.ratio}
+\end{equation}
+\begin{equation}
+    \left(\frac{\adjOutAttr_{mp}}{\outAttr_{mp}}\right) \outsideShareVar_{mp}
+    \;+\;
+    \sum_{r\in \itinInMarket_{m}}\sum_{\ell\in \fareClassSet} 
+    \left(\frac{\adjAttr_{rp\ell}}{\attr_{rp\ell}}\right) \shareVar_{rp\ell}
+    \;=\; 1
+    \quad \forall m\in \marketSet,\; \forall p\in \psgTypeSet
+    % temp-command \tag{1g}
+    \label{constr:main.choice.limit}
+\end{equation}
+\noindent\textbf{Capacity and Availability Constraints}
+\begin{equation}
+    \sum_{m\in \marketSet}\sum_{p\in \psgTypeSet}\sum_{\ell\in \fareClassSet}\sum_{r\in \itinUsingArc{m}{a}} 
+    \demand_{mp}\, \shareVar_{rp\ell}\;\le\; \sum_{f\in \fleetSet} \fleetCap_{f}\, \fleetAssignVar_{af}
+    \quad \forall a\in \flightArc
+    % temp-command \tag{1h}
+    \label{constr:main.choice.capacity}
+\end{equation}
+\begin{equation}
+    \sum_{f\in \fleetSet} \fleetAssignVar_{af} \;\ge\; \shareVar_{rp\ell}
+    \quad \forall a\in \flightArc,\; \forall m\in \marketSet,\, \forall r\in \itinUsingArc{m}{a},\, \forall p\in \psgTypeSet,\,\forall \ell\in\fareClassSet
+    % temp-command \tag{1i}
+    \label{constr:main.choice.covering}
+\end{equation}
+\noindent\textbf{Variable Domains}
+\begin{equation}
+    \fleetAssignVar_{af}\in\{0,1\} \quad \forall a\in \flightArc, \; \forall f\in \fleetSet
+    % temp-command \tag{1j}
+    \label{constr:main.domain.x.flight}
+\end{equation}
+\begin{equation}
+    \fleetAssignVar_{af}\ge 0 \quad \forall a\in \holdingArc, \; \forall f\in \fleetSet
+    % temp-command \tag{1k}
+    \label{constr:main.domain.x.holding}
+\end{equation}
+\begin{equation}
+    \outsideShareVar_{mp}\ge 0 \quad \forall m\in \marketSet, \; \forall p\in \psgTypeSet
+    % temp-command \tag{1l}
+    \label{constr:main.domain.w.out}
+\end{equation}
+\begin{equation}
+    \shareVar_{rp\ell}\ge 0 \quad \forall r\in \itinSet, \; \forall p\in \psgTypeSet, \; \forall \ell\in \fareClassSet
+    % temp-command \tag{1m}
+    \label{constr:main.domain.w}
+\end{equation}
+}
+
+The model defines a comprehensive plan matching services to passenger itineraries under resource and time constraints. The objective function \eqref{objfun:main} minimizes the total operating cost minus the total ticket revenue, effectively maximizing the operator's overall profit. For resource assignment, constraint \eqref{constr:main.flow} ensures flow conservation, meaning the number of type-$f$ resources arriving at any time-space node $(i, t)$ exactly equals those departing. Constraint \eqref{constr:main.fleet_available} bounds the resource utilization, ensuring that the total number of resources engaged in services ($\flightArcTc{\checkTime}$) and holdings ($\holdingArcTc{\checkTime}$) crossing a designated count time $\checkTime$ does not exceed the available resource limit $\fleetAvail_f$. To manage operational density, let $\arcDuringSepTime_{ijt} = \{a=((i,t^\prime)\rightarrow(j,t^{\prime\prime}))\;\forall a\in\flightArc\mid t\leq t^\prime<t+\minInterdepTime_{ij} \}$ denote the set of service arcs departing on segment $s=(i,j)$ within the minimum separation time starting from time $t$. Then constraint \eqref{constr:main.cooldown} enforces a minimum departure separation time, preventing multiple services from departing on the same spatial segment $(i,j)$ within the duration specified by the set $\arcDuringSepTime_{ijt}$, while constraint \eqref{constr:main.seg_freq} forces the schedule to exactly meet the required predetermined operation frequency $\freq_s$ for each segment $s$. Constraints \eqref{constr:main.choice.ratio}-\eqref{constr:main.choice.covering} represent the passenger choice constraints. Finally, constraints \eqref{constr:main.domain.x.flight} to \eqref{constr:main.domain.w} restrict the resource assignment and passenger allocation variables to their appropriate domains.
+
+\section{Computational Complexity and Scale}\label{sec:complexity}\label{sec:preconditioning}
+
+The \problemName problem is NP-hard. To see this, consider a restricted version in which passenger choice is removed: each market has fixed demand, a single admissible itinerary, and fixed revenue, and the choice-consistency constraints \eqref{constr:main.choice.ratio}--\eqref{constr:main.choice.limit} are inactive. The remaining problem is a service network design problem on a time-space network with binary service-activation and resource-assignment decisions subject to capacity and flow-balance constraints. This class contains the capacitated fixed-charge multicommodity network design problem as a special case, which is known to be NP-hard. Therefore, \problemName, which generalizes this restricted problem by adding itinerary-level choice variables and choice-consistency constraints, is NP-hard.
+
+A central challenge lies in the combinatorial explosion of feasible itineraries. Each market admits a set of itineraries composed of one or more service arcs connected at intermediate nodes. The number of such itineraries grows rapidly with network size, the number of allowed connections, and the temporal resolution of the discretization. Consider a network with $|\airportSet|$ nodes and $|\segSet|$ directed segments. Under a discretization step of $\discretizationStep$ minutes over a 24-hour planning horizon, each segment admits up to $\lfloor 24 \times 60 / \discretizationStep \rfloor$ candidate departure times. For multi-leg itineraries with up to $k$ connections and a maximum connection window of $W$ minutes, the number of feasible itineraries scales combinatorially: each additional leg multiplies the possibilities by the number of compatible onward departures within the connection window. The exact count depends on the network topology, segment frequencies, connection-time rules, and the OD market set.
+
+To illustrate, we consider a real-world airline scheduling instance that will be detailed in Section~\ref{sec:comp_study}. This network contains $60$ airports and $259$ directed segments. With a $15$-minute discretization, up to $2$ connections, and a $3$-hour maximum connection window, the enumeration yields $475{,}776$ feasible itineraries across the OD markets. Coupling this many itinerary variables with binary resource assignment constraints produces an extremely dense mixed-integer program that pushes the limits of state-of-the-art solvers.
+
+Beyond worst-case complexity and practical scale, the formulation also presents numerical challenges. While the SBLP formulation elegantly linearizes the choice probabilities, directly feeding the raw attraction values (e.g., $\attr_{rp\ell}$) derived from discrete choice models into the solver can lead to severe numerical intractability. Specifically, in a typical Multinomial Logit (MNL) computation $\attr_{rp\ell} = \exp(V_{rp\ell})$, the raw attraction values are often exponentially small when the systematic utility $V_{rp\ell}$ is negative. This introduces extremely tiny coefficients into the constraint matrix, particularly in the choice ratio constraint \eqref{constr:main.choice.ratio}. As a consequence, the resulting constraint matrix becomes highly ill-conditioned, leading to numerical instability in the simplex method and severe tail-off effects during bound computation.
+% \clearpage

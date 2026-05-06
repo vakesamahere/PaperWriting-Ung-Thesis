@@ -1,0 +1,111 @@
+
+\begin{lemma}\label{lem:fleet_avail.expand}
+For every resource type $f\in\fleetSet$ and cut time $\checkTime$,
+\begin{equation*}
+\begin{aligned}
+    &\sum_{a\in\holdingArcTc{\checkTime}}\fleetAssignVar_{af}
+     + \sum_{a\in\flightArcTc{\checkTime}}\fleetAssignVar_{af}
+     - \sum_{a\in\invertArcTc{\checkTime}}\fleetAssignVar_{af}\\
+    &=
+    \sum_{k\in K_f}
+        \routeAmount{\pathInRoute{f}{k}}
+        \left(
+            |\arcPosi|-|\arcNega|
+        \right).
+\end{aligned}
+\end{equation*}
+\end{lemma}
+\begin{proof}
+Using \eqref{eq:fleet_avail.aggregate} and the disjointness of the family
+$\{\Phi_{\arcSet}^{-1}(a)\}_{a\in\arcSet}$ we obtain
+\begin{equation*}
+\begin{aligned}
+    &\sum_{a\in\holdingArcTc{\checkTime}}\fleetAssignVar_{af}
+     + \sum_{a\in\flightArcTc{\checkTime}}\fleetAssignVar_{af}
+     - \sum_{a\in\invertArcTc{\checkTime}}\fleetAssignVar_{af}\\
+    &=
+    \sum_{a'\in\Phi_{\arcSet}^{-1}(\holdingArcTc{\checkTime})}\bar{\fleetAssignVar}_{a'f}
+    +\sum_{a'\in\Phi_{\arcSet}^{-1}(\flightArcTc{\checkTime})}\bar{\fleetAssignVar}_{a'f}
+    -\sum_{a'\in\Phi_{\arcSet}^{-1}(\invertArcTc{\checkTime})}\bar{\fleetAssignVar}_{a'f}.
+\end{aligned}
+\end{equation*}
+Inserting the route decomposition~\eqref{eq:fleet_avail.route_decomp} and exchanging summations yields
+\begin{equation*}
+\begin{aligned}
+    &\sum_{a\in\holdingArcTc{\checkTime}}\fleetAssignVar_{af}
+     + \sum_{a\in\flightArcTc{\checkTime}}\fleetAssignVar_{af}
+     - \sum_{a\in\invertArcTc{\checkTime}}\fleetAssignVar_{af}\\
+    % &=          \sum_{a'\in\Phi_{\arcSet}^{-1}(\holdingArcTc{\checkTime})}\sum_{k\in K_f}\routeAmount{\pathInRoute{f}{k}}\#\{r \mid a^{\prime}_{k,r}=a'\}\\
+    %     &\quad +\sum_{a'\in\Phi_{\arcSet}^{-1}(\flightArcTc{\checkTime})}\sum_{k\in K_f}\routeAmount{\pathInRoute{f}{k}}\#\{r \mid a^{\prime}_{k,r}=a'\}\\
+    %     &\quad -\sum_{a'\in\Phi_{\arcSet}^{-1}(\invertArcTc{\checkTime})}\sum_{k\in K_f}\routeAmount{\pathInRoute{f}{k}}\#\{r \mid a^{\prime}_{k,r}=a'\}\\
+    &=
+    \sum_{k\in K_f}\routeAmount{\pathInRoute{f}{k}}
+        \left(
+            \sum_{a'\in\Phi_{\arcSet}^{-1}(\holdingArcTc{\checkTime})}\#\{r \mid a^{\prime}_{k,r}=a'\}
+            +\sum_{a'\in\Phi_{\arcSet}^{-1}(\flightArcTc{\checkTime})}\#\{r \mid a^{\prime}_{k,r}=a'\}
+            -\sum_{a'\in\Phi_{\arcSet}^{-1}(\invertArcTc{\checkTime})}\#\{r \mid a^{\prime}_{k,r}=a'\}
+        \right)\\
+    &=
+    \sum_{k\in K_f}\routeAmount{\pathInRoute{f}{k}}
+        \left(
+            \#\{r \mid a^{\prime}_{k,r}\in\Phi_{\arcSet}^{-1}(\holdingArcTc{\checkTime})\}
+            +\#\{r \mid a^{\prime}_{k,r}\in\Phi_{\arcSet}^{-1}(\flightArcTc{\checkTime})\}
+            -\#\{r \mid a^{\prime}_{k,r}\in\Phi_{\arcSet}^{-1}(\invertArcTc{\checkTime})\}
+        \right)\\
+    &=
+    \sum_{k\in K_f}
+        \routeAmount{\pathInRoute{f}{k}}
+        \left(
+            \#\{r \mid a_{k,r}\in\holdingArcTc{\checkTime}\}
+            + \#\{r \mid a_{k,r}\in\flightArcTc{\checkTime}\}
+            - \#\{r \mid a_{k,r}\in\invertArcTc{\checkTime}\}
+        \right).
+\end{aligned}
+\end{equation*}
+For notational convenience lift every arrival time across the planning horizon:
+\[
+    \widetilde{t}_o(a) := t_o(a),\qquad
+    \widetilde{t}_d(a) :=
+        \begin{cases}
+            t_d(a),      & t_o(a)+\travelTime_a < \planningEnd,\\
+            t_d(a)+H, & t_o(a)+\travelTime_a \ge \planningEnd.
+        \end{cases}
+\]
+Then the circular relations used in the definitions of $\arcPosi$ and $\arcNega$ rewrite as
+\begin{equation*}
+\begin{aligned}
+    a\in\arcPosi
+        &\iff \widetilde{t}_o(a) \le \checkTime < \widetilde{t}_d(a),\\
+    a\in\arcNega
+        &\iff \widetilde{t}_d(a) \le \checkTime < \widetilde{t}_o(a) \wedge t_o(a)+\travelTime_a < \planningEnd.
+\end{aligned}
+\end{equation*}
+Fix $r$ and abbreviate $a:=a_{k,r}$. We compare the lifted inequalities with the constraint sets:
+\begin{itemize}
+    \item If $a\in\flightArcTc{\checkTime}$, then either
+    $t_o(a)\le \checkTime < t_d(a)$ (non wrap) or
+    $t_d(a)<t_o(a)\le \checkTime < \planningEnd \le t_o(a)+\travelTime_a$ (wrap case).
+    In both situations $\widetilde{t}_o(a) \le \checkTime < \widetilde{t}_d(a)$, hence $a\in\arcPosi$.
+    The same implication holds for holding arcs.
+    Conversely, if $a\in\arcPosi$ and $t_o(a)+\travelTime_a < \planningEnd$, then $\checkTime$ lies between $t_o(a)$ and $t_d(a)$ without wrapping, so $a$ belongs to $\holdingArcTc{\checkTime}\cup\flightArcTc{\checkTime}$.
+    If $a\in\arcPosi$ and $t_o(a)+\travelTime_a \ge \planningEnd$, then $\checkTime$ sits between $\widetilde{t}_o(a)=t_o(a)$ and $\widetilde{t}_d(a)=t_d(a)+H$, forcing the wrap-around condition in $\holdingArcTc{\checkTime}$ or $\flightArcTc{\checkTime}$. Thus
+    \[
+        a\in\holdingArcTc{\checkTime}\cup\flightArcTc{\checkTime}
+        \iff a\in\arcPosi.
+    \]
+    \item If $a\in\invertArcTc{\checkTime}$, Definition~\ref{def:relax.invertArcTc} furnishes
+    $t_d(a)\le \checkTime < t_o(a)$ together with $t_o(a)+\travelTime_a<\planningEnd$.
+    Hence $\widetilde{t}_d(a)=t_d(a)$, yielding $\widetilde{t}_d(a) \le \checkTime < \widetilde{t}_o(a)$, i.e.\ $a\in\arcNega$.
+    Conversely, if $a\in\arcNega$ then by definition $t_o(a)+\travelTime_a<\planningEnd$ and
+    $\widetilde{t}_d(a) \le \checkTime < \widetilde{t}_o(a)$.
+    Because the wrap condition excludes $\widetilde{t}_d(a)=t_d(a)+H$, the lifted inequality collapses to $t_d(a)\le \checkTime < t_o(a)$, so $a\in\invertArcTc{\checkTime}$.
+\end{itemize}
+Therefore
+\[
+    \#\{r \mid a_{k,r}\in\holdingArcTc{\checkTime}\cup\flightArcTc{\checkTime}\}=|\arcPosi|,
+    \qquad
+    \#\{r \mid a_{k,r}\in\invertArcTc{\checkTime}\}=|\arcNega|,
+\]
+and the parenthesis equals $|\arcPosi|-|\arcNega|$.
+This proves the lemma.
+\end{proof}

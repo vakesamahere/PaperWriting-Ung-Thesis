@@ -1,0 +1,9 @@
+\paragraph*{Segment-frequency constraints \eqref{constr:relax.seg_freq}.}
+Since $\Phi_{\arcSet}$ preserves the segment index, each $\segArcSet{s}$ is the image of $\full{\segArcSet{s}}$.
+Therefore
+\[
+    \sum_{f\in\fleetSet}\sum_{a\in\segArcSet{s}}\fleetAssignVar_{af}
+    = \sum_{f\in\fleetSet}\sum_{a'\in\full{\segArcSet{s}}}\bar{\fleetAssignVar}_{a'f}
+    = \freq_s,
+\]
+and \eqref{constr:relax.seg_freq} holds.

@@ -5,11 +5,34 @@
   fullwidthstop=circle,
   fontset=fandol,
   times=false,
-  minted=true,
+  minted=false,
   biblatex=true,
 ]{tongjithesis}
 
-\tjbibresource{bib/note.bib}
+% \tjbibresource{bib/note.bib}
+\tjbibresource{bib/references.bib}
+
+\usepackage{xspace}
+\usepackage[cal=cm]{mathalpha}
+
+% 定理环境（补充原论文使用的完整名称别名）
+\newtheorem{property}{性质}[chapter]
+\newtheorem{theorem}{定理}[chapter]
+\newtheorem{proposition}{命题}[chapter]
+\newtheorem{lemma}{引理}[chapter]
+\newtheorem{definition}{定义}[chapter]
+
+% tikz 设置
+\usetikzlibrary{calc}
+\tikzset{
+  timeaxis/.style={very thick, ->},
+  flight/.style={thick, ->},
+  timec/.style={dashed},
+  timecActive/.style={ultra thick, ->},
+  dot/.style={circle,fill=black,inner sep=1.2pt},
+}
+
+\input{command/notations.tex}
 
 \begin{document}
 
@@ -29,19 +52,25 @@
 \cleardoublepage
 
 \mainmatter
-\input{chapters/01_guide}
-\input{chapters/02_intro}
-\input{chapters/03_float}
-\input{chapters/04_math}
-\input{chapters/05_reference}
-\input{chapters/06_conclusion}
+
+% 绪论
+\chapter{绪论}
+\input{chapter/introduction.tex}
+\input{chapter/literature_review.tex}
+
+% 正文
+\input{chapter/model_overview.tex}
+
+\input{chapter/algorithm.tex}
+\input{chapter/computational_study.tex}
+\input{chapter/conclusion.tex}
 
 \makereferences
 
 \appendix
-\input{chapters/appendix}
+\input{chapter/appendix.tex}
 
 \backmatter
-\input{chapters/ack}
+\input{chapter/ack}
 
 \end{document}

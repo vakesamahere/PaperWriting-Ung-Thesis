@@ -1,0 +1,98 @@
+\chapter{Solution Methodology}\label{sec:solution_methodology}
+
+\section{Overall Solution Algorithm}
+\label{sec:algorithm}
+
+As discussed in Section~\ref{sec:complexity}, the full \problemName formulation is NP-hard and becomes computationally challenging in practice due to the combined growth of the time-space network and the itinerary-choice layer. While the standard Dynamic Discretization Discovery (DDD) method efficiently compresses physical network nodes and arcs, it lacks the mechanism to handle the highly coupled, itinerary-based passenger choice behavior. To bridge this gap, we propose the Itinerary Aggregation Approach (\algoNotation). The fundamental departure from standard DDD is that \algoNotation extends the dynamic aggregation from the physical network dimension to the logical passenger dimension. By introducing the concept of path signatures, \algoNotation groups millions of constituent itineraries into a compact set of super itineraries without losing the structural integrity of the choice model and the optimality of the solution. By establishing tight lower bounds through this dual-aggregation, recovering logically valid upper bounds, and precisely inserting missing time points to correct both physical chronological violations and itinerary-level phantom revenues, this algorithmic framework guarantees convergence to the exact global optimal solution.
+
+This section outlines the cohesive exact solution framework, establishing the foundation for the three essential algorithmic building blocks: a relaxation model (Section \ref{sec:lbm}) which provides a valid lower bound, an upper bound generation process acting as a repair algorithm (Section \ref{sec:ub}), and a discretization refinement strategy (Section \ref{sec:refinement}) ensuring convergence to the global optimum over iterations. 
+
+\subsection{Initial Discretization}\label{sec:initial_discretization}
+
+The \algoNotation algorithm begins with an initial discretization $\discretization$ that is deliberately coarse to keep the relaxation model small. However, the choice of initial step sizes has a profound impact on the quality of the relaxation. As will be detailed in Section~\ref{sec:lbm}, the floor-mapping rule used to construct service arcs in the relaxed network (Property~\ref{def:relax.flightArc}) can produce physically meaningless inverse arcs when the grid is too coarse relative to the travel time of a segment. To eliminate this pathology from the outset, we adopt an initial discretization in which each node $i \in \airportSet$ receives an individual step size $\initStep_i$ calibrated to its shortest inbound travel time. The precise construction and its theoretical justification are presented in Section~\ref{sec:init_disc_detail}.
+
+\subsection{Iterative Framework}
+We start with an initial discretization and iteratively solve the lower bound model to obtain a relaxation solution and its corresponding lower bound. Then, we use the relaxation solution to generate an upper bound through an MIP-based repair algorithm. If the gap between the upper and lower bounds is within a predefined threshold $\epsilon>0$, we terminate the algorithm. Otherwise, we refine the discretization based on the current solution and repeat the process, which ensures convergence to the global optimal solution of the full model. The algorithm is summarized in Algorithm~\ref{alg:refinement}. 
+
+\begin{algorithm}[ht]
+\caption{Iterative Refinement Algorithm for $\problemNotation$}
+\label{alg:refinement}
+\begin{algorithmic}[1]
+\State $LB \gets -\infty$.
+\State $UB \gets +\infty$.
+\State $\solution^{*} \gets \text{null}$.
+\ForAll{$i\in\airportSet$}
+\Comment{Initialize (Section~\ref{sec:initial_discretization})}
+    \State $\initStep_i\gets\min_{j:(j,i)\in\segSet}\{\travelTime_{ji}\}$
+    \State $\discretization_i\gets\{t\mid t=\planningStart+k\,\initStep_i,\, k \in \mathbb{Z}_{\ge0}, t < \planningEnd\}$
+\EndFor
+\State $iter\gets 0$
+\Loop
+    \State $iter \gets iter + 1$
+    \State $\solution, LB \gets\Call{ATF}{\arcSet}$
+    \Comment{Update Lower Bound}
+    \State $\solution^{*}_{new}, UB_{new} \gets \Call{UB\_Model}{\solution}$
+    \If{$UB_{new} < UB$}
+        \State $\solution^{*}, UB \gets \solution^{*}_{new}, UB_{new}$
+        \Comment{Update Upper Bound}
+    \EndIf
+    \If{$UB - LB \le \epsilon \;\textbf{or}\; iter \ge \text{maxIter}$}
+        \State \textbf{break}
+    \EndIf
+    % \ForAll{$i \in \airportSet, t \in \discretization_i, f \in \fleetSet$}
+    %     \Comment{Refinement}
+    %     \State $Q_{imp} \gets D(i, t, f) - H_{in}(i, t, f) - A_{legal}(i, t, f)$
+    %     \If{$Q_{imp} > 0$}
+    %         \State $\mathcal{K} \gets A_{illegal}(i, t, f)$
+    %         \State Sort $\mathcal{K}$ by flow volume $\fleetAssignVar_{k}$ in descending order
+    %         \State $covered \gets 0$
+    %         \ForAll{$k \in \mathcal{K}$}
+    %             \If{$covered < Q_{imp}$}
+    %                 \State $\discretization_i \gets \discretization_i \cup \{t_{\text{dep}}(k) + \travelTime_k\}$
+    %                 \State $covered \gets covered + \fleetAssignVar_{k}$
+    %             \Else
+    %                 \State \textbf{break}
+    %             \EndIf
+    %         \EndFor
+    %     \EndIf
+    % \EndFor
+    \State $\discretization \gets \Call{Refinement}{\solution, \discretization}$
+    \Comment{Refine Discretization}
+\EndLoop
+\State \Return $\solution, \solution^{*}, LB, UB$
+\end{algorithmic}
+\end{algorithm}
+
+\section{Attraction Balancing Pre-conditioning}\label{sec:preconditioning_solution}
+
+To stabilize the optimization process, we propose a market-specific numerical pre-conditioning technique termed \textit{Attraction Balancing}. For each market $m \in \marketSet$ and passenger type $p \in \psgTypeSet$, we identify the minimum non-zero absolute attraction value among all attraction-related parameters:
+\begin{equation*}
+    \attrMin_{mp} = \min \left\{ \left|\outAttr_{mp}\right|, \, \left|\attr_{rp\ell}\right|, \, \left|\adjAttr_{rp\ell}\right| \mid r \in \itinInMarket_m, \, \ell \in \fareClassSet, \, \text{value} \neq 0 \right\}
+    \label{eq:attr_min}
+\end{equation*}
+
+We then apply a scaling factor $\attrScale_{mp} = 1.0 / \attrMin_{mp}$ to uniformly scale all attraction parameters within that market-passenger combination. Since $\adjAttr_{rp\ell} = \attr_{rp\ell} - \shadowAttr_{rp\ell}$ by the GAM definition, we scale the underlying nominal and shadow attractions:
+\begin{equation*}
+\begin{aligned}
+    \outAttr_{mp} &\leftarrow \attrScale_{mp} \cdot \outAttr_{mp}\\
+    \attr_{rp\ell} &\leftarrow \attrScale_{mp} \cdot \attr_{rp\ell} \quad \forall r \in \itinInMarket_m, \, \ell \in \fareClassSet\\
+    \shadowAttr_{rp\ell} &\leftarrow \attrScale_{mp} \cdot \shadowAttr_{rp\ell} \quad \forall r \in \itinInMarket_m, \, \ell \in \fareClassSet
+\end{aligned}
+\end{equation*}
+Consequently, the adjusted attractions are also scaled by the same factor, i.e., $\adjAttr_{rp\ell} \leftarrow \attrScale_{mp} \cdot \adjAttr_{rp\ell}$ and $\adjOutAttr_{mp} \leftarrow \attrScale_{mp} \cdot \adjOutAttr_{mp}$.
+
+Mathematically, since the choice constraints \eqref{constr:main.choice.ratio} and \eqref{constr:main.choice.limit} are homogeneous in the attraction parameters within each market-passenger combination, multiplying all attraction values by a positive constant $\attrScale_{mp}$ strictly preserves the feasible region and the optimal solution. To verify this, observe that constraint \eqref{constr:main.choice.ratio} becomes:
+\begin{equation*}
+    (\attrScale_{mp} \cdot \outAttr_{mp})\, \shareVar_{rp\ell} \;\le\; (\attrScale_{mp} \cdot \attr_{rp\ell})\, \outsideShareVar_{mp}
+\end{equation*}
+which is equivalent to the original constraint after canceling the common positive factor $\attrScale_{mp}$ from both sides. Similarly, constraint \eqref{constr:main.choice.limit} remains valid because both the numerator and denominator in the coefficients are scaled by the same factor, preserving the ratios $\adjAttr_{rp\ell}/\attr_{rp\ell}$ and $\adjOutAttr_{mp}/\outAttr_{mp}$.
+
+Computationally, this pre-conditioning ensures that the smallest non-zero coefficient in the choice constraints is exactly $1.0$, effectively eliminating matrix ill-conditioning. This simple yet critical transformation serves as a catalyst in both the lower bounding model and upper bounding model components of our solution framework, drastically accelerating the convergence of the lower bound and robustifying the overall algorithmic stability. All experimental results reported in this paper employ this attraction balancing pre-processing step uniformly across all instances.
+
+An alternative approach to address the numerical instability is to replace the $\shareVar_{rp\ell}$ with $\demand_{mp} \shareVar_{rp\ell}$ where the unique $m$ meets $r\in \itinInMarket_m$ and remove the $\demand_{mp}$ from the objective function and constraints. Meanwhile, the doamin of $\shareVar_{rp\ell}$ and $\outsideShareVar_{mp}$ is changed to $[0, \demand_{mp}]$ (or simply $[0,+\infty]$). This approach can effectively eliminate the large coefficients in the objective function and choice constraints, specifically the $\demand_{mp}\fare_{r\ell}$ terms. The value of new $\shareVar$ variables represents the actual number of passengers choosing itinerary $r$ under fare $\ell$, rather than the share of demand, which is often a small fraction in $[10^{-5}, 10^{-4}]$.
+
+\input{chapter/lbm/relaxation.tex}
+
+\input{chapter/ub/freqfix_iti.tex}
+
+\input{chapter/refinement/_main.tex}

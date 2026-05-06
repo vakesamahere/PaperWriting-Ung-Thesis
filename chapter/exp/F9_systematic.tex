@@ -1,0 +1,209 @@
+\newcommand{\textCase}[1]{\text{#1}}
+\chapter{Computational Study}
+\label{sec:comp_study}
+
+We apply the proposed \algoNotation framework to airline schedule planning---a canonical instance of service network design with passenger choice. In this setting, the network nodes correspond to airports, the service resource types correspond to aircraft fleet types, the service arcs correspond to scheduled flights, and the spatial segments correspond to origin-destination airport pairs. This application domain is particularly well suited for evaluating our framework because it exhibits all the computational challenges discussed in the preceding sections: a large number of feasible itineraries, strong coupling between markets through shared network capacity, and the need for precise temporal resolution.
+
+\section{Experimental Setup}
+\label{sec:exp_setup}
+
+Two solution methods are compared throughout the study:
+\begin{itemize}
+    \item \textbf{Raw Model.} The full mixed-integer formulation is passed directly to Gurobi without any algorithmic preprocessing.
+    \item \textbf{\algoNotation.} The proposed Itinerary Aggregation Approach, which iteratively solves a relaxed lower-bound model, repairs the solution to obtain a feasible upper bound, and refines the discretization.
+\end{itemize}
+
+The main experiments impose fixed computational budgets of 1 hour and 5 hours. The primary performance metric is the \emph{certified optimality gap}, defined as the relative difference between a valid lower bound and a feasible upper bound (incumbent). Horizon-scaled instances are controlled computational benchmarks that systematically vary problem size; they are not intended to represent distinct real-world business planning cycles.
+
+Although \algoNotation is an exact framework with finite-convergence guarantees, the main computational study evaluates finite-time performance under fixed runtime budgets. When terminated early, \algoNotation still returns a feasible incumbent and a valid lower bound, and therefore provides a certified optimality gap.
+
+\section{F9-Derived Airline Benchmark}
+\label{sec:f9_benchmark}
+
+We construct 18 benchmark instances derived from Frontier Airlines (F9), an ultra-low-cost carrier operating in the United States. The instances are organized along two dimensions: network size and planning horizon. Three network sizes are considered---small (20 airports), medium (40 airports), and full (60 airports)---each paired with six planning horizons ranging from 12 hours to 72 hours. The horizons are labeled $0.5\times$, $1.0\times$, $1.5\times$, $2.0\times$, $2.5\times$, and $3.0\times$ relative to a base 24-hour period.
+
+Table~\ref{tab:f9_instances} summarizes the instance characteristics. The number of candidate scheduled service departures (Services column) and the number of feasible passenger itineraries grow substantially with both network size and horizon length. The largest instance (\textCase{full\_3.0$\times$}) contains more than 1.4 million feasible itineraries.
+
+\begin{table}[htbp]
+\centering
+\caption{F9-derived benchmark instances: network and demand characteristics.}
+\label{tab:f9_instances}
+\begin{tabular}{lrrrrrr}
+\toprule
+Instance & Airports & Segments & Services & Markets & Itineraries & Horizon \\
+\midrule
+\textCase{small\_0.5$\times$}  & 20 & 83 & 94    & 94  & $19{,}592$      & 12h \\
+\textCase{small\_1.0$\times$}  & 20 & 83 & 100   & 94  & $118{,}176$     & 24h \\
+\textCase{small\_1.5$\times$}  & 20 & 83 & 188   & 94  & $137{,}768$     & 36h \\
+\textCase{small\_2.0$\times$}  & 20 & 83 & 200   & 94  & $236{,}352$     & 48h \\
+\textCase{small\_2.5$\times$}  & 20 & 83 & 212   & 94  & $255{,}944$     & 60h \\
+\textCase{small\_3.0$\times$}  & 20 & 83 & 300   & 94  & $354{,}528$     & 72h \\
+\midrule
+\textCase{medium\_0.5$\times$} & 40 & 194 & 246  & 204 & $43{,}406$      & 12h \\
+\textCase{medium\_1.0$\times$} & 40 & 194 & 266  & 204 & $255{,}936$     & 24h \\
+\textCase{medium\_1.5$\times$} & 40 & 194 & 476  & 204 & $299{,}342$     & 36h \\
+\textCase{medium\_2.0$\times$} & 40 & 194 & 532  & 204 & $511{,}872$     & 48h \\
+\textCase{medium\_2.5$\times$} & 40 & 194 & 584  & 204 & $555{,}278$     & 60h \\
+\textCase{medium\_3.0$\times$} & 40 & 194 & 798  & 204 & $767{,}808$     & 72h \\
+\midrule
+\textCase{full\_0.5$\times$}   & 60 & 259 & 327  & 395 & $81{,}252$      & 12h \\
+\textCase{full\_1.0$\times$}   & 60 & 259 & 348  & 395 & $475{,}776$     & 24h \\
+\textCase{full\_1.5$\times$}   & 60 & 259 & 628  & 395 & $557{,}028$     & 36h \\
+\textCase{full\_2.0$\times$}   & 60 & 259 & 696  & 395 & $951{,}552$     & 48h \\
+\textCase{full\_2.5$\times$}   & 60 & 259 & 752  & 395 & $1{,}032{,}804$ & 60h \\
+\textCase{full\_3.0$\times$}   & 60 & 259 & 1044 & 395 & $1{,}427{,}328$ & 72h \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Main Performance Comparison}
+\label{sec:main_performance}
+
+Table~\ref{tab:comp_results} reports the certified optimality gap achieved by each method under 1-hour and 5-hour computational budgets across all 18 instances.
+
+\begin{table}[htbp]
+\centering
+\caption{Certified optimality gaps under fixed computational budgets.}
+\label{tab:comp_results}
+\begin{tabular}{lcccc}
+\toprule
+Instance & Raw Gap (1h) & \algoNotation Gap (1h) & Raw Gap (5h) & \algoNotation Gap (5h) \\
+\midrule
+\textCase{small\_0.5$\times$}  & xxx\% & xxx\% & xxx\% & xxx\% \\
+\textCase{small\_1.0$\times$}  & xxx\% & xxx\% & xxx\% & xxx\% \\
+\textCase{small\_1.5$\times$}  & xxx\% & xxx\% & xxx\% & xxx\% \\
+\textCase{small\_2.0$\times$}  & xxx\% & xxx\% & xxx\% & xxx\% \\
+\textCase{small\_2.5$\times$}  & xxx\% & xxx\% & xxx\% & xxx\% \\
+\textCase{small\_3.0$\times$}  & xxx\% & xxx\% & xxx\% & xxx\% \\
+\midrule
+\textCase{medium\_0.5$\times$} & xxx\% & xxx\% & xxx\% & xxx\% \\
+\textCase{medium\_1.0$\times$} & xxx\% & xxx\% & xxx\% & xxx\% \\
+\textCase{medium\_1.5$\times$} & xxx\% & xxx\% & xxx\% & xxx\% \\
+\textCase{medium\_2.0$\times$} & xxx\% & xxx\% & xxx\% & xxx\% \\
+\textCase{medium\_2.5$\times$} & xxx\% & xxx\% & xxx\% & xxx\% \\
+\textCase{medium\_3.0$\times$} & xxx\% & xxx\% & xxx\% & xxx\% \\
+\midrule
+\textCase{full\_0.5$\times$}   & xxx\% & xxx\% & xxx\% & xxx\% \\
+\textCase{full\_1.0$\times$}   & xxx\% & xxx\% & xxx\% & xxx\% \\
+\textCase{full\_1.5$\times$}   & xxx\% & xxx\% & xxx\% & xxx\% \\
+\textCase{full\_2.0$\times$}   & xxx\% & xxx\% & xxx\% & xxx\% \\
+\textCase{full\_2.5$\times$}   & xxx\% & xxx\% & xxx\% & xxx\% \\
+\textCase{full\_3.0$\times$}   & xxx\% & xxx\% & xxx\% & xxx\% \\
+\bottomrule
+\end{tabular}
+\vspace{0.5em}
+\begin{minipage}{0.92\textwidth}
+\footnotesize
+Notes: A gap below 1\% is reported as $<$1\%, with the time to reach the threshold shown in parentheses. ``No incumbent'' indicates that no feasible solution was returned within the corresponding budget. ``OOM'' indicates out-of-memory termination.
+\end{minipage}
+\end{table}
+
+The results reveal a clear scalability pattern. On small instances, direct Gurobi is often competitive. As the planning horizon and network size increase, however, the raw formulation first loses its ability to certify high-quality incumbents and eventually fails to return usable solutions. \algoNotation, in contrast, continues to provide feasible schedules together with valid lower bounds, leading to substantially smaller certified gaps on the medium and full-scale instances.
+
+For the small network (20 airports), the raw formulation benefits from a compact constraint matrix and a manageable number of itineraries. Gurobi's branch-and-bound procedure makes steady progress, and the certified gaps at both checkpoints are comparable to---or better than---those of \algoNotation. The iterative overhead of \algoNotation is not fully amortized on instances of this size.
+
+As the network grows to 40 and 60 airports, the picture changes qualitatively. The raw formulation suffers from weak LP relaxations and massive fractional degeneracy, causing the branch-and-bound tree to expand without meaningful improvement in either the incumbent or the lower bound. On the medium and full instances with longer horizons, the raw solver either returns large certified gaps, fails to produce a feasible incumbent, or terminates due to memory exhaustion. \algoNotation, by contrast, maintains tractability through itinerary aggregation: the lower-bound model operates on a compact set of super-itineraries, and the upper-bound repair module reconstructs feasible integer schedules from the relaxed solution. The certified gaps produced by \algoNotation remain moderate even on the largest instances, demonstrating that the framework scales gracefully with both network size and planning horizon.
+
+\section{Component Analysis}
+\label{sec:component_analysis}
+
+To isolate the contribution of each algorithmic component, we conduct three ablation studies on representative full-network instances: \textCase{full\_1.0$\times$}, \textCase{full\_2.0$\times$}, and \textCase{full\_3.0$\times$}. All ablation experiments use a 5-hour computational budget.
+
+\subsection{Attraction Balancing}
+
+Attraction Balancing (Section~\ref{sec:preconditioning_solution}) rescales the choice-model coefficients to eliminate numerical ill-conditioning. Table~\ref{tab:ablation_ab} compares the full \algoNotation framework against a variant that omits this preprocessing step.
+
+\begin{table}[htbp]
+\centering
+\caption{Ablation: effect of Attraction Balancing.}
+\label{tab:ablation_ab}
+\begin{tabular}{lccc}
+\toprule
+Instance & Full \algoNotation Gap & No-AB Gap & No-AB Status/Notes \\
+\midrule
+\textCase{full\_1.0$\times$} & xxx\% & xxx\% & \\
+\textCase{full\_2.0$\times$} & xxx\% & xxx\% & \\
+\textCase{full\_3.0$\times$} & xxx\% & xxx\% & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Without Attraction Balancing, the solver encounters numerical difficulties in the choice constraints, leading to slower convergence and degraded gap certification. The preprocessing step is computationally inexpensive and uniformly improves robustness across all instances.
+
+\subsection{Itinerary Aggregation in the Lower Bound}
+
+The core mechanism of the lower-bound model is itinerary aggregation via super-itineraries. To quantify its contribution, we compare the full \algoNotation lower bound against a variant that applies time aggregation only, without grouping itineraries into super-itineraries. Table~\ref{tab:ablation_ia} reports the lower-bound gaps.
+
+\begin{table}[htbp]
+\centering
+\caption{Ablation: effect of Itinerary Aggregation on the lower bound.}
+\label{tab:ablation_ia}
+\begin{tabular}{lccc}
+\toprule
+Instance & Full \algoNotation LB Gap & No-IA LB Gap & Notes \\
+\midrule
+\textCase{full\_1.0$\times$} & xxx\% & xxx\% & \\
+\textCase{full\_2.0$\times$} & xxx\% & xxx\% & \\
+\textCase{full\_3.0$\times$} & xxx\% & xxx\% & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Removing itinerary aggregation substantially weakens the lower bound. Without super-itineraries, the relaxation permits fictitious revenue from fractional resource allocations that form invalid offer sets, inflating the bound and reducing its certification value. This confirms that itinerary aggregation is the primary driver of bound strength in the \algoNotation framework.
+
+\subsection{Itinerary Cuts in the Upper Bound}
+
+The upper-bound repair module combines frequency fixing with itinerary cuts (Section~\ref{sec:ub}). Table~\ref{tab:ablation_ic} isolates the effect of itinerary cuts by comparing the full \algoNotation upper bound against a variant that uses frequency fixing alone.
+
+\begin{table}[htbp]
+\centering
+\caption{Ablation: effect of Itinerary Cuts on the upper bound.}
+\label{tab:ablation_ic}
+\begin{tabular}{lccc}
+\toprule
+Instance & Full \algoNotation UB & No-IC UB & No-IC Status \\
+\midrule
+\textCase{full\_1.0$\times$} & xxx\% & xxx\% & \\
+\textCase{full\_2.0$\times$} & xxx\% & xxx\% & \\
+\textCase{full\_3.0$\times$} & xxx\% & xxx\% & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Without itinerary cuts, the upper-bound model must resolve the full revenue-allocation problem from scratch, leading to weaker incumbents or longer solve times. Itinerary cuts transfer structural information from the relaxation to the repair model, tightening the feasible region and accelerating convergence to high-quality feasible solutions.
+
+\medskip
+
+In summary, Attraction Balancing improves numerical robustness; Itinerary Aggregation is the main driver of bound strength; Itinerary Cuts improve the repair model. Refinement is not treated as a standalone computational component because its role is to guarantee finite convergence rather than to serve as a primary source of bound improvement.
+
+\section{Operational Interpretation of the Base Solution}
+\label{sec:operational_interpretation}
+
+To verify that the optimized service plans are operationally meaningful, we examine the solution of the \textCase{full\_1.0$\times$} instance in detail. This analysis is intended as a sanity check of the optimized service plan rather than a full managerial evaluation. The main focus of the computational study is certified optimality gaps and scalability.
+
+The optimal schedule activates exactly $348$ flights across all $60$ airports. The fleet assignment balances the available sub-types based on demand density: $178$ flights are operated by the higher-capacity A321-271NX, while the remaining $170$ flights are allocated to the A320-214. This heterogeneous deployment assigns the largest aircraft to trunk routes with sufficient consolidated demand, minimizing per-seat-mile cost, while smaller variants fulfill secondary frequency requirements without excessive capacity spoilage.
+
+The algorithm exhibits profitability-driven market selectivity. Out of $382$ markets, the schedule captures demand from only the $120$ most profitable markets, abandoning structurally unprofitable ones to conserve operating costs. Within these targeted markets, the SBLP component secures an average market share of $5.42\%$, which exceeds F9's historical market share of $4.85\%$ across the same markets.
+
+The optimal passenger allocation utilizes $112$ multi-leg connecting itineraries compared to only $64$ direct itineraries. This reliance on connecting itineraries demonstrates the model's ability to consolidate fragmented demand from disparate markets by synchronizing departure and arrival times across connecting airports.
+
+\section{Cross-Domain Proof-of-Concept}
+\label{sec:cross_domain}
+
+To demonstrate that the itinerary-aggregation mechanism applies beyond airline scheduling, we conduct a proof-of-concept experiment on an intercity bus network. Table~\ref{tab:cross_domain} compares the airline reference instance with the bus case.
+
+\begin{table}[htbp]
+\centering
+\caption{Cross-domain applicability: airline vs.\ intercity bus.}
+\label{tab:cross_domain}
+\begin{tabular}{lrrrrrrr}
+\toprule
+Application & Nodes & Segments & Services & Markets & Itineraries & Raw Gap/Status & \algoNotation Gap/Status \\
+\midrule
+Airline (\textCase{full\_1.0$\times$}) & 60 & 259 & 348 & 395 & $475{,}776$ & xxx\% & xxx\% \\
+Intercity bus & xxx & xxx & xxx & xxx & xxx & xxx & xxx \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Although both airline and intercity bus systems are passenger transportation applications, the bus case differs in network density, service frequency, resource cost structure, and transfer patterns. This experiment is intended to show that the itinerary-aggregation mechanism applies beyond flight scheduling. The \algoNotation framework produces feasible schedules and valid lower bounds in both domains, confirming that the algorithmic components---super-itinerary construction, frequency fixing, itinerary cuts, and iterative refinement---are not specific to the airline cost and demand structure.

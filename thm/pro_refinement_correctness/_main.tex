@@ -1,0 +1,10 @@
+\begin{theorem}
+If the LBM solution $\fleetAssignVar$ is infeasible for the original problem $\model{\discretizationFull}$, then at least one of the following must occur:
+\begin{enumerate}
+    \item A separation violation is detected.
+    \item An impossible departure (short arc) violation is detected.
+\end{enumerate}
+Consequently, the refinement strategy will always be able to add new time points to $\discretization$ until the solution is feasible.
+\label{thm:refinement_correctness}
+\end{theorem}
+

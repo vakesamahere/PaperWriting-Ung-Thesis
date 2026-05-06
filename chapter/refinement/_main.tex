@@ -1,0 +1,41 @@
+\section{Refining Discretization}
+\label{sec:refinement}
+
+Because the relaxation model relies on an aggregated time discretization $\discretization$, its optimal solutions may employ services that violate strict real-world constraints. In our algorithm sequence, the Refinement step is invoked whenever such an illegal lower-bound solution is produced. By systematically analyzing network flow, we identify specific chronologically invalid connections (which we denote as ``Impossible Departures''), services that too close to be physically realized (which denote as ``Inter Departures'') and super itineraries whose revenue contribution connot be achieved by any original itinerary combination (which we denote as ``Phantom Revenue''). We then strategically insert new time points to the discretization $\discretization$ to eliminate these infeasibilities. In this section, we first define the violation metrics for each of these three types of violations, and show that existence of any of these violations is necessary and sufficient for the relaxation solution to be illegal in the original model. Then, we present the refinement strategy to eliminate these violations, and prove that the algorithm will converge to a globally optimal solution after finite iterations. Note that the relaxation solutions can be illegal in the original model even when its objective value equals that produced by the upper bound, which means the algorithm is converged. We do not need to further refine the discretization to eliminate the violations in this case because we have already obtained a globally optimal solution.
+
+\begin{definition}
+\label{def:illegal_solution}
+Let $\solution_{rel} = (\fleetAssignVar^*, \shareVar^*, \outsideShareVar^*)$ be an optimal solution to the relaxation model $\model{\discretization, \itinSetSuper}$ with an objective value of $Z_{rel}^*$. 
+
+The relaxation solution $\solution_{rel}$ is defined as illegal with respect to the full model $\model{\discretizationFull}$ if there does not exist a passenger flow allocation $(\shareVar, \outsideShareVar)$ such that the combined assignment $\solution = (\fleetAssignVar^*, \shareVar, \outsideShareVar)$ is feasible in $\model{\discretizationFull}$ and achieves an objective value $Z = Z_{rel}^*$.
+\end{definition}
+
+\input{chapter/refinement/impossible_departure.tex}
+\input{chapter/refinement/inter_departure.tex}
+\input{chapter/refinement/phantom_revenue.tex}
+% ========================
+
+The following theorem guarantees that the relaxation solution is illegal in the original model if and only if there are at least one of these three violations.
+
+\input{thm/relax_illegal/_main.tex}
+
+% ========================
+
+\subsection{Refinement Strategy}\label{sec:refine_process}
+\paragraph{Impossible Departure}
+If $\impDeparts(i, t, f) := \impDeparts > 0$, we have a violation. The culprits are the set of illegal arrival arcs $\mathcal{K} = \flightArc[-,illegal](i, t, f)$.
+
+For each $k \in \mathcal{K}$, we determine its correction time $t'_{arr} = t_{\text{dep}}(k) + \travelTime_k$, which is the true physical arrival time.  We resolve the violation using the following greedy process. First, sort the culprits $\mathcal{K}$ by their flow volume $\fleetAssignVar_{k}$ in descending order. Then, greedily select culprits from $\mathcal{K}$ until the sum of their flow covers the deficit $\impDeparts$.
+Finally, for each selected culprit $k$, add its true arrival time $t'_{arr}$ to the time discretization of node $i$ as $\discretization_i \gets \discretization_i \cup \{t'_{arr}(k)\}$. This ensures that in the next iteration, the model can no longer rely on the illegal arc $k$ to satisfy the departure demand at $(i, t)$, as it will now have a more accurate representation of the resource unit's availability time.
+
+As a result, the time node grid is densified. In the next iteration, the previously problematic arc $k$ will be mapped to land at $t'_{arr}$ (which is later than $t$). This accurately delays the supply of the resource unit, rendering it unavailable for the impossible departure at $t$, thus the current relaxation solution will be infeasible in the next iteration.
+
+\paragraph{Inter Departure}
+If an inter-departure violation is detected on segment $(i,j)$ with $\sepViolAmount_{ij}(t) > 0$, it indicates that multiple physical services assigned to this segment are aggregated into an overlapping separation window. To resolve this, we identify the set of active original service arcs $k \in \segArcSet{s}$ whose physical departure times $t_a(k)$ fall within the violating interval $[t, t + \minInterdepTime_{s})$. 
+Following a similar greedy logic to the impossible departures, we sort these culprit arcs by their flow volume $\fleetAssignVar_{k}$ and select the top arcs. For each selected arc $k$, we insert its true physical departure time $t_a(k)$ into the discretization of the origin node $i$ as $\discretization_i \gets \discretization_i \cup \{t_a(k)\}$. This densification ensures that the model can distinguish between these close departures in the next iteration, eventually forcing them to satisfy the minimum separation constraint.
+
+\paragraph{Phantom Revenue}
+When a super itinerary $R$ is identified as having phantom revenue (i.e., $s_{Rpl}^* > 0$ in the RFS), the current discretization is too coarse to represent the true physical connectivity or capacity constraints of its constituent itineraries $S_{(R)}$. To eliminate this infeasibility, we refine the discretization along the path of $R$. For each original itinerary $r \in S_{(R)}$ that contributes to the revenue shortfall, we extract the physical arrival and departure times of all its constituent service legs. Let $t^{phys}$ be such a physical time point at node $i$. We update the discretization $\discretization_i \gets \discretization_i \cup \{t^{phys}\}$. By splitting the time nodes at the transition points of the super itinerary, we break the equivalence class $S_{(R)}$, forcing the relaxation model to acknowledge the chronological or capacity conflicts that originally led to the revenue overestimation.
+
+The following theorem guarantees that the refinement strategy will converge to a globally optimal solution after finite iterations.
+\input{thm/refine_converge/_main.tex}

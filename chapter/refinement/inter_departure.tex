@@ -1,0 +1,26 @@
+\subsection{Inter-Departure Violations}
+In the relaxation model, multiple departures on the same segment may be scheduled within a segment's minimum inter-departure time, which violates operational separation constraints. To detect and quantify such violations we define the departure flow inside the window starting at time $t$ on segment $(i,j)$ and compare it with the allowable limit.
+
+Let the set of arcs on segment $s = (i,j)$ be denoted by $\segArcSet{s}$. For each arc $a\in\segArcSet{s}$ write $a=(i,t_a,j,t'_a)$ so that $t_a$ denotes the departure time of $a$. Using the resource assignment variables $\fleetAssignVar_{a,f}$, we define the aggregated departure flow in the interval $[t, t+\minInterdepTime_{s})$ as
+\begin{equation}
+    \arcDepartFlow_{ijt} = \sum_{a\in\segArcSet{s}} \mathbf{1}\{t_a \in [t,\, t+\minInterdepTime_{s})\} \sum_{f\in\fleetSet} \fleetAssignVar_{a,f}.
+\end{equation}
+
+Here $\arcDepartFlow_{ijt}$ denotes the total number of departures measured in assigned flow on segment $(i,j)$ inside the minimum-separation window starting at $t$. In the full-model scope the instantaneous capacity permits at most one departure per separation window, hence the allowable upper bound is $1$. A separation violation occurs when the actual flow exceeds $1$.
+
+We quantify the excess by the Separation Violation Flow
+\begin{equation}
+    \sepViolFlow_{ijt} = \max\bigl\{0,\; \arcDepartFlow_{ijt} - 1\bigr\}.
+\end{equation}
+
+Equivalently one may define the Separation Violation Amount
+\begin{equation}
+    \sepViolAmount_{ij}(t) = \arcDepartFlow_{ijt} - 1,
+\end{equation}
+and truncate to non-negative values when reporting violations.
+
+Detection procedure: compute $\sepViolAmount_{ijt}$ for all segments $(i,j)$ and all discretized start times $t\in\discretization$. If there exists any $t$ such that
+\begin{equation}
+    \sepViolAmount_{ijt} > 0,
+\end{equation}
+then the solution contains an inter-departure violation (the second illegal condition in Theorem~\ref{thm:relax_illegal}). The metric identifies which segments and time windows require refinement or constraint tightening. By adding time points to the discretization $\discretization^{1}$ we can ensure that all these inter-departure violations will not occur in the refined model. Denote the refined discretization as $\discretization^{2}$. The refine procedure will be described in the Subsection~\ref{sec:refine_process}.

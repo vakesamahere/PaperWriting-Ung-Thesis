@@ -1,0 +1,23 @@
+\subsection{Impossible Departures}
+The relaxation model may utilize resource units that physically have not arrived yet but are available in the model for the reason that we allow some short arcs in the relaxation model. This leads to infeasible service connections when we try to implement the solution in reality.
+To detect unrealistic service connections, we apply a flow balance check at each active node $(i, t)$ in the time-space network.
+
+At a specific node $(i, t)$, incoming flow from upstream must support outgoing flow. We categorize the incoming arcs of a resource type $f$ into components. Denote $\holdingArcIn(i, t, f)$ as the holding flow into node $(i, t)$ for resource type $f$, $\flightArc[-,legal](i, t, f)$ as services with feasible turn-around times, i.e., arcs $a = (i, t', j, t)$ where $t' + \travelTime_a \le t$, and $\flightArc[-,illegal](i, t, f)$ as short arcs where $t' + \travelTime_a > t$. We have
+$$\inArcSet{i,t}=\holdingArcIn(i, t, f)\uplus \flightArc[-,legal](i, t, f) \uplus \flightArc[-,illegal](i, t, f)$$
+
+The outgoing flows from node $(i, t)$ for resource type $f$ consist of service departures and holding flows. Denote $\departArc(i, t, f)$ as the departure flow from node $(i, t)$ for resource type $f$, and $\holdingArcOut(i, t, f)$ as the holding flow out of node $(i, t)$ for resource type $f$. We have
+$$\outArcSet{i,t}=\departArc(i, t, f)\uplus \holdingArcOut(i, t, f)$$
+
+At any node $(i, t)$, the available resource units for departure for resource type $f$ is the sum of holding flow and legal service arrivals, i.e., $\sum_{a\in\holdingArcIn(i, t, f)}\fleetAssignVar_{a,f} + \sum_{a\in\flightArc[-,legal](i, t, f)}\fleetAssignVar_{a,f}$. The actual departure demand is $\sum_{a\in\departArc(i, t, f)}\fleetAssignVar_{a,f}$. If the departure demand exceeds the available resource units, i.e.,
+\begin{equation}
+    \sum_{a\in\departArc(i, t, f)}\fleetAssignVar_{a,f} > \sum_{a\in\holdingArcIn(i, t, f)}\fleetAssignVar_{a,f} + \sum_{a\in\flightArc[-,legal](i, t, f)}\fleetAssignVar_{a,f}
+\end{equation}
+then we have impossible departures at node $(i, t)$ for resource type $f$. This means the model is relying on illegal service arcs to satisfy the departure demand, which is infeasible in reality.
+For each active node $(i, t)$ and resource type $f$, we calculate the illegal departure quantity $\impDeparts(i,t,f)$:
+\begin{equation}
+    \impDeparts(i,t,f) = \sum_{a\in\departArc(i, t, f)}\fleetAssignVar_{a,f} - \sum_{a\in\holdingArcIn(i, t, f)}\fleetAssignVar_{a,f} - \sum_{a\in\flightArc[-,legal](i, t, f)}\fleetAssignVar_{a,f}
+\end{equation}
+
+Here, $\impDeparts(i,t,f)$ represents the net demand for resource units that cannot be satisfied by legal means. If $\impDeparts(i,t,f) > 0$, the model is forced to use illegal arrivals $\flightArc[-,illegal]$ to satisfy this departure demand. This metric directly quantifies the illegality.
+
+By adding time points to the discretization $\discretization$ we can ensure that all these illegal departures will not occur in the refined model. Denote the refined discretization as $\discretization^{1}$. The refine procedure will be described in the Subsection~\ref{sec:refine_process}.

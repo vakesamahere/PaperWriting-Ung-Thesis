@@ -1,0 +1,20 @@
+\begin{lemma}
+\label{lem:time_invariance_cost}
+For any time discretization $\discretization$, the operational cost of assigning a resource type $f \in \fleetSet$ to a service arc $a \in \segArcSet{s}$ depends solely on the spatial segment $s \in \segSet$ and the resource type, independent of the departure or arrival times. Consequently, the total operational cost of any feasible routing plan $\mathbf{\fleetAssignVar}$ is completely determined by the macroscopic service frequencies $\freq_{sf} = \sum_{a \in \segArcSet{s}} \fleetAssignVar_{af}$.
+\end{lemma}
+
+\begin{proof}
+By the problem definition, the operational cost $\cost_{af}$ for any service arc $a$ that traverses segment $(i,j)$ using resource type $f$ is a spatial constant $\cost_{sf}$. Let $\mathbf{\fleetAssignVar}$ be a feasible routing vector over a given time discretization. The total operational cost is given by:
+\begin{equation*}
+    \cost(\mathbf{\fleetAssignVar}) = \sum_{f \in \fleetSet} \sum_{a \in \arcSet} \cost_{af} \fleetAssignVar_{af}
+\end{equation*}
+By partitioning the set of all service arcs $\arcSet$ into subsets $\segArcSet{s}$ associated with each spatial segment $s \in \segSet$, we can rewrite the cost as:
+\begin{equation*}
+    \cost(\mathbf{\fleetAssignVar}) = \sum_{f \in \fleetSet} \sum_{s \in \segSet} \sum_{a \in \segArcSet{s}} \cost_{sf} \fleetAssignVar_{af} = \sum_{f \in \fleetSet} \sum_{s \in \segSet} \cost_{sf} \left( \sum_{a \in \segArcSet{s}} \fleetAssignVar_{af} \right)
+\end{equation*}
+Since the macroscopic frequency of resource type $f$ on segment $s$ is defined as $\freq_{sf} = \sum_{a \in \segArcSet{s}} \fleetAssignVar_{af}$, the total cost simplifies exactly to:
+\begin{equation*}
+    \cost(\mathbf{\fleetAssignVar}) = \sum_{f \in \fleetSet} \sum_{s \in \segSet} \cost_{sf} \freq_{sf}
+\end{equation*}
+Thus, the total cost term is invariant to the temporal variables and is purely a function of the spatial frequency vector $\mathbf{\freq}$.
+\end{proof}

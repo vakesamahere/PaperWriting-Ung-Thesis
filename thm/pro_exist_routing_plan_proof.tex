@@ -1,0 +1,96 @@
+\begin{proof}
+    \newcommand{\assignmentVector}{\mathbf{x}}
+    \newcommand{\feasibleSet}{\mathscr{X}}
+    \newcommand{\vectorAdd}{\oplus }
+    \newcommand{\vectorMinus}{\ominus}
+    \newcommand{\vectorLe}{\preceq}
+We fix a resource type $f\in\fleetSet$ and prove the statement for its assignment vector 
+$\assignmentVector^f=\{\fleetAssignVar_{af}\}_{a\in\arcSet}$. $\assignmentVector^f_{a}$ denotes the number of resource type $f$ assigned to arc $a$, which is a non-negative real number.
+
+\paragraph{Step 0. Algebraic structure.}
+Define the flow feasible set denoting all assignment vectors satisfying the flow-balance constraint~\eqref{constr:main.flow}:
+\[
+\feasibleSet_f=\Bigl\{
+\assignmentVector^f\in\mathbb{R}_{\ge0}^{\lvert\arcSet\rvert}\;\Bigm|\;
+\sum_{a\in\outArcSet{i,t}}\assignmentVector^f_{a}-\sum_{a\in\inArcSet{i,t}}\assignmentVector^f_{a}=0,\ \forall(i,t)\in\nodeSet
+\Bigr\}.
+\]
+\[
+    \vectorAdd: \feasibleSet_f \times \feasibleSet_f \to \feasibleSet_f,\quad x \vectorAdd x' = \{x_a + x'_a\}_{a\in\arcSet}
+\]
+\[
+    \vectorMinus: \feasibleSet_f \times \feasibleSet_f \to \feasibleSet_f,\quad x \vectorMinus x' = \{x_a - x'_a\}_{a\in\arcSet}
+\]
+\[
+    \vectorLe: x \vectorLe x' \iff x_a \le x'_a,\ \forall a\in\arcSet
+\]
+$(\feasibleSet_f,\vectorAdd)$ forms a commutative monoid:
+it is closed under addition $\vectorAdd$, associative, and admits the zero vector $\mathbf{0}$ as identity.
+We equip it with the partial order $\vectorLe$ defined componentwise; for $x',x\in\feasibleSet_f$,
+the difference $x\vectorMinus x'$ is defined if $x'\vectorLe x$ and remains in $\feasibleSet_f$.
+
+\paragraph{Step 1. Cycle vectors.}
+A \emph{directed cycle} $C=(a_1,\ldots,a_L)$ is a finite sequence of arcs 
+forming a closed walk on $\net$; the same arc may appear multiple times along $C$.
+For any arc $a\in\arcSet$, denote by
+\[
+    \nu_{C}(a) := \#\{r\in\{1,\ldots,L\}\mid a_r = a\}
+\]
+its multiplicity within $C$.
+For any scalar $z\ge 0$, define its \emph{cycle vector}
+\[
+v(C;z)_a=
+\begin{cases}
+z\,\nu_{C}(a),& a\in C,\\[2pt]
+0,&\text{otherwise}.
+\end{cases}
+\]
+Then $v(C;z)\in\feasibleSet_f$ because every node on the cycle has one incoming and one outgoing arc,
+and scaling by $z$ preserves the flow-balance constraint~\eqref{constr:main.flow}.
+
+\paragraph{Step 2. Existence of a directed cycle.}
+For a nonzero $\assignmentVector\in\feasibleSet_f$, define the positive-support subgraph 
+${\net}^+(\assignmentVector)$ induced by $\arcSet^+(\assignmentVector)=\{a\in\arcSet\mid \assignmentVector_a>0\}$.
+At every node of ${\net}^+(\assignmentVector)$, the flow-balance constraint ensures
+$\text{outdegree}\ge1$ and $\text{indegree}\ge1$.
+Starting from any node with positive outflow and following positive arcs,
+finiteness of the network implies that a node must repeat, 
+thus forming a directed cycle $C\subseteq \arcSet^+(\assignmentVector)$.
+
+\paragraph{Step 3. Greedy peeling procedure.}
+Let $z=\min_{a\in C}\assignmentVector_a/\nu_{C}(a)>0$ (so that $v(C;z)\vectorLe \assignmentVector$) and define $\assignmentVector':=\assignmentVector-v(C;z)$.
+Then:
+\begin{itemize}
+\item $\assignmentVector'\ge0$ componentwise, because $z$ is the minimum scaled value $\assignmentVector_a/\nu_C(a)$;
+\item $\assignmentVector'\in\feasibleSet_f$, since both $\assignmentVector$ and $v(C;z)$ satisfy~\eqref{constr:main.flow};
+\item the support strictly shrinks: $\arcSet^+(\assignmentVector')\subsetneq \arcSet^+(\assignmentVector)$.
+\end{itemize}
+Therefore, for $\assignmentVector^f$ iterating this procedure finitely many times (at most $|A^+(\assignmentVector^f)|$)
+yields a decomposition
+\[
+\assignmentVector^f=\sum_{k=1}^{K}v(C_k;z_k),\qquad K\le|A^+(\assignmentVector^f)|.
+\]
+
+\paragraph{Step 4. Constructing the routing plan.}
+For each cycle $C_k$, let $\pathInRoute{f}{k}$ be its projection onto the set of service arcs
+$\flightArc$.
+Let $\routeAmount{\pathInRoute{f}{k}}:=z_k$, and denote
+\[
+    \nu_{fk}(a)
+        := \#\{r\mid a_{k,r}=a\}
+        = \nu_{C_k}(a),
+\]
+the number of times arc $a$ appears in the projected cycle (if $a\notin C_k$, the count is zero).
+Then, for any $a\in\flightArc$,
+\[
+\sum_{k=1}^{K}\routeAmount{\pathInRoute{f}{k}}\nu_{fk}(a)
+=\sum_{k=1}^{K}v(C_k;z_k)_a
+=\assignmentVector^f_a
+=\fleetAssignVar_{af},
+\]
+Define 
+$\route{f}=\{(\pathInRoute{f}{k},\routeAmount{\pathInRoute{f}{k}})\}_{k=1}^{K}$
+and 
+$\routingPlan(\solution)=\{\route{f}\mid f\in\fleetSet\}$.
+Hence, for every resource type $f$, we can derive a routing plan consistent with its assignment vector.
+\end{proof}

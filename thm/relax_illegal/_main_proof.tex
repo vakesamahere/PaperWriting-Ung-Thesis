@@ -1,0 +1,52 @@
+\begin{proof}
+By Definition \ref{def:illegal_solution}, a relaxation solution $\solution_{rel} = (\fleetAssignVar^*, \shareVar^*, \outsideShareVar^*)$ with objective value $Z_{rel}^*$ is illegal if we cannot find a valid passenger allocation $(\shareVar, \outsideShareVar)$ such that $\solution = (\fleetAssignVar^*, \shareVar, \outsideShareVar)$ is feasible in the full model $\model{\discretizationFull}$ and achieves $Z = Z_{rel}^*$. We prove the theorem by establishing sufficiency and necessity.
+
+\textbf{Sufficiency (If any condition holds, the solution is illegal):} \\
+We establish sufficiency by demonstrating that each condition explicitly produces a mathematical inequality that strictly contradicts the constraint formulation of the full model $\model{\discretizationFull}$.
+
+\begin{itemize}
+    \item \textit{Condition 1 holds ($\impDeparts(i,t,f) > 0$):} 
+    In the full model $\model{\discretizationFull}$, the exact chronological flow conservation \eqref{constr:main.flow} combined with the non-negativity of variables explicitly requires that the total departure flow at any node $(i,t)$ must be bounded by the physically arrived and holding supply. The full model formulation algebraically mandates:
+    \begin{equation}
+        \sum_{a\in\departArc(i, t, f)} \fleetAssignVar_{af} \;\le\; \sum_{a\in\holdingArcIn(i, t, f)} \fleetAssignVar_{af} \;+\; \sum_{a\in\flightArc[-,legal](i, t, f)} \fleetAssignVar_{af} \quad \text{(Full Model Constraint)} \label{eq:proof.flow.legal}
+    \end{equation}
+    However, Condition 1 explicitly states that the relaxation assignment $\fleetAssignVar^*$ strictly violates this bound:
+    \begin{equation}
+        \sum_{a\in\departArc(i, t, f)} \fleetAssignVar_{af}^* \;>\; \sum_{a\in\holdingArcIn(i, t, f)} \fleetAssignVar_{af}^* \;+\; \sum_{a\in\flightArc[-,legal](i, t, f)} \fleetAssignVar_{af}^* \quad \text{(Condition 1)}
+    \end{equation}
+    This is a direct algebraic contradiction. Thus, $\fleetAssignVar^*$ cannot be a feasible assignment in $\model{\discretizationFull}$, rendering the solution illegal.
+    
+    \item \textit{Condition 2 holds ($\arcDepartFlow_{ijt} > 1$):} 
+    The full model explicitly enforces the minimum departure separation time via the cooldown constraint \eqref{constr:main.cooldown}, which algebraically mandates an upper bound of $1$:
+    \begin{equation}
+        \sum_{f\in \fleetSet}\sum_{a\in \arcDuringSepTime_{ijt}} \fleetAssignVar_{af} \;\le\; 1 \quad \text{(Full Model Constraint \ref{constr:main.cooldown})}
+    \end{equation}
+    However, the definition of Condition 2 explicitly produces a strictly opposite inequality under the assignment $\fleetAssignVar^*$:
+    \begin{equation}
+        \sum_{f\in \fleetSet}\sum_{a\in \arcDuringSepTime_{ijt}} \fleetAssignVar_{af}^* \;=\; \arcDepartFlow_{ijt} \;>\; 1 \quad \text{(Condition 2)}
+    \end{equation}
+    This explicitly contradicts \eqref{constr:main.cooldown}, confirming the feasible space is empty ($\emptyset$).
+    
+    \item \textit{Condition 3 holds ($\sum s_{Rpl}^* > 0$):} 
+    Assume Conditions 1 and 2 do not hold, so $\fleetAssignVar^*$ satisfies the physical network constraints. To be a legal solution achieving $Z = Z_{rel}^*$, there must exist passenger variables $(\shareVar, \outsideShareVar)$ that satisfy the exact choice and capacity formulation of $\model{\discretizationFull}$ while replicating the relaxation revenue. This algebraically mandates that the following system of inequalities must have a feasible solution:
+    \begin{equation}
+    \begin{cases}
+        \text{Eq. \eqref{constr:main.choice.ratio}, \eqref{constr:main.choice.limit}, \eqref{constr:main.choice.capacity}, \eqref{constr:main.choice.covering}} & \text{(Full Model Constraints under } \fleetAssignVar^*) \\
+        \sum_{m,p,l} \sum_{r \in \itinInMarket_m} \demand_{mp} \fare_{rl} \shareVar_{rpl} \;\ge\; \sum_{m,p,l} \sum_{R \in \itinSuperInMarket_m} \demand_{mp} \fare_{Rl} \shareVar_{Rpl}^* & \text{(Target Revenue Requirement)}
+    \end{cases}
+    \end{equation}
+    However, the Revenue Feasibility Subproblem (RFS) maximizes exactly the left-hand side of the revenue requirement subject to the four full-model constraints. Condition 3 ($\sum s_{Rpl}^* > 0$) guarantees that the maximum possible revenue is strictly bounded below the target. Therefore, for all $(\shareVar, \outsideShareVar)$ within the full-model constraints, the exact opposite inequality holds:
+    \begin{equation}
+        \sum_{m,p,l} \sum_{r \in \itinInMarket_m} \demand_{mp} \fare_{rl} \shareVar_{rpl} \;<\; \sum_{m,p,l} \sum_{R \in \itinSuperInMarket_m} \demand_{mp} \fare_{Rl} \shareVar_{Rpl}^* \quad \text{(Condition 3 Implication)}
+    \end{equation}
+    This explicit contradiction proves the constraint system is algebraically infeasible. The solution is therefore illegal.
+\end{itemize}
+
+\textbf{Necessity (If the solution is illegal, at least one condition must hold):} \\
+Assume $\solution_{rel}$ is illegal. By Definition \ref{def:illegal_solution}, under the fixed assignment $\fleetAssignVar^*$, either the feasible space for passenger allocations in $\model{\discretizationFull}$ is empty, or the space is non-empty but the maximum achievable objective is strictly less than $Z_{rel}^*$.
+\begin{itemize}
+    \item If the feasible space is empty, $\fleetAssignVar^*$ breaks the physical formulation of $\model{\discretizationFull}$. Since aggregate spatial flow and choice bounds are strictly preserved by the mapping (Theorem \ref{pro.valid_relaxation}), the algebraic contradiction must occur in the exact chronological constraints. It must either strictly violate the flow conservation limit (triggering Condition 1's inequality) or strictly violate the instantaneous separation capacity (triggering Condition 2's inequality).
+    \item If the feasible space is non-empty but the maximum achievable objective is $Z < Z_{rel}^*$, the illegality is entirely due to revenue overestimation. Because the RFS is mathematically equivalent to optimizing over the full-model constraints \eqref{constr:main.choice.ratio}-\eqref{constr:main.choice.covering}, an inability to meet the target revenue strictly forces the RFS penalty objective $\sum s_{Rpl}^*$ to be strictly positive (triggering Condition 3).
+\end{itemize}
+Therefore, an illegal solution must trigger at least one of the three mutually exhaustive conditions, completing the proof.
+\end{proof}

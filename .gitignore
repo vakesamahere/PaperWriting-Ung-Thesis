@@ -17,6 +17,11 @@ _out
 *.toc
 *.xdv
 *.synctex.gz
+*.synctex(busy)
+*SAVE-ERROR
+*.toc
+
+template/
 
 # minted
 _minted*

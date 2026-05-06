@@ -1,0 +1,67 @@
+\chapter{Computational Study}
+\label{sec:comp_study}
+
+To demonstrate the practical applicability of the proposed \algoNotation framework, we apply it to airline schedule planning---a canonical instance of service network design with passenger choice. In this setting, the network nodes correspond to airports, the service resource types correspond to aircraft fleet types, the service arcs correspond to scheduled flights, and the spatial segments correspond to origin-destination airport pairs. This application domain is particularly well-suited for evaluating our framework because it exhibits all the computational challenges discussed in the preceding sections: a large number of feasible itineraries, strong coupling between markets through shared network capacity, and the need for precise temporal resolution.
+
+We evaluate the performance of the \algoNotation framework using real-world instances derived from Frontier Airlines (F9), and compare against a baseline of solving the integrated model directly using a state-of-the-art solver (referred to as the ``Raw Model''). To stress-test scalability, we systematically vary the planning horizon from $0.5\times$ to $3\times$ the base 24-hour period, producing six instances of increasing size.
+
+\section{Experimental Setup}
+The Frontier Airlines (F9) case study represents an ultra-low-cost carrier (ULCC) network characteristic of highly competitive airline markets in the United States.
+
+The network encompasses $60$ airports and $259$ directed flight segments. The airline operates a homogeneous Airbus A320-family fleet, modeled with $4$ specific fleet sub-types to account for varying seating capacities and operating costs. The seat capacities primarily range between $186$ and $228$ seats. The passenger demand side includes $382$ origin-destination (OD) markets. We consider routing options with up to $2$ connections and a maximum connection window of $3$ hours.
+
+The base case (F9-1.0x) is constructed with a 24-hour planning horizon and a time discretization of $15$ minutes ($96$ intervals per day). This resolution is chosen to align with the industry-standard on-time performance threshold: in commercial aviation, an arrival within $15$ minutes of the scheduled time is considered on-time by regulatory authorities. This discretization step therefore represents the finest temporal granularity at which schedule deviations are operationally meaningful. A total of $475{,}776$ feasible itineraries are generated for this base case. Coupling nearly half a million itinerary variables with discrete fleet assignment constraints results in an extremely dense mathematical program, pushing the limits of conventional computational resources.
+
+To investigate how the framework scales with problem size, we construct five additional instances by varying the planning horizon. The scaled variants adopt a 45-minute discretization step to keep the number of time intervals tractable while extending the horizon. The F9-0.5x instance covers a 12-hour horizon with $81{,}252$ itineraries; F9-1.5x extends to 36 hours with $557{,}028$ itineraries; F9-2.0x to 48 hours with $951{,}552$; F9-2.5x to 60 hours with $1{,}032{,}804$; and F9-3.0x to 72 hours with $1{,}427{,}328$ itineraries. All instances share the same network of $60$ airports, $259$ segments, $4$ fleet sub-types, and $382$ OD markets.
+
+\section{Computational Performance}
+We compare the convergence behavior and tractability of the \algoNotation algorithm against the Raw Model baseline. Each instance is evaluated at a 2-hour and a 12-hour computational checkpoint. A gap below $1\%$ is treated as effectively optimal; once this threshold is reached, the clock stops. The results are summarized in Table~\ref{tab:f9_horizon_scaling}.
+
+\begin{table}[htbp]
+\centering
+\caption{Performance comparison under different planning horizons}
+\label{tab:f9_horizon_scaling}
+\begin{tabular}{lcccc}
+\toprule
+Case & Raw Gap (2h) & \algoNotation Gap (2h) & Raw Gap (12h) & \algoNotation Gap (12h) \\
+\midrule
+F9-0.5x & 9.44\%  & 11.79\% & 3.10\%  & 6.11\%  \\
+F9-1.0x & 18.40\% & 1.84\%  & 4.75\%  & $<1\%$ (2.1h) \\
+F9-1.5x & 13.09\% & $<1\%$ (0.1h) & $<1\%$ (5.7h) & $<1\%$ (0.1h) \\
+F9-2.0x & --      & 1.25\%  & 15.26\% & 1.25\%  \\
+F9-2.5x & 19.65\% & 1.91\%  & 18.06\% & 1.89\%  \\
+F9-3.0x & --      & $<1\%$ (1.3h) & -- & $<1\%$ (1.3h) \\
+\bottomrule
+\end{tabular}
+\vspace{0.5em}
+\begin{minipage}{0.88\textwidth}
+\footnotesize
+Notes: A gap below 1\% is reported as $<1\%$, with the actual time to reach the threshold shown in parentheses. ``--'' indicates that the raw model did not return a usable feasible incumbent or bound within the corresponding time limit.
+\end{minipage}
+\end{table}
+
+On the base case (F9-1.0x), when the complete integrated model with $475{,}776$ itinerary variables is passed directly to the Gurobi solver, the root relaxation and integer bounding processes suffer from massive fractional degeneracy. After a continuous 12-hour execution, the Raw Model only manages to close the gap to $4.75\%$. The \algoNotation algorithm, by contrast, reaches effective optimality ($<1\%$) in just $2.1$ hours by leveraging the Lower Bound Model to achieve a much tighter bound and solving a sequence of compact upper-bound sub-problems.
+
+As the planning horizon grows, the advantage of \algoNotation becomes more pronounced. For the two largest instances (F9-2.0x and F9-3.0x), the raw solver fails to produce any usable bound within 2 hours---it is still processing the root LP relaxation. At 12 hours, the raw model on F9-2.0x and F9-2.5x still exhibits gaps of $15\%$--$18\%$, while F9-3.0x never escapes the LP relaxation phase entirely. The \algoNotation algorithm, meanwhile, reaches $<1\%$ on F9-3.0x in just $1.3$ hours and maintains gaps of $1\%$--$2\%$ on the remaining large instances.
+
+Notably, the \algoNotation algorithm performs \emph{better} on some of the larger instances than on the smallest one (F9-0.5x). The F9-1.5x and F9-3.0x cases reach optimality in under $1.5$ hours, while F9-0.5x retains a $6\%$ gap at 12 hours. This can be attributed to the interaction between horizon length and temporal granularity: the 45-minute discretization used in the scaled instances reduces the number of time points per airport, shrinking the relaxation model solved in each \algoNotation iteration and enabling faster convergence of the lower bound. The F9-0.5x instance, with only 16 time points and a 12-hour horizon, offers limited temporal flexibility for the relaxation, leading to weaker bounds.
+
+The F9-0.5x instance is also the only case where the raw model outperforms \algoNotation at both checkpoints. With only $81{,}252$ itineraries and a compact formulation, the raw MIP is small enough for the solver to make steady progress through branch-and-bound. The \algoNotation algorithm's iterative decomposition incurs overhead that is not fully amortized on such a small instance. This highlights that the \algoNotation framework is specifically designed for---and most beneficial on---large-scale instances where the monolithic formulation becomes intractable.
+
+The unexplored node counts of the branch-and-bound trees are plotted in Figure~\ref{fig:comp_tree} for the F9-1.0x instance, which clearly shows that the Raw Model's tree keeps expanding while the incumbent solution and the lower bound remain nearly unchanged.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.75\textwidth]{figure/img/unexpl_raw_end_both.pdf}
+    \caption{Comparison of the Branch-and-Bound tree expansion (unexplored nodes) between the models over time.}
+    \label{fig:comp_tree}
+\end{figure}
+In contrast, the \algoNotation algorithm finishes in an early stage of the branch-and-bound process, with a much smaller tree. The \algoNotation algorithm circumvents the weak LP relaxation by leveraging the Lower Bound Model (LBM) to achieve a much tighter lower bound. This structural advantage becomes increasingly pronounced as the planning horizon grows: the raw model's tree explodes in size while the \algoNotation sub-problems remain compact.
+
+\section{Analysis of the Optimized Schedule}
+The globally optimal solution of the base case (F9-1.0x) yields profound operational and commercial insights into scheduling behavior. We systematically extract the activated variables from the exact solution to analyze the underlying operations.
+
+The optimal schedule physically activates exactly $348$ flights, maintaining active service across all $60$ airports in the specified network. The fleet assignment perfectly balances the available sub-types based on demand density: $178$ of the scheduled flights are operated by the higher-capacity A321-271NX, while the remaining $170$ flights are allocated to the A320-214. This heterogeneous deployment ensures that the largest aircraft are strictly assigned to trunk routes with sufficient consolidated demand, minimizing the per-seat-mile cost, while the smaller variants are deployed to efficiently fulfill secondary frequency requirements without excessive capacity spoilage.
+
+Rather than attempting to blindly serve all potential OD pairs, the algorithm exhibits acute profitability-driven selectivity. Out of the $382$ markets, the schedule strategically captures demand from only the $120$ most profitable markets, consciously abandoning structurally unprofitable ones to conserve operating costs. Within these targeted markets, the Sales-Based Linear Program (SBLP) component secures an average market share of $5.42\%$. This is higher than F9's historical market share of $4.85\%$ across these markets, indicating that the optimized schedule is effectively capturing a larger portion of the demand in the most lucrative segments.
+
+Furthermore, the optimization exploits the network's spatial connectivity. The optimal passenger allocation actively utilizes $112$ multi-leg connecting itineraries compared to only $64$ direct itineraries. This heavy reliance on connecting itineraries demonstrates the model's ability to efficiently stitch together fractional demand from disparate markets. By chronologically synchronizing the departure and arrival bounds of physical flights across focus cities, the \algoNotation framework seamlessly captures indirect demand and maximizes the total system-wide operating profit.

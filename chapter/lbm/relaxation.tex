@@ -1,0 +1,382 @@
+\section{Relaxation Model $\model{\discretization, \itinSetSuper}$ via Discritization and Itinerary Aggregation}
+\label{sec:lbm}
+
+To address the tractability issues of the full time-space network, we introduce a time relaxation approach. The central idea of this step is to formulate a relaxed model on a much coarser, partially discretized time-space network, thereby drastically reducing the problem size while still guaranteeing a valid theoretical lower bound for the exact algorithm. This base model ignores certain strict timing feasibility requirements which are subsequently resolved in later algorithm stages. The model proposed in this section is called the Lower Bound Model (LBM) or the relaxation model in the rest of the paper.
+
+% \section*{Understanding $\discretization$}
+We consider $\discretization$ as a transformation of $\discretizationFull$. The transformation can be seen as aggregations of time-arcs. 
+Every time-arc in $\full{\net}$ have a corresponding arc in $\net$.That means, we have some time-nodes $(i,t)$ in $\discretization$. All time-arcs $\full{\net}$ will exist in $\net$, and their start time, end time, and travel time may change because they can only use time-nodes in $\discretization$. In order to ensure the optimality, we can let the travel time be shorter than what they are. And there may even be inverse arcs whose start time is later than finish time.
+The time-expanded network $\net = (\nodeSet, \arcSet)$, where $\nodeSet = \{(i,t)\mid \forall i\in\airportSet, t\in\discretization_i\},\;\arcSet = \holdingArc \cup \flightArc$, constructed from time discretization $\discretization$ satisfies the following properties:
+% \[
+%     \net = (\nodeSet, \arcSet)
+% \]
+% \[
+%     \nodeSet = \{(i,t)\mid \forall i\in\airportSet, t\in\discretization_i\},\;\arcSet = \holdingArc \cup \flightArc
+% \]
+% \[
+%     \net = \Phi(\netFlat, \discretization) = \Phi(\airportSet,\segSet,\discretization)
+% \]
+\begin{property}[Domain of Discretization $\discretization$]
+    $\forall i\in\airportSet,\,\{\planningStart\}\subseteq\discretization_i\subseteq\discretizationFull_i$
+\end{property}
+\begin{property}[Nodes $\nodeSet = \Phi_{\nodeSet}(\netFlat, \discretization)$]
+    Node set $N$ contains node $(i,\planningStart)\;\forall i\in\airportSet$
+\end{property}
+\begin{property}[Holding Arcs]
+    \label{def:relax.holdingArc}
+    Each ground arc $a\in\holdingArc$ is defined as $a=((i,t),(i,t^{+}))$, where
+    $$t^{+}=\begin{cases}
+            \min\{\bar{t}\mid\bar{t}>t,\bar{t}\in\discretization_i\} & ,\exists\bar{t}>t,\bar{t}\in\discretization_i\\
+            \planningStart & ,\text{otherwise}
+    \end{cases}$$
+\end{property}
+\begin{property}[Service Arcs]
+    \label{def:relax.flightArc}
+    Each flight arc $a\in\flightArc$ is defined as $a=((i,t),(j,t^\prime)),\;\forall (i,j)\in\segSet,t\in\discretization_i$, where
+    $$t^\prime=\max\{\bar{t}\mid\bar{t}\leq(t+\travelTime_{ij})\;\text{mod}\;(\planningEnd-\planningStart)+\planningStart,\bar{t}\in\discretization_j\}$$
+\end{property}
+
+Denote the arc mapping induced by the discretization transformation as
+$\Phi_{\arcSet}:\full{\arcSet}\to \widetilde{\arcSet}$,
+where $\widetilde{\arcSet}:=\arcSet\cup\{\bot\}$ augments the partial network with a virtual symbol $\bot$ capturing collapsed holding arcs.
+For $a\in\arcSet$ define its pre-image
+$\Phi_{\arcSet}^{-1}(a)=\{a'\in\full{\arcSet}\mid\Phi_{\arcSet}(a')=a\}$, and let
+$\Phi_{\arcSet}^{-1}(\bot)$ collect the arcs mapped to the virtual element.
+Define analogously $\Phi_{\nodeSet}:\full{\nodeSet}\twoheadrightarrow\nodeSet$
+and $\Phi_{\nodeSet}^{-1}(i,t)=\{(i,\tau)\in\full{\nodeSet}\mid\Phi_{\nodeSet}(i,\tau)=(i,t)\}$.
+
+For every node $i\in\airportSet$, Property~1 gives $\{\planningStart\}\subseteq\discretization_i\subseteq\discretizationFull_i$,
+so we may introduce the projection
+\[
+    \phi_i:\discretizationFull_i\to\discretization_i,\qquad 
+    \phi_i(\tau)=\max\{\bar{t}\in\discretization_i\mid \bar{t}\le \tau\}.
+\]
+Property~2 yields $\Phi_{\nodeSet}((i,\tau))=(i,\phi_i(\tau))$.
+Using Properties~3 and 4, the arc mapping of $(i,\tau)\rightarrow(j,\tau')$ is specified as
+\begin{equation}
+    \Phi_{\arcSet}(((i,\tau)\rightarrow(j,\tau'))) =
+    \begin{cases}
+        ((i,\phi_i(\tau))\rightarrow(j,\phi_j(\tau'))), & \text{if } i\neq j,\\[2pt]
+        ((i,\phi_i(\tau))\rightarrow(i,\phi_i(\tau'))), & \text{if } i=j,\ \phi_i(\tau)<\phi_i(\tau'),\\[2pt]
+        \bot, & \text{if } i=j,\ \phi_i(\tau)=\phi_i(\tau').
+    \end{cases}
+\end{equation}
+Each service arc keeps its tail on the rounded-down partial times and sets its head to the latest partial time point that the travel time is not increased, whereas a holding arc bridges to the next partial node if one exists, and otherwise collapses into $\bot$ when both endpoints project to the same partial node.
+
+\section*{Variables}
+\subsection*{Fleet Assignment Variable $\fleetAssignVar_{af} = \fleetAssignVar_{a^{\discretization},f}^{\net}$}
+\[
+    \fleetAssignVar_{a^{\discretization},f}^{\net} = \sum_{a^{\discretizationFull}:\, \Phi(a^{\discretizationFull}) = a^{\discretization}}\fleetAssignVar_{a^{\discretizationFull},f}^{\full{\net}}
+\]
+\subparagraph*{Domain}
+\begin{equation}
+    \fleetAssignVar_{af}\in\mathbb{Z}_{\ge0} \quad \forall a\in \flightArc, \; \forall f\in \fleetSet
+    % temp-command \tag{2j}
+    \label{constr:relax.domain.x.flight}
+\end{equation}
+which ensures optimality.
+Therefore domains of some $\fleetAssignVar_{a,f}$ need to change.
+
+\section*{Constraints Transformation}
+Below we show systematically about the algorithmical influence of applying the partial discretization.
+Considering each constraint. (\ref{constr:main.flow}, \ref{constr:main.seg_freq}) keeps. (\ref{constr:main.choice.ratio}, \ref{constr:main.choice.limit}, \ref{constr:main.choice.capacity}, \ref{constr:main.choice.covering}) keeps. The only differences of constraints above are the sets of arcs and nodes are changed to the ones in the partial network. However, some constraints need to be modified to ensure the optimality of the relaxation model.
+
+% (\ref{constr:main.fleet_available}) may have problems when there are inverse arcs. Right hand sides of (\ref{constr:main.cooldown}) need to be the value of the maximum flights of next time periods.
+
+An resource unit may be counted twice when traveling through blue paths. The blue service arcs are not counted directly, but their two blue holding arcs are, each adding 1 to the total.
+\input{figure/inverse_arc.tex}
+Let set $\invertArcTc{t_c}$ denotes inverse(except wrapped) arcs across $t_c$:
+\begin{equation}
+\begin{aligned}
+    \invertArcTc{t_c} = \{a=((i,t)\rightarrow(j,t^\prime))\;\forall a\in\flightArc\mid t^\prime\leq t_c<t<t+\travelTime_{ij}<\planningEnd\}
+    % temp-command \tag{def$_{\invertArcTc{t_c}}$}
+    \label{def:relax.invertArcTc}
+\end{aligned}
+\end{equation}
+Therefore, the fleet availability constraints are modified to
+\begin{equation}
+    \sum_{a\in \holdingArcTc{\checkTime}} \fleetAssignVar_{af} + \sum_{a\in \flightArcTc{\checkTime}} \fleetAssignVar_{af} - \sum_{a\in \invertArcTc{\checkTime}} \fleetAssignVar_{af} \le \fleetAvail_{f}
+    \quad \forall f\in \fleetSet
+    % temp-command \tag{2c}
+    \label{constr:relax.fleet_available}
+\end{equation}
+
+Aggregation may cause numbers of services which are originally far away from each other depart at same or relative closer time in the relaxation model. In order to ensure the optimality of the relaxation model, we need to enable departure-pairs which are legal in the full network.
+Right hand sides of (\ref{constr:main.cooldown}) need to be the value of the maximum services of next time periods.
+% \subparagraph*{Set of arcs for segment $(i,j)$ at time $t$: $\arcDuringSepTime_{ijt}^\discretization$}
+% % \begin{align}
+% %     \arcDuringSepTime_{ijt}^\discretization = \{&a=((i,t^\prime)\rightarrow(j,t^{\prime\prime}))\;\forall a\in\flightArc\mid
+% %     && t\leq t^\prime<t+\minInterdepTime_{ij}<\planningEnd \cup t\leq t^\prime<\planningEnd<t+\minInterdepTime_{ij}\notag \\
+% %     &&& \cup t^\prime<t+\minInterdepTime_{ij}-(\planningEnd-\planningStart)<\planningEnd<t+\minInterdepTime_{ij}\}\notag \\
+% %     = \{&a=((i,t^\prime)\rightarrow(j,t^{\prime\prime}))\;\forall a\in\flightArc\mid
+% %     && t\leq t^\prime<t+\minInterdepTime_{ij}\notag \\
+% %     &&& \cup t^\prime<t+\minInterdepTime_{ij}-(\planningEnd-\planningStart)<\planningEnd<t+\minInterdepTime_{ij}\}
+% %     % temp-command \tag{def$_{\arcDuringSepTime_{ijt}^\discretization}$}
+% %     \label{def:relax.arcDuringSepTime}
+% % \end{align}
+% \begin{equation}
+%     \arcDuringSepTime_{ijt}^\discretization = \{a=((i,t^\prime)\rightarrow(j,t^{\prime\prime}))\;\forall a\in\flightArc\mid t\leq t^\prime<t+\minInterdepTime_{ij} \}
+%     \label{def:relax.arcDuringSepTime}
+% \end{equation}
+The upper bound of the number of services which can depart in the interval $[t, t+\minInterdepTime_{ij})$, $\departLimit_{ijt}$ is defined as:
+\begin{equation}
+\begin{aligned}
+    \departLimit_{ijt} & = \begin{cases}
+        \lceil \frac{t^{+}-t}{\minInterdepTime_{ij}}\rceil & t^{+}-t>0\notag\\
+        \lceil \frac{\planningEnd-\planningStart+t^{+}-t}{\minInterdepTime_{ij}}\rceil & t^{+}-t<0
+    \end{cases} \\
+    & = \lceil \frac{t^{+}-t+\frac{\planningEnd-\planningStart}{2}(\frac{t^{+}-t-|t^{+}-t|}{|t^{+}-t|})}{\minInterdepTime_{ij}}\rceil
+    % temp-command \tag{def$_{\departLimit_{ijt}}$}
+    \label{def:relax.departLimit}
+\end{aligned}
+\end{equation}
+where
+$
+    t^{+}=\min\{\bar{t}\in\discretization_i\mid\bar{t}>\max\{\bar{\bar{t}}\mid(i,\bar{\bar{t}},j,\bar{\bar{t}}^\prime)\in\arcDuringSepTime_{ijt}^\discretization\}\}
+$
+Therefore, the frequency constraints are modified to
+\begin{equation}
+    \sum_{f\in \fleetSet}\sum_{a\in \arcDuringSepTime_{ijt}} \fleetAssignVar_{af} \le \departLimit_{ijt}
+    \quad \forall (i,j)\in \segSet,\; \forall t \in \discretization_i
+    % temp-command \tag{2d}
+    \label{constr:relax.cooldown}
+\end{equation}
+
+\subsection{Topology-Aware Heterogeneous Initial Discretization}\label{sec:init_disc_detail}
+
+The arc-mapping rules defined in Properties~\ref{def:relax.holdingArc}--\ref{def:relax.flightArc} reveal a structural vulnerability of uniform coarse discretizations. Under Property~\ref{def:relax.flightArc}, the arrival time of a service arc on segment $(j,i)$ departing at $t \in \discretization_j$ is set to the latest grid point in $\discretization_i$ no later than $t + \travelTime_{ji}$ (floor mapping). If a uniform step size $\discretizationStep$ is applied across all nodes and $\discretizationStep > \travelTime_{ji}$ for some segment $(j,i)$, the mapped arrival time $t'$ may satisfy $t' \le t$, producing an inverse arc in which a resource unit appears to arrive no later than it departs. As shown in Equation~\eqref{def:relax.invertArcTc} and Constraint~\eqref{constr:relax.fleet_available}, inverse arcs require dedicated correction terms in the fleet availability constraints. More critically, they open up a large region of physically infeasible solutions in the relaxation, severely degrading the lower bound quality.
+
+To eliminate inverse arcs at their source, we adopt a topology-aware heterogeneous initial discretization. Instead of a single global step, each node $i \in \airportSet$ receives an individual initial step size $\initStep_i$ defined as the minimum inbound travel time:
+\begin{equation}\label{eq:init_step}
+    \initStep_i = \min_{j:\,(j,i)\in\segSet} \left\{ \travelTime_{ji} \right\}.
+\end{equation}
+For nodes with no inbound segments, we set $\initStep_i = \planningEnd - \planningStart$ as a safe default. The initial time point set for node $i$ is then generated as the arithmetic progression
+\begin{equation}\label{eq:init_discretization}
+    \discretization_i = \left\{ t \;\middle|\; t = \planningStart + k \cdot \initStep_i,\quad k \in \mathbb{Z}_{\ge 0},\quad t < \planningEnd \right\}.
+\end{equation}
+
+\begin{proposition}[Elimination of Inverse Arcs]\label{prop:no_inverse}
+    Under the initial discretization defined by \eqref{eq:init_step}--\eqref{eq:init_discretization}, the relaxed network $\net$ contains no inverse arcs, i.e., for every flight arc $a = ((j,t) \to (i,t')) \in \flightArc$ with $(j,i) \in \segSet$, we have $t' > t$.
+\end{proposition}
+\begin{proof}
+    By Property~\ref{def:relax.flightArc}, $t' = \max\{\bar{t} \in \discretization_i \mid \bar{t} \le t + \travelTime_{ji}\}$. Since $\discretization_i$ is an arithmetic progression with common difference $\initStep_i \le \travelTime_{ji}$ (by \eqref{eq:init_step}), the interval $(t,\, t + \travelTime_{ji}]$ has length $\travelTime_{ji} \ge \initStep_i$ and therefore contains at least one grid point of $\discretization_i$. Hence $t' \ge t + \initStep_i > t$ (noting $\initStep_i > 0$ by construction).
+\end{proof}
+
+Beyond ensuring physical feasibility, this strategy provides two additional benefits.
+
+\paragraph{Topology-adaptive variable compression.}
+The heterogeneous step sizes naturally adapt to the hub-and-spoke structure of real-world service networks. Hub nodes, which receive many short-haul services, obtain a small $\initStep_i$ and hence a finer grid that preserves temporal precision. Spoke nodes served predominantly by long-haul segments receive a large $\initStep_i$ and a correspondingly coarser grid. This self-adaptive behavior keeps the total number of initial time points---and consequently the number of decision variables---compact without sacrificing the physical validity of the network, avoiding out-of-memory failures that arise when a uniformly fine grid is applied to large-scale instances.
+
+\paragraph{Tighter initial relaxation.}
+By precluding inverse arcs, the initial relaxation model operates over a solution space that is already free of the most egregious chronological violations. This yields a substantially tighter lower bound from the very first iteration, reducing the number of refinement iterations required for convergence.
+
+\subsection{Itinerary Aggregation}
+The full model typically exhibits a large optimality gap, as its LP relaxation allows fractional resource flows to be split across multiple adjacent departure-time arcs.
+This enables a single resource unit to be reused fractionally, collecting revenue from several nearby time-arcs.
+Moreover, some time-arcs generate revenue only when the corresponding resource flow increases from zero to a small positive value.
+As a result, the LP relaxation can exploit the high initial revenue portions of multiple time-arcs without paying the full operating cost on any individual arc, leading to significant revenue overestimation.
+
+The relaxation model based on time-arc aggregation we have introduced above, in which each time-arc represents a larger time interval is a valid relaxation of the original model and is designed to be solved efficiently, is not introduced to address the revenue-overestimation issue. The structural revenue-overestimation problem caused by fractional resource reuse is inherited by the relaxation model.
+Moreover, due to the nature of the aggregation, this issue may persist even in the integer solutions of the relaxation model.
+Consequently, although the relaxation is computationally attractive, it does not by itself eliminate the artificial revenue gains arising from fractional resource flows.
+
+The resulting relaxation value remains close to that of the LP relaxation of the full model, which still permits fractional resource flows to exploit multiple revenue-generating opportunities.
+This issue is therefore difficult to resolve by refining the time discretization alone.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\linewidth]{figure/illustrate_rev_overestimation/rev_distribution}
+    \caption{Illustration of Revenue Overestimation and Persistency in Discretization Aggregation}
+    \label{fig:rev_overestimation}
+\end{figure}
+
+Figure~\ref{fig:rev_overestimation} provides a visual demonstration of this overestimation phenomenon using a specific case. In the diagram, blue arrows represent service assignments, orange bars represent the captured passengers, and gray lines (in Panel 3) indicate the underlying original services.
+In the Base Case (Panel 1), the optimal integer solution selects one service $f_0$ ($x=1$), which captures the yield portion of the service (the first third), generating revenue $r_0$.
+In the LP Relaxation (Panel 2), the solver exploits fractional variables by assigning three services $f_1, f_2, f_3$ each at value $x=\frac{1}{3}$. Thus each fractional assignment includes the first third of the service, resulting in a revenue of $3r_0$. This erroneously implies that we can serve all potential demand with just one resource unit equivalent of capacity spread over time.
+Panel 3 illustrates that our relaxation model defined above inherits this flaw when time points $t_1, t_2, t_3$ are merged into a single window. The model might allow the aggregated service $f_{agg}$ ($x=1$) to claim the summed demand of the underlying original services, again resulting in $3r_0$ revenue as the same way as in the LP relaxation of the full model.
+
+However, under our proposed Itinerary Aggregation, the situation depicted in Panel 3 is eliminated.
+The super-itinerary construction explicitly checks the feasibility of combining original itineraries.
+Since the departures at $t_1, t_2, t_3$ are too close to be legally operated by a single resource unit (violating minimum separation time), they form an illegal combination for a single super-itinerary.
+Our method restricts the attraction summation to valid subsets of original itineraries (using the $\departLimit$ parameter defined in Equation~\ref{def:relax.departLimit}), thereby stripping out the artificial revenue gains and restoring a realistic objective value.
+
+To address this challenge, we introduce an \emph{itinerary aggregation} procedure that complements the time-arc aggregation.
+
+\paragraph{Itinerary aggregation procedure.}
+Given a time-arc aggregation defined by the discretization $\discretization$, we further perform an itinerary-level aggregation that is consistent with the aggregated time-arcs.
+Let $\itinSet$ denote the original set of itineraries in the full network.
+Each itinerary $r \in \itinSet$ consists of an ordered sequence of legs, and each leg uses a time-arc $(o,d,t)$ in the original discretization. Every original itinerary $r$ can thus be represented as a path
+\begin{equation}
+\origPath{r} = \bigl( (o_1,d_1,t_1), (o_2,d_2,t_2), \dots \bigr)
+\end{equation}
+where $(o_k,d_k,t_k)$ denotes the origin, destination, and departure time of leg $k$ in itinerary $r$. We refer to this ordered tuple as the \emph{original path signature} of itinerary $r$.
+
+Under the aggregated discretization, each original departure time $t$ is mapped to the beginning of its corresponding time window.
+As a result, every original itinerary $r$ induces a discretized path
+\begin{equation}
+\pathSig{r} = \bigl( (o_1,d_1,\bar t_1), (o_2,d_2,\bar t_2), \dots \bigr)
+\end{equation}
+where $\bar t_k$ denotes the aggregated departure time of leg $k$.
+We define the \emph{discreted path signature} of itinerary $r$ as the ordered tuple $\pathSig{r}$.
+Throughout, the notation $(o,d,\bar{t})\in\pathSig{r}$ indicates that the leg with origin $o$, destination $d$, and aggregated departure time $\bar{t}$ occurs as an entry in the tuple; if the same spatial segment appears on multiple legs of the itinerary, each occurrence is counted separately in any summation or product indexed over $\pathSig{r}$.
+
+The itinerary aggregation is then performed by partitioning $\itinSet$ into equivalence classes $\eqClassByPathSig$ based on discreted path signature.
+Two itineraries $r,r' \in \itinSet$ are assigned to the same group if and only if they share the same path signature, i.e.,
+\[
+r \eqRelByPathSig r' \iff \pathSig{r} = \pathSig{r'}
+\]
+For each equivalence class, we construct a \emph{super-itinerary} that represents all original itineraries in this class.
+The super-itinerary inherits the common node sequence and aggregated time-arcs, and replaces all original itineraries in the relaxation model. The set of super-itineraries is denoted by $\itinSetSuper$. A super-itinerary $R$ can be represented by an aggregated path signature in the
+same way as an original itinerary. We denote this signature by $\pathSig{R}$.
+
+Attributes associated with itineraries are aggregated conservatively.
+Specifically, for each fare class, the fare of a super-itinerary are set to the maximum value among all original itineraries in the corresponding equivalence class.
+\begin{equation}
+\fare_{r\ell} = \max_{r' \in \eqClassByPathSig_{(r)}} \fare_{r'\ell} \quad \forall r \in \itinSetSuper, \; \ell \in \fareClassSet
+\end{equation}
+
+The attraction values of super-itineraries are set to the maximum summation of attractions among all possible combinations of original itineraries in the corresponding equivalence class. This ensures that the super-itinerary's attraction is at least as high as any original itinerary combination it represents. Original itineraries using the same path in the original network can be operated simultaneously without conflict. Therefore, like partitioning $\itinSet$ into equivalence classes $\eqClassByPathSig$ by discreted path signature, for each super-itinerary $R$ we also partition $\eqClassByPathSig_{(R)}$ into equivalence classes $\eqClassByOrigPath^{R}$ by original path signature, two itineraries $r,r' \in \eqClassByPathSig_{(R)}$ are assigned to the same group if and only if they share the same original path signature, i.e.,
+\[r \eqRelByOrigPath r' \iff \origPath{r} = \origPath{r'}\]
+Given passenger type $p$ and fare class $\ell$. For each equivalence class $\eqClassByOrigPath^{R}_r$, we have a summation of attractions among all original itineraries in the corresponding equivalence class $\sum_{r\in \eqClassByOrigPath^{R}_r} \attr_{rp\ell}$. And now we set the attraction values of a super-itinerary $r$ as the first $\departLimit$ maximum summation among all equivalence class in the quotient set $\eqClassByPathSig_{(R)} /\eqRelByOrigPath$ as follows:
+\begin{equation*}
+    \begin{aligned}
+        \maxAttrCombSet_{Rp\ell}
+        & \;=\;
+        \arg\max_{\itinCombSet: \itinCombSet \subseteq \eqClassByPathSig_{(R)} /\eqRelByOrigPath,\; |\itinCombSet| \le \combLimit_R}
+        \sum_{\mathscr{O} \in \itinCombSet} \sum_{r\in \mathscr{O}} \attr_{rp\ell}
+        \\
+        \combLimit_R
+        & \;=\;
+        \prod_{(o,d,\bar{t}) \in \pathSig{R}}
+        \min\{\departLimit_{od\bar{t}}, \freq_{o,d}\}
+    \end{aligned}
+\end{equation*}
+\begin{equation}
+\attrSuper_{Rp\ell}
+\;=\;
+\sum_{\mathscr{O} \in \maxAttrCombSet_{Rp\ell}} \sum_{r\in \mathscr{O}} \attr_{rp\ell}
+% temp-command \tag{def$_{\attrSuper_{Rp\ell}}$}
+\label{def:relax.attrSuper}
+\end{equation}
+\begin{equation}
+\adjAttrSuper_{Rp\ell}
+\;=\;
+\attrSuper_{Rp\ell} \times \min_{r: r\in\mathscr{O}, \mathscr{O} \in \maxAttrCombSet_{Rp\ell}} \left\{\frac{\adjAttr_{rp\ell}}{\attr_{rp\ell}}\right\}
+% temp-command \tag{def$_{\adjAttrSuper_{Rp\ell}}$}
+\label{def:relax.shadowAttrSuper}
+\end{equation}
+where $\departLimit_{od\bar{t}}$ is defined in (\ref{def:relax.departLimit}), $\maxAttrCombSet_{Rp\ell}$ is the set of equivalence classes of original itineraries with the same original path signature that maximizes the total attraction for passenger type $p$ and fare class $\ell$, subject to the constraint that the number of selected equivalence classes does not exceed $\departLimit$. For each leg $(o,d,\bar{t})$ along the super-itinerary's path, the number of services that can physically coexist within the aggregated time window is bounded by $\min\{\departLimit_{od\bar{t}}, \freq_{o,d}\}$, reflecting both the separation-time capacity and the segment frequency. Because original itineraries with different path signatures may consolidate on certain legs, the overall limit $\departLimit$ is taken as the maximum of these per-leg bounds: as long as there exists at least one leg that can accommodate $\departLimit$ distinct services, the corresponding equivalence classes may coexist legally.
+This ensures that the relaxation model does not underestimate passenger utility and the objective value while preventing multiple fractional flows from exploiting multiple nearby departure times within the same time window.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\linewidth]{figure/illustrate_valid_combinations/valid_combinations}
+    \caption{Mechanism of Lower Bound Preservation in Itinerary Aggregation}
+    \label{fig:valid_combinations}
+\end{figure}
+
+Figure~\ref{fig:valid_combinations} illustrates why the itinerary aggregation maintains the lower bound property.
+% Consider an equivalence class of original itineraries mapping to the same super-itinerary. These original itineraries (e.g., $r_1, r_2, r_3, r_4, r_5$) may have mutual conflicts due to separation time constraints in the full model. For instance, $r_1$ and $r_3$ cannot be simultaneously operated if they are too close.
+% Conceptually (Method 1), the super-itinerary's attraction $\attrSuper$ should be calculated by preventing all conflicts and finding the subset that maximizes the total attraction.
+% In the example, the valid subset $\{(r_1, r_2), (r_5)\}$ yields a total attribute of 0.5, which is greater than $\{(r_3, r_4)\}$'s 0.4.
+Consider an equivalence class of original itineraries mapping to the same super-itinerary. These original itineraries (e.g., $r_1, r_2, r_3$) may have mutual conflicts due to separation time constraints in the full model. For instance, $r_1$ and $r_2$ cannot be simultaneously operated if they are too close.
+Conceptually (Method 1), the super-itinerary's attraction $\attrSuper$ should be calculated by preventing all conflicts and finding the subset that maximizes the total attraction.
+In the example, the valid subset $\{(r_1), (r_3)\}$ yields a total attribute of 0.3, which is greater than $\{(r_2)\}$'s 0.2.
+
+However, finding the exact maximum weight independent set considering all the conflicts may be computationally expensive.
+Therefore, in our proposed model, we employ a simplified and efficient approximation (Method 2). For each leg $(o,d,\bar{t})$ along the path, the per-leg capacity is bounded by $\min\{\departLimit_{od\bar{t}}, \freq_{od}\}$, accounting for both the separation-time limit (Equation~\ref{def:relax.departLimit}) and the segment frequency. The overall $\departLimit$ is then derived from these per-leg bounds, reflecting the fact that itineraries with different original path signatures may consolidate on shared legs.
+We approximate the maximum feasible attraction by selecting the top $\departLimit$ equivalence classes from the quotient set.
+Since $\departLimit$ is an upper bound on the size of any valid service sequence, the attraction sum calculated by Method 2 is guaranteed to be greater than or equal to the attraction of any actual conflict-free subset (Method 1), and thus greater than or equal to any feasible integer solution.
+Selecting the super-itinerary in the relaxation model effectively grants this "optimistic" revenue.
+For any valid solution feasible in the original problem, its revenue cannot exceed this maximum possible revenue calculated for the super-itinerary. Thus, the relaxation objective (Minimize Cost - Revenue) remains less than or equal to the true optimal objective, preserving the validity of the lower bound.
+
+Constraints involving itinerary-level variables are updated to reflect the aggregation. Specifically, constraints (\ref{constr:main.choice.ratio}, \ref{constr:main.choice.limit}, \ref{constr:main.choice.capacity}, \ref{constr:main.choice.covering}) are modified as follows:
+\begin{equation}
+    \outAttr_{mp}\, \shareVar_{rp\ell} \;\le\; \attrSuper_{rp\ell}\, \outsideShareVar_{mp}
+    \quad \forall m\in \marketSet,\, \forall p\in \psgTypeSet,\, \forall r\in \itinSuperInMarket_{m},\, \forall \ell\in \fareClassSet
+    % temp-command \tag{2f}
+    \label{constr:relax.choice.ratio}
+\end{equation}
+\begin{equation}
+    \left(\frac{\adjOutAttr_{mp}}{\outAttr_{mp}}\right) \outsideShareVar_{mp}
+    \;+\;
+    \sum_{r\in \itinSuperInMarket_{m}}\sum_{\ell\in \fareClassSet} 
+    \left(\frac{\adjAttrSuper_{rp\ell}}{\attrSuper_{rp\ell}}\right) \shareVar_{rp\ell}
+    \;\le\; 1
+    \quad \forall m\in \marketSet,\; \forall p\in \psgTypeSet
+    % temp-command \tag{2g}
+    \label{constr:relax.choice.limit}
+\end{equation}
+\begin{equation}
+    \sum_{m\in \marketSet}\sum_{p\in \psgTypeSet}\sum_{\ell\in \fareClassSet}\sum_{r\in \itinSuperUsingArc{m}{a}} 
+    \demand_{mp}\, \shareVar_{rp\ell}\;\le\; \sum_{f\in \fleetSet} \fleetCap_{f}\, \fleetAssignVar_{af}
+    \quad \forall a\in \flightArc
+    % temp-command \tag{2h}
+    \label{constr:relax.choice.capacity}
+\end{equation}
+\begin{equation}
+    \sum_{f\in \fleetSet} \fleetAssignVar_{af} \;\ge\; \shareVar_{rp\ell}
+    \quad \forall a\in \flightArc,\; \forall m\in \marketSet,\, \forall r\in \itinSuperUsingArc{m}{a},\, \forall p\in \psgTypeSet,\,\forall \ell\in\fareClassSet
+    % temp-command \tag{2i}
+    \label{constr:relax.choice.covering}
+\end{equation}
+
+Through this itinerary aggregation, all fractional resource flows using different original time-arcs within one aggregated time window are forced to compete for the same super-itinerary.
+As a consequence, revenue collected on an aggregated time-arc corresponds to at most $\departLimit_{ijt}$ complete resource flows in the original network, effectively eliminating the artificial revenue inflation caused by fractional resource reuse across adjacent departure times.
+
+% \model{\discretization, \itinSetSuper}, the final relaxation model
+We denote the final relaxation model incorporating both time-arc aggregation and itinerary aggregation as $\model{\discretization, \itinSetSuper}$. Denote $\model{\discretization} = \model{\discretization, \itinSet}$ when the itinerary set is same as in the full model.
+
+The model $\model{\discretization, \itinSetSuper}$ is written as follows:
+\begin{align}
+    \min \;\; &
+    \sum_{a\in \flightArc}\sum_{f\in \fleetSet} \cost_{af}\, \fleetAssignVar_{af}
+    \;-\;
+    \sum_{m\in \marketSet}\sum_{p\in \psgTypeSet}\sum_{r\in \itinInMarket_{m}}\sum_{\ell\in \fareClassSet} 
+    \demand_{mp}\,\fare_{r\ell}\, \shareVar_{rp\ell}
+    % temp-command \tag{2a}
+    \label{objfun:relax}
+\\
+    \text{s.t.} &
+    \sum_{a\in \outArcSet{i,t}} \fleetAssignVar_{af} - \sum_{a\in \inArcSet{i,t}} \fleetAssignVar_{af} = 0 
+    \quad \forall (i,t)\in \nodeSet,\; \forall f\in \fleetSet
+    % temp-command \tag{2b}
+    \label{constr:relax.flow}
+\\&
+    \eqref{constr:relax.fleet_available},
+    \eqref{constr:relax.cooldown} \notag
+\\&
+    \sum_{f\in \fleetSet}\sum_{a\in \segArcSet{s}} \fleetAssignVar_{af} = \freq_{s}
+    \quad \forall s\in \segSet
+    % temp-command \tag{2e}
+    \label{constr:relax.seg_freq}
+\\&
+    \eqref{constr:relax.choice.ratio},
+    \eqref{constr:relax.choice.limit},
+    \eqref{constr:relax.choice.capacity},
+    \eqref{constr:relax.choice.covering},
+    \eqref{constr:relax.domain.x.flight} \notag
+\\&
+    \fleetAssignVar_{af}\ge 0 \quad \forall a\in \holdingArc, \; \forall f\in \fleetSet
+    % temp-command \tag{2k}
+    \label{constr:relax.domain.x.holding}
+\\&
+    \outsideShareVar_{mp}\ge 0 \quad \forall m\in \marketSet, \; \forall p\in \psgTypeSet
+    % temp-command \tag{2l}
+    \label{constr:relax.domain.w.out}
+\\&
+    \shareVar_{rp\ell}\ge 0 \quad \forall r\in \itinSet, \; \forall p\in \psgTypeSet, \; \forall \ell\in \fareClassSet
+    % temp-command \tag{2m}
+    \label{constr:relax.domain.w}
+\end{align}
+
+The following theorem guarantees the validity of the relaxation model $\model{\discretization, \itinSetSuper}$ as a lower bound for the original model $\model{\discretizationFull}$.
+\input{thm/valid_relaxation/_main.tex}
+
+% % ---------------------------------------- Re model ----------------------------------------
+% % plan 1: time potential -> eliminate internal loops
+% \input{chapter/lbm/time_potential.tex}
+% % plan 2: limit discretization -> ensure no inverse-arc
+% \input{chapter/lbm/discretization.tex}
+% % plan 3: limit discretization -> ensure no inverse-arc
+% \input{chapter/lbm/dynamic_positioning_discovery.tex}
+% % ------------------------------------------------------------------------------------------

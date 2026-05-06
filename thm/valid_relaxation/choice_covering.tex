@@ -1,0 +1,23 @@
+\paragraph*{Constraint~(\ref{constr:relax.choice.covering})} For any $a = (o,t,d,t') \in\flightArc, m\in\marketSet, r\in\itinSuperUsingArc{m}{a}, p\in\psgTypeSet, \ell\in\fareClassSet$, by similar logic in proving constraint~(\ref{constr:relax.choice.ratio}), denote $\departLimit = \departLimit_{odt}$, we have
+\begin{equation*}
+\begin{aligned}
+    \shareVar_{rp\ell}
+    & \le \max_{\itinCombSet: \itinCombSet \subseteq \eqClassByPathSig_{(r)} /\eqRelByOrigPath,\; |\itinCombSet| \le \departLimit} \sum_{\mathscr{O} \in \itinCombSet} \sum_{r' \in \mathscr{O}} \bar{\shareVar}_{r'p\ell}
+\end{aligned}
+\end{equation*}
+Simultaneously, by definition of $\departLimit$, there is at most $\departLimit$ services departing from time window $(o,d,t)$, therefore
+\begin{equation*}
+\begin{aligned}
+    \sum_{f\in \fleetSet} \fleetAssignVar_{af}
+    & = \sum_{f\in \fleetSet} \sum_{a^\prime\in\Phi_{\arcSet}^{-1}(a)} \bar{\fleetAssignVar}_{a^\prime f} \\
+    & \ge \max_{\mathscr{X}: \mathscr{X} \subseteq \{(a',f)\mid f\in \fleetSet, a^\prime\in\Phi_{\arcSet}^{-1}(a)\},\; |\mathscr{X}| \le \departLimit} \sum_{(a',f) \in \mathscr{X}} \bar{\fleetAssignVar}_{a'f}
+\end{aligned}
+\end{equation*}
+Because $(\bar{\fleetAssignVar}, \bar{\shareVar}, \bar{\outsideShareVar})$ is feasible to $\model{\discretizationFull}$, by constraint~(\ref{constr:main.choice.covering}) we can see that,
+\[
+    \sum_{f\in \fleetSet} \fleetAssignVar_{af}
+    \ge \max_{\mathscr{X}: \mathscr{X} \subseteq \{(a',f)\mid f\in \fleetSet, a^\prime\in\Phi_{\arcSet}^{-1}(a)\},\; |\mathscr{X}| \le \departLimit} \sum_{(a',f) \in \mathscr{X}} \bar{\fleetAssignVar}_{a'f}
+    \ge \max_{\itinCombSet: \itinCombSet \subseteq \eqClassByPathSig_{(r)} /\eqRelByOrigPath,\; |\itinCombSet| \le \departLimit} \sum_{\mathscr{O} \in \itinCombSet} \sum_{r' \in \mathscr{O}} \bar{\shareVar}_{r'p\ell}
+    \ge \shareVar_{rp\ell}
+\]
+Therefore, constraint~(\ref{constr:relax.choice.covering}) is satisfied.

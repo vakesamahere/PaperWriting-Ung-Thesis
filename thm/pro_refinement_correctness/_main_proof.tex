@@ -1,0 +1,12 @@
+\begin{proof}
+Suppose $\fleetAssignVar$ is feasible for the relaxation $\model{\discretization}$ but infeasible for the original problem. The constraints of the original problem are:
+1. Flow balance and demand satisfaction (same structure as LBM).
+2. Resource availability (ground inventory $\ge 0$).
+3. Service separation (inter-departure time $\ge \minInterdepTime_{ij}$).
+
+If the infeasibility is due to service separation, then there exists a segment $(i,j)$ and two services departing at $t_1, t_2$ such that $|t_1 - t_2| < \minInterdepTime_{ij}$. In the LBM, these services are assigned to arcs in $\net$. If they are assigned to the same time point or close time points such that their interval overlaps in the original time scale, the calculation of $\sepViolFlow_{ijt}$ over the interval $[t, t+\minInterdepTime_{ij})$ will capture this. Specifically, since the LBM allows them (satisfying relaxed constraints), but they violate the original constraint, they must fall into a window of size $\minInterdepTime_{ij}$ with a count $> 1$. Thus, a separation violation is detected.
+
+If the infeasibility is due to resource availability, it means that at some node $j$ and time $t$, a service is scheduled to depart but no resource unit is available. Since $\fleetAssignVar$ satisfies flow balance in $\net$, the resource unit must have "arrived" in the model. However, in reality, it has not. This implies that the model arrival time $t'_{arr}$ satisfies $t'_{arr} \le t$, but the actual arrival time $T_{arr}$ satisfies $T_{arr} > t$. This is exactly the condition $\cumDepart_{jf}(t) > \cumArrReal_{jf}(t) + \fleetCountStartByI_{jf}$. Thus, an impossible departure violation is detected.
+
+Since the infeasibility must stem from one of the relaxed constraints (time aggregation or travel time shortening), one of these two detection mechanisms will be triggered.
+\end{proof}

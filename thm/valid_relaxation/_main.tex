@@ -1,0 +1,14 @@
+\begin{theorem}
+\label{pro.valid_relaxation}
+    The relaxation model $\model{\discretization, \itinSetSuper}$ is a valid relaxation of the full model $\model{\discretizationFull}$. For any feasible solution $\bar{\solution}=(\bar{\fleetAssignVar}, \bar{\shareVar}, \bar{\outsideShareVar})$ to $\model{\discretizationFull}$, there exists a corresponding solution $\bar{\solution}$ to $\solution$ with the non-worse objective value. The mapping from $(\bar{\fleetAssignVar},\bar{\shareVar})$ to $(\fleetAssignVar, \shareVar, \outsideShareVar)$ is given by
+    \begin{equation}
+    \begin{aligned}
+        \fleetAssignVar_{af} &= \sum_{a^\prime\in\Phi_{\arcSet}^{-1}(a)} \bar{\fleetAssignVar}_{a^\prime f},
+        \quad \forall f\in \fleetSet,\; \forall a\in \arcSet\\
+        \shareVar_{rp\ell} &= \sum_{r' \in \eqClassByPathSig_{(r)}} \bar{\shareVar}_{r'p\ell} \quad \forall r \in \itinSetSuper,\, \forall p \in \psgTypeSet,\, \forall \ell \in \fareClassSet\\
+        \outsideShareVar_{mp} &= \bar{\outsideShareVar}_{mp} \quad \forall m \in \marketSet,\, \forall p \in \psgTypeSet
+    \end{aligned}
+    \label{eq:map_ori2rel}
+    \end{equation}
+where $\eqClassByPathSig_{(r)}$ is the equivalence class of original itineraries mapped to super-itinerary $r$ based on path signature.
+\end{theorem}

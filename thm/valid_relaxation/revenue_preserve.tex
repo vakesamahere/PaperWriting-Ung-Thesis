@@ -1,0 +1,16 @@
+Moreover, using the similar logic in the proof of constraint~(\ref{constr:relax.choice.capacity}), we can show that the revenue term of the constructed solution $(\fleetAssignVar, \shareVar, \outsideShareVar)$ in $\model{\discretization, \itinSetSuper}$ is no less than that of $(\bar{\fleetAssignVar}, \bar{\shareVar}, \bar{\outsideShareVar})$ in $\model{\discretizationFull}$. The cost term is preserved:
+
+\[
+    \sum_{a\in\arcSet}\sum_{f\in\fleetSet}\cost_{af}\fleetAssignVar_{af}
+    = \sum_{a\in\arcSet}\sum_{f\in\fleetSet}\cost_{af}
+      \sum_{a'\in\Phi_{\arcSet}^{-1}(a)}\bar{\fleetAssignVar}_{a'f}
+    = \sum_{a'\in\full{\arcSet}}\sum_{f\in\fleetSet}\cost_{a'f}\bar{\fleetAssignVar}_{a'f},
+\]
+and
+\[
+    \sum_{m,p,r,\ell}\demand_{mp}\fare_{r\ell}\shareVar_{rp\ell}
+    \ge \sum_{m,p,r,\ell}\demand_{mp}\fare_{r\ell}\bar{\shareVar}_{rp\ell},
+    \qquad
+    \sum_{m,p}\adjOutAttr_{mp}\outsideShareVar_{mp}
+    = \sum_{m,p}\adjOutAttr_{mp}\bar{\outsideShareVar}_{mp}.
+\]

@@ -1,0 +1,15 @@
+\begin{proof}
+  Because the $\discretizationFull$ contains finite time points, we only need to proof that at least one time point will be added to the discretization $\discretization$ when there is a violation. Conbining with Theorem~\ref{thm:relax_illegal}, we know that the algorithm converges if there is no violation, which means we can strictly expand $\discretization$ to the $\discretizationFull$ before convergence. If the $\discretization$ is expanded to $\discretizationFull$, the relaxation model is equivalent to the original model, and thus the solution is globally optimal.
+
+  We show that at least one time point will be added to the discretization $\discretization$ when there is a violation for each of the three types of violations below.
+  
+  \begin{itemize}
+      \item \textbf{Impossible Departure:} If $\impDeparts(i,t,f) > 0$, there exists at least one illegal arrival arc $k \in \flightArc[-,illegal](i, t, f)$ with flow $\fleetAssignVar_{k} > 0$. By definition, its physical arrival time $t'_{arr}(k) = t_{\text{dep}}(k) + \travelTime_k$ is strictly later than the discrete node $t$ to which it was mapped ($t'_{arr} > t$). Since the relaxation mapping maps the arrival to the nearest node $\le t'_{arr}$, and a violation exists, $t'_{arr}$ cannot be in the current discretization $\discretization_i$. Thus, adding $t'_{arr}$ strictly expands $\discretization_i$ with a point from $\discretizationFull$.
+      
+      \item \textbf{Inter Departure:} If $\arcDepartFlow_{ijt} > 1$, there are multiple physical departures on segment $(i,j)$ within a window of $\minInterdepTime_s$ that are not yet separated by the current grid. This implies that at least two physical departure times $t_a(k_1)$ and $t_a(k_2)$ from the original model are being aggregated or mapped such that they violate the cooldown constraint. Adding these exact physical times $t_a \in \discretizationFull$ (which are currently missing from $\discretization_i$) ensures $\discretization_i$ grows.
+      
+      \item \textbf{Phantom Revenue:} A shortfall $s_{Rpl}^* > 0$ means the RFS is infeasible for super itinerary $R$. This occurs only if the current discretization $\discretization$ lacks the necessary time nodes to distinguish the arrival/departure events of the constituent itineraries $r \in S_{(R)}$ that would expose the violation. By adding the physical time points of these original itineraries from $\discretizationFull$, we ensure that at least one new node is inserted into $\discretization$, eventually splitting the super itinerary into its original components.
+  \end{itemize}
+
+  In all cases, every refinement step adds at least one point from the finite set $\discretizationFull \setminus \discretization$. Therefore, the algorithm must converge to a globally optimal solution in a finite number of iterations.
+\end{proof}

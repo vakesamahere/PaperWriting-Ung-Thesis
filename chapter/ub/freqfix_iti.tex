@@ -1,0 +1,117 @@
+\section{Upper Bound Generation}
+\label{sec:ub}
+
+While the LBM provides a valid lower bound, its formulation on a coarse time-space network often results in solutions that are physically infeasible when mapped back to exact operating times. We propose an MIP-based upper bound (UB) generation module that acts as a repair algorithm based on lower bound information. This approach is designed to reconstruct strict, high-quality feasible solutions from the relaxed state. This section details the UB module within our \algoNotation framework. Unlike purely data-driven heuristics that blindly prune active arcs based on pool statistics, we propose a structure-aware macro-locking strategy called Frequency Fixing, carefully enhanced by rigorous Itinerary Cuts. The upper bound model $\ubm(\discretizationFull,\model{\discretization, \itinSetSuper})$ is formulated on the full time-space network $\full{\net}$ to ensure that the generated solution is directly feasible for the original problem, thus providing a valid upper bound.
+
+\subsection{Frequency Fixing Constraint}
+The core assumption of Frequency Fixing is that although the relaxation solution is defined on a coarse network—and thus potentially physically infeasible when mapped to exact timings—it makes highly accurate decisions regarding resource allocation. Therefore, the resource frequency determined by the relaxation model is highly trustworthy and can be locked in the current iteration.
+
+Let $\fleetAssignVar^{*}$ be the integer optimal solution obtained from the relaxation model. We calculate the service frequency for each segment $s=(i,j)$ and resource type $f$:
+\begin{equation}
+    \freq_{s,f} = \sum_{a \in \segArcSet{s}} \fleetAssignVar_{a,f}^{*}  \quad \in \mathbb{Z}_{\ge 0}
+\end{equation}
+
+We then construct the Upper Bound Model by enforcing these counts. We replace the generic frequency constraint~\eqref{constr:main.seg_freq} in the original model $\model{\discretizationFull}$ with:
+\begin{equation}
+    \sum_{a \in \full{\segArcSet{s}}} \fleetAssignVar_{a,f} = \freq_{s,f}, \quad \forall s \in \segSet, f \in \fleetSet
+    % temp-command \tag{3e}
+    \label{constr:ubm.freq_fix}
+\end{equation}
+
+By forcing the solver to respect the volume of the relaxation solution, the solver's burden is reduced to finding the best feasible timings that satisfy flow balance. This effectively reduces the multi-faceted original model into a pure scheduling problem.
+
+\subsection{Addressing Revenue Overestimation via Itinerary Cuts}
+The standard Frequency Fixing only locks macro-level resource frequencies but leaves the revenue overestimation problem, which makes the model difficult to solve. To mitigate this, we inject super itineraries from the relaxation model into the upper bound model. We introduce continuous market share variables $\shareSVar_{R,p,\ell} \in [0, 1]$ in the UB model to represent the proportion of the market demand choosing super itinerary $R$ for passenger type $p$ and fare class $\ell$. By adding cuts that link the super itinerary share variables $\shareSVar_{R,p,\ell}$ with the original fine-grained share variables $\shareVar_{r,p,\ell}$, we enforce that the revenue contribution of a super itinerary must dominate the total revenue of its constituent fine-grained itineraries, thereby significantly tightening the upper bound and accelerating convergence of the branch-and-bound search. The detailed formulation of these cuts is provided below:
+\begin{equation}
+    \outAttr_{mp}\, \shareSVar_{Rp\ell} \;\le\; \attrSuper_{Rp\ell}\, \outsideShareVar_{mp}
+    \quad \forall m\in \marketSet,\, \forall p\in \psgTypeSet,\, \forall R\in \itinSuperInMarket_{m},\, \forall \ell\in \fareClassSet
+    % temp-command \tag{3f}
+    \label{constr:ubm.itinerary_cut.choice.ratio}
+\end{equation}
+\begin{equation}
+    \left(\frac{\adjOutAttr_{mp}}{\outAttr_{mp}}\right) \outsideShareVar_{mp}
+    \;+\;
+    \sum_{R\in \itinSuperInMarket_{m}}\sum_{\ell\in \fareClassSet} 
+    \left(\frac{\adjAttrSuper_{Rp\ell}}{\attrSuper_{Rp\ell}}\right) \shareSVar_{Rp\ell}
+    \;\le\; 1
+    \quad \forall m\in \marketSet,\; \forall p\in \psgTypeSet
+    % temp-command \tag{3g}
+    \label{constr:ubm.itinerary_cut.choice.limit}
+\end{equation}
+\begin{equation}
+    \sum_{m\in \marketSet}\sum_{p\in \psgTypeSet}\sum_{\ell\in \fareClassSet}\sum_{R\in \itinSuperUsingArc{m}{a}} 
+    \demand_{mp}\, \shareSVar_{Rp\ell}\;\le\; \sum_{a'\in \Phi^{-1}(a)}\sum_{f\in \fleetSet} \fleetCap_{f}\, \fleetAssignVar_{a'f}
+    \quad \forall a\in \flightArc
+    % temp-command \tag{3h}
+    \label{constr:ubm.itinerary_cut.choice.capacity}
+\end{equation}
+\begin{equation}
+    \sum_{a'\in \Phi^{-1}(a)}\sum_{f\in \fleetSet} \fleetAssignVar_{a'f} \;\ge\; \shareSVar_{Rp\ell}
+    \quad \forall a\in \flightArc,\; \forall m\in \marketSet,\, \forall R\in \itinSuperUsingArc{m}{a},\, \forall p\in \psgTypeSet,\,\forall \ell\in\fareClassSet
+    % temp-command \tag{3i}
+    \label{constr:ubm.itinerary_cut.choice.covering}
+\end{equation}
+\begin{equation}
+   \shareSVar_{R,p,\ell} \cdot \fare_{R,\ell} \;\le\; \sum_{r \in R} \shareVar_{r, p, \ell} \cdot \fare_{r,\ell}
+   % temp-command \tag{3n}
+   \label{constr:ubm.itinerary_cut.cut}
+\end{equation}
+
+Collectively, constraints \eqref{constr:ubm.itinerary_cut.choice.ratio}-\eqref{constr:ubm.itinerary_cut.choice.covering} make sure that the super itinerary share $\shareSVar_{R,p,\ell}$ represents the customer choice behavior at the macro level (time windows in the partial network) and yields no less share than the aggregated share of its constituent fine-grained itineraries. The cut \eqref{constr:ubm.itinerary_cut.cut} explicitly links the super itinerary share variable with the fine-grained share variables, ensuring that the revenue contribution of the super itinerary dominates the sum of its underlying itineraries. By enforcing these relationships between the super itinerary and its constituent itineraries, we effectively tighten the upper bound and guide the solver towards more promising regions of the solution space, thus accelerating convergence to the global optimum.
+
+Let $\textbf{c}^{\mathrm{LB}}$ denote the cost term of optimal objective value of $\model{\discretization, \itinSetSuper}$. Let $\textbf{r}^{\mathrm{LB}}$ denote the revenue term of optimal objective value of $\model{\discretization, \itinSetSuper}$. By Proposition~\ref{pro.valid_relaxation}, $\model{\discretization, \itinSetSuper}$ constitutes a valid relaxation of the full model; it follows that the optimal revenue of any feasible solution of the original problem is bounded below by $\textbf{r}^{\mathrm{LB}}$. We exploit this bound explicitly by appending the following valid inequality:
+\begin{equation}
+    \sum_{m\in \marketSet}\sum_{p\in \psgTypeSet}\sum_{\ell\in \fareClassSet}\sum_{r\in \itinInMarket_m}
+    \demand_{mp}\, \fare_{r\ell}\, \shareVar_{rp\ell} \;\le\; \textbf{r}^{\mathrm{LB}}
+    % temp-command \tag{3o}
+    \label{constr:ubm.obj_cut}
+\end{equation}
+This cut explicitly excludes all LP solutions whose total revenue falls strictly below the known lower bound, thereby tightening the feasible region and reducing the effective search space of the branch-and-bound procedure.
+
+Thus, we have a upper bound generation module that synergistically combines frequency fixing and itinerary cuts, effectively repairing the relaxed LB solution into a high-quality feasible solution that guides the exact solver towards global optimality, which is written as follows:
+\begin{equation}\begin{aligned}
+    \ubm(\discretizationFull,\model{\discretization, \itinSetSuper}) = \min_{\shareSVar, \shareVar, \fleetAssignVar} \quad & \textbf{c}^{\mathrm{LB}} - \sum_{m\in \marketSet}\sum_{p\in \psgTypeSet}\sum_{\ell\in \fareClassSet}\sum_{r\in \itinInMarket_m} \demand_{mp}\, \shareVar_{rp\ell} \fare_{r,\ell}
+    % temp-command \tag{3a}
+\\
+    \text{s.t.} \quad
+    &
+    \eqref{constr:main.flow}, \eqref{constr:main.fleet_available}, \eqref{constr:main.cooldown}, \eqref{constr:main.seg_freq} \notag
+\\&
+    \eqref{constr:main.choice.ratio}, \eqref{constr:main.choice.limit}, \eqref{constr:main.choice.capacity}, \eqref{constr:main.choice.covering} \notag
+\\&
+    \eqref{constr:main.domain.x.flight}, \eqref{constr:main.domain.x.holding}, \eqref{constr:main.domain.w.out}, \eqref{constr:main.domain.w} \notag
+\\&
+    \eqref{constr:ubm.freq_fix}, \eqref{constr:ubm.itinerary_cut.choice.ratio}, \eqref{constr:ubm.itinerary_cut.choice.limit}, \eqref{constr:ubm.itinerary_cut.choice.capacity}, \eqref{constr:ubm.itinerary_cut.choice.covering}, \eqref{constr:ubm.itinerary_cut.cut}, \eqref{constr:ubm.obj_cut} \notag
+\end{aligned}\end{equation}
+The following theorem guarantees the validity of the upper bound generated by $\ubm(\discretizationFull,\model{\discretization, \itinSetSuper})$ for the original model $\model{\discretizationFull}$.
+\input{thm/valid_upper_bound/_main.tex}
+% --- Explicit note about UBM infeasibility handling ---
+% If locked aggregated frequencies cannot be realized on the full time-space network,
+% UBM is infeasible; in our algorithm this corresponds to an objective of +\infty
+% and the candidate upper bound is ignored by the master algorithm (Algorithm~1).
+% We state this explicitly to clarify that no additional fallback repair is required:
+If the UB model $\ubm(\discretizationFull,\model{\discretization, \itinSetSuper})$ becomes infeasible under the locked aggregated frequencies $\freq_{s,f}$, the solver effectively returns an outcome (treated as an upper bound of $+\infty$ in our algorithm logic). In such cases the algorithm does not update the incumbent UB and proceeds to the refinement phase driven by LBM-infeasibilities.
+\subsection{Variable Reduction}
+To accelerate the solution process, we apply a series of exact variable reductions based on the fixed aggregated frequencies $\freq_{s,f}$. Because $\freq_{s,f}$ dictates the available network capacity, any segment with zero assigned services fundamentally breaks connectivity, allowing us to safely fix many variables to zero and eliminate redundant downstream variables and constraints prior to sending the model to the solver.
+
+For any segment $s \in \segSet$ and resource type $f \in \fleetSet$, if the locked frequency $\freq_{s,f} = 0$, it implies that no services of type $f$ can be operated on segment $s$. Consequently, we immediately cascade this zero assignment to all underlying service assignment variables:
+\begin{equation}
+    \fleetAssignVar_{a,f} = 0, \quad \forall a \in \full{\segArcSet{s}} \text{ if } \freq_{s,f} = 0
+\end{equation}
+This satisfies the frequency constraint \eqref{constr:ubm.freq_fix} intrinsically for these combinations, allowing us to remove these variables and constraints from the domain.
+
+Since an itinerary $r$ (or super itinerary $R$) fundamentally consists of a sequence of time-space service arcs, removing all capacity from any of its underlying spatial segments directly severs these physical paths. For notational convenience, we write $s \in r$ (or $s \in R$) to indicate that the spatial segment $s$ is traversed by the time-space arcs of itinerary $r$ (or super itinerary $R$). If an itinerary relies on a segment $s$ where no services of any resource type are assigned (i.e., $\sum_{f\in\fleetSet} \freq_{s,f} = 0$), the itinerary becomes physically impossible. Due to the covering constraints \eqref{constr:main.choice.covering} and \eqref{constr:ubm.itinerary_cut.choice.covering}, the market share associated with such itineraries falls to zero:
+\begin{equation}
+    \shareVar_{r,p,\ell} = 0, \quad \text{if } \exists s \in r \text{ s.t. } \sum_{f\in\fleetSet} \freq_{s,f} = 0
+\end{equation}
+\begin{equation}
+    \shareSVar_{R,p,\ell} = 0, \quad \text{if } \exists s \in R \text{ s.t. } \sum_{f\in\fleetSet} \freq_{s,f} = 0
+\end{equation}
+These zero-valued variables can be explicitly removed from the model. As a consequence, the itinerary cut constraint \eqref{constr:ubm.itinerary_cut.cut} for a given super itinerary $R$ can be completely deleted only if all of its constituent fine-grained itineraries $r \in R$ are closed (i.e., fixed to zero). If only a subset of $r \in R$ are removed, the constraint \eqref{constr:ubm.itinerary_cut.cut} must be retained to bind the super itinerary variable $sw_R$ with the remaining active fine-grained itineraries.
+
+For any market $m \in \marketSet$, if all its constituent active itineraries $r \in \itinInMarket_{m}$ and super itineraries $R \in \itinSuperInMarket_{m}$ are eliminated by the reduction above, a purely unserved scenario is triggered. Passengers in this market simply have no available service options to choose from.
+According to the choice limit identity constraint \eqref{constr:main.choice.limit}, the outside option share variable $\outsideShareVar_{mp}$ inevitably becomes a deterministic constant bounded entirely by the respective utilities:
+\begin{equation}
+    \outsideShareVar_{mp} = \frac{\outAttr_{mp}}{\adjOutAttr_{mp}}, \quad \text{if } \shareVar_{r,p,\ell} = 0 \; \forall r \in \itinInMarket_m
+\end{equation}
+Therefore, we can completely eliminate $\outsideShareVar_{mp}$ as a variable and remove market $m$'s related choice limit \eqref{constr:main.choice.limit} and ratio limits \eqref{constr:main.choice.ratio} entirely from the optimization framework, significantly compressing the constraint matrix dimensions.

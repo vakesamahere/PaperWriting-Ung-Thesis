@@ -1,0 +1,66 @@
+\paragraph*{Seperation constraints \eqref{constr:relax.cooldown}.}
+Fix any segment $(i,j)$ and $t\in\discretization_i$ and let $t^{+}$ be the next time in $\discretization_i$ following $t$.
+Define the set of fine-grained departure times aggregated at $(i,t)$ as
+\[
+    \Theta_{ijt}=\{\tau\in\discretizationFull_i\mid t\le\tau<t^{+}\},
+\]
+and let $H=\planningEnd-\planningStart$ be the length of the planning horizon.
+Consider all full-model service arcs
+\[
+    \mathcal{A}_{ijt}=\bigcup_{a\in\arcDuringSepTime_{ijt}^\discretization}\Phi_{\arcSet}^{-1}(a),
+\]
+and denote by $\delta(a')$ the departure time of $a'\in\mathcal{A}_{ijt}$.
+For each resource type $f$ we replicate $\delta(a')$ exactly $\bar{\fleetAssignVar}_{a'f}$ times and obtain a multiset
+\[
+    \Delta=\{\tilde{\delta}_1,\tilde{\delta}_2,\ldots,\tilde{\delta}_K\},
+    \qquad K=\sum_{f\in\fleetSet}\sum_{a\in \arcDuringSepTime_{ijt}^\discretization}\fleetAssignVar_{af},
+\]
+where every element of $\Delta$ is defined without wraparound by
+\[
+    \tilde{\delta}=
+    \begin{cases}
+        \delta(a'), & t^{+}\ge t,\\[2pt]
+        \delta(a') + H\cdot\mathbf{1}\{\delta(a')<t^{+}\}, & t^{+}<t.
+    \end{cases}
+\]
+In both cases $\tilde{\delta}\in[t,\,t^{+}]$ (if $t^{+}\ge t$) or $\tilde{\delta}\in[t,\,t^{+}+H]$ (if $t^{+}<t$).
+Sort $\Delta$ in nondecreasing order: $\tilde{\delta}_1\le\tilde{\delta}_2\le\cdots\le\tilde{\delta}_K$.
+
+We claim that consecutive elements of $\Delta$ are separated by at least $\minInterdepTime_{ij}$.
+Indeed, suppose $\tilde{\delta}_r$ and $\tilde{\delta}_{r+1}$ correspond to arcs $a'_r$ and $a'_{r+1}$ departing at times $\tau_r$ and $\tau_{r+1}$ in the fine discretization (after undoing the unwrapping when $t^{+}<t$).
+If $\tilde{\delta}_{r+1}-\tilde{\delta}_r<\minInterdepTime_{ij}$, then $\tau_{r}\le\tau_{r+1}<\tau_r+\minInterdepTime_{ij}$ (modulo $H$), hence both arcs belong to $\arcDuringSepTime_{ij\tau_r}^{\discretizationFull}$.
+Constraint~\eqref{constr:main.cooldown} of the full model would then force
+\[
+    \sum_{f\in\fleetSet}\sum_{a'\in \arcDuringSepTime_{ij\tau_r}^{\discretizationFull}}\bar{\fleetAssignVar}_{a'f} \ge 2,
+\]
+contradicting feasibility of $\solution$.
+Therefore,
+\[
+    \tilde{\delta}_{r+1}-\tilde{\delta}_r \ge \minInterdepTime_{ij},\qquad r=1,\ldots,K-1.
+\]
+Let
+\[
+    L=
+    \begin{cases}
+        t^{+}-t, & t^{+}\ge t,\\[2pt]
+        H+t^{+}-t, & t^{+}<t,
+    \end{cases}
+\]
+which is exactly the numerator appearing in Definition~\eqref{def:relax.departLimit}.
+Because all elements of $\Delta$ lie in an interval of length $L$, we obtain
+\[
+    (K-1)\,\minInterdepTime_{ij} \le \tilde{\delta}_K-\tilde{\delta}_1 \le L,
+\]
+and consequently
+\[
+    K \le 1 + \frac{L}{\minInterdepTime_{ij}}
+      = \left\lceil \frac{L}{\minInterdepTime_{ij}} \right\rceil
+      = \departLimit_{ijt}.
+\]
+Hence
+\[
+    \sum_{f\in\fleetSet}\sum_{a\in \arcDuringSepTime_{ijt}^\discretization}\fleetAssignVar_{af}
+    = K
+    \le \departLimit_{ijt},
+\]
+which establishes constraint~\eqref{constr:relax.cooldown}.
