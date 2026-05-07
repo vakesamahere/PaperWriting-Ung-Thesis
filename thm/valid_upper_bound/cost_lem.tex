@@ -1,20 +1,20 @@
 \begin{lemma}
 \label{lem:time_invariance_cost}
-For any time discretization $\discretization$, the operational cost of assigning a resource type $f \in \fleetSet$ to a service arc $a \in \segArcSet{s}$ depends solely on the spatial segment $s \in \segSet$ and the resource type, independent of the departure or arrival times. Consequently, the total operational cost of any feasible routing plan $\mathbf{\fleetAssignVar}$ is completely determined by the macroscopic service frequencies $\freq_{sf} = \sum_{a \in \segArcSet{s}} \fleetAssignVar_{af}$.
+对任意时间离散化 $\discretization$，将资源类型 $f \in \fleetSet$ 分配到服务弧 $a \in \segArcSet{s}$ 的运营成本仅取决于空间航段 $s \in \segSet$ 和资源类型，与出发或到达时间无关。因此，任意可行路由方案 $\mathbf{\fleetAssignVar}$ 的总运营成本完全由宏观服务频率 $\freq_{sf} = \sum_{a \in \segArcSet{s}} \fleetAssignVar_{af}$ 决定。
 \end{lemma}
 
 \begin{proof}
-By the problem definition, the operational cost $\cost_{af}$ for any service arc $a$ that traverses segment $(i,j)$ using resource type $f$ is a spatial constant $\cost_{sf}$. Let $\mathbf{\fleetAssignVar}$ be a feasible routing vector over a given time discretization. The total operational cost is given by:
+由问题定义，对于使用资源类型 $f$ 经过航段 $(i,j)$ 的任意服务弧 $a$，其运营成本 $\cost_{af}$ 是空间常数 $\cost_{sf}$。设 $\mathbf{\fleetAssignVar}$ 为给定时间离散化上的可行路由向量。总运营成本为：
 \begin{equation*}
     \cost(\mathbf{\fleetAssignVar}) = \sum_{f \in \fleetSet} \sum_{a \in \arcSet} \cost_{af} \fleetAssignVar_{af}
 \end{equation*}
-By partitioning the set of all service arcs $\arcSet$ into subsets $\segArcSet{s}$ associated with each spatial segment $s \in \segSet$, we can rewrite the cost as:
+将所有服务弧集 $\arcSet$ 按每个空间航段 $s \in \segSet$ 对应的子集 $\segArcSet{s}$ 进行划分，可将成本改写为：
 \begin{equation*}
     \cost(\mathbf{\fleetAssignVar}) = \sum_{f \in \fleetSet} \sum_{s \in \segSet} \sum_{a \in \segArcSet{s}} \cost_{sf} \fleetAssignVar_{af} = \sum_{f \in \fleetSet} \sum_{s \in \segSet} \cost_{sf} \left( \sum_{a \in \segArcSet{s}} \fleetAssignVar_{af} \right)
 \end{equation*}
-Since the macroscopic frequency of resource type $f$ on segment $s$ is defined as $\freq_{sf} = \sum_{a \in \segArcSet{s}} \fleetAssignVar_{af}$, the total cost simplifies exactly to:
+由于资源类型 $f$ 在航段 $s$ 上的宏观频率定义为 $\freq_{sf} = \sum_{a \in \segArcSet{s}} \fleetAssignVar_{af}$，总成本恰好化简为：
 \begin{equation*}
     \cost(\mathbf{\fleetAssignVar}) = \sum_{f \in \fleetSet} \sum_{s \in \segSet} \cost_{sf} \freq_{sf}
 \end{equation*}
-Thus, the total cost term is invariant to the temporal variables and is purely a function of the spatial frequency vector $\mathbf{\freq}$.
+因此，总成本项与时间变量无关，纯粹是空间频率向量 $\mathbf{\freq}$ 的函数。
 \end{proof}

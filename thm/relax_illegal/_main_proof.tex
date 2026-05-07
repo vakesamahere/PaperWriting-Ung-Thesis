@@ -1,52 +1,52 @@
 \begin{proof}
-By Definition \ref{def:illegal_solution}, a relaxation solution $\solution_{rel} = (\fleetAssignVar^*, \shareVar^*, \outsideShareVar^*)$ with objective value $Z_{rel}^*$ is illegal if we cannot find a valid passenger allocation $(\shareVar, \outsideShareVar)$ such that $\solution = (\fleetAssignVar^*, \shareVar, \outsideShareVar)$ is feasible in the full model $\model{\discretizationFull}$ and achieves $Z = Z_{rel}^*$. We prove the theorem by establishing sufficiency and necessity.
+由定义 \ref{def:illegal_solution}，松弛解 $\solution_{rel} = (\fleetAssignVar^*, \shareVar^*, \outsideShareVar^*)$ 目标值为 $Z_{rel}^*$ 是非法的，如果我们无法找到有效的旅客分配 $(\shareVar, \outsideShareVar)$ 使得 $\solution = (\fleetAssignVar^*, \shareVar, \outsideShareVar)$ 在完整模型 $\model{\discretizationFull}$ 中可行且达到 $Z = Z_{rel}^*$。我们通过建立充分性和必要性来证明该定理。
 
-\textbf{Sufficiency (If any condition holds, the solution is illegal):} \\
-We establish sufficiency by demonstrating that each condition explicitly produces a mathematical inequality that strictly contradicts the constraint formulation of the full model $\model{\discretizationFull}$.
+\textbf{充分性（若任一条件成立，则解是非法的）：} \\
+我们通过证明每个条件显式产生一个与完整模型 $\model{\discretizationFull}$ 约束公式严格矛盾的数学不等式来建立充分性。
 
 \begin{itemize}
-    \item \textit{Condition 1 holds ($\impDeparts(i,t,f) > 0$):} 
-    In the full model $\model{\discretizationFull}$, the exact chronological flow conservation \eqref{constr:main.flow} combined with the non-negativity of variables explicitly requires that the total departure flow at any node $(i,t)$ must be bounded by the physically arrived and holding supply. The full model formulation algebraically mandates:
+    \item \textit{条件 1 成立（$\impDeparts(i,t,f) > 0$）：}
+    在完整模型 $\model{\discretizationFull}$ 中，精确的时序流量守恒 \eqref{constr:main.flow} 结合变量非负性显式要求任意节点 $(i,t)$ 的总出发流量必须受物理到达和停留供给的约束。完整模型公式在代数上要求：
     \begin{equation}
-        \sum_{a\in\departArc(i, t, f)} \fleetAssignVar_{af} \;\le\; \sum_{a\in\holdingArcIn(i, t, f)} \fleetAssignVar_{af} \;+\; \sum_{a\in\flightArc[-,legal](i, t, f)} \fleetAssignVar_{af} \quad \text{(Full Model Constraint)} \label{eq:proof.flow.legal}
+        \sum_{a\in\departArc(i, t, f)} \fleetAssignVar_{af} \;\le\; \sum_{a\in\holdingArcIn(i, t, f)} \fleetAssignVar_{af} \;+\; \sum_{a\in\flightArc[-,legal](i, t, f)} \fleetAssignVar_{af} \quad \text{（完整模型约束）} \label{eq:proof.flow.legal}
     \end{equation}
-    However, Condition 1 explicitly states that the relaxation assignment $\fleetAssignVar^*$ strictly violates this bound:
+    然而，条件 1 显式指出松弛分配 $\fleetAssignVar^*$ 严格违反此界：
     \begin{equation}
-        \sum_{a\in\departArc(i, t, f)} \fleetAssignVar_{af}^* \;>\; \sum_{a\in\holdingArcIn(i, t, f)} \fleetAssignVar_{af}^* \;+\; \sum_{a\in\flightArc[-,legal](i, t, f)} \fleetAssignVar_{af}^* \quad \text{(Condition 1)}
+        \sum_{a\in\departArc(i, t, f)} \fleetAssignVar_{af}^* \;>\; \sum_{a\in\holdingArcIn(i, t, f)} \fleetAssignVar_{af}^* \;+\; \sum_{a\in\flightArc[-,legal](i, t, f)} \fleetAssignVar_{af}^* \quad \text{（条件 1）}
     \end{equation}
-    This is a direct algebraic contradiction. Thus, $\fleetAssignVar^*$ cannot be a feasible assignment in $\model{\discretizationFull}$, rendering the solution illegal.
+    这是直接的代数矛盾。因此，$\fleetAssignVar^*$ 不可能是 $\model{\discretizationFull}$ 中的可行分配，使得该解非法。
     
-    \item \textit{Condition 2 holds ($\arcDepartFlow_{ijt} > 1$):} 
-    The full model explicitly enforces the minimum departure separation time via the cooldown constraint \eqref{constr:main.cooldown}, which algebraically mandates an upper bound of $1$:
+    \item \textit{条件 2 成立（$\arcDepartFlow_{ijt} > 1$）：}
+    完整模型通过冷却约束 \eqref{constr:main.cooldown} 显式强制最小出发间隔时间，在代数上要求上界为 $1$：
     \begin{equation}
-        \sum_{f\in \fleetSet}\sum_{a\in \arcDuringSepTime_{ijt}} \fleetAssignVar_{af} \;\le\; 1 \quad \text{(Full Model Constraint \ref{constr:main.cooldown})}
+        \sum_{f\in \fleetSet}\sum_{a\in \arcDuringSepTime_{ijt}} \fleetAssignVar_{af} \;\le\; 1 \quad \text{（完整模型约束 \ref{constr:main.cooldown}）}
     \end{equation}
-    However, the definition of Condition 2 explicitly produces a strictly opposite inequality under the assignment $\fleetAssignVar^*$:
+    然而，条件 2 的定义在分配 $\fleetAssignVar^*$ 下显式产生严格相反的不等式：
     \begin{equation}
-        \sum_{f\in \fleetSet}\sum_{a\in \arcDuringSepTime_{ijt}} \fleetAssignVar_{af}^* \;=\; \arcDepartFlow_{ijt} \;>\; 1 \quad \text{(Condition 2)}
+        \sum_{f\in \fleetSet}\sum_{a\in \arcDuringSepTime_{ijt}} \fleetAssignVar_{af}^* \;=\; \arcDepartFlow_{ijt} \;>\; 1 \quad \text{（条件 2）}
     \end{equation}
-    This explicitly contradicts \eqref{constr:main.cooldown}, confirming the feasible space is empty ($\emptyset$).
+    这显式矛盾 \eqref{constr:main.cooldown}，确认可行空间为空（$\emptyset$）。
     
-    \item \textit{Condition 3 holds ($\sum s_{Rpl}^* > 0$):} 
-    Assume Conditions 1 and 2 do not hold, so $\fleetAssignVar^*$ satisfies the physical network constraints. To be a legal solution achieving $Z = Z_{rel}^*$, there must exist passenger variables $(\shareVar, \outsideShareVar)$ that satisfy the exact choice and capacity formulation of $\model{\discretizationFull}$ while replicating the relaxation revenue. This algebraically mandates that the following system of inequalities must have a feasible solution:
+    \item \textit{条件 3 成立（$\sum s_{Rpl}^* > 0$）：}
+    假设条件 1 和 2 不成立，则 $\fleetAssignVar^*$ 满足物理网络约束。要成为达到 $Z = Z_{rel}^*$ 的合法解，必须存在旅客变量 $(\shareVar, \outsideShareVar)$ 满足 $\model{\discretizationFull}$ 的精确选择和容量公式，同时复现松弛收益。这在代数上要求以下不等式系统有可行解：
     \begin{equation}
     \begin{cases}
-        \text{Eq. \eqref{constr:main.choice.ratio}, \eqref{constr:main.choice.limit}, \eqref{constr:main.choice.capacity}, \eqref{constr:main.choice.covering}} & \text{(Full Model Constraints under } \fleetAssignVar^*) \\
-        \sum_{m,p,l} \sum_{r \in \itinInMarket_m} \demand_{mp} \fare_{rl} \shareVar_{rpl} \;\ge\; \sum_{m,p,l} \sum_{R \in \itinSuperInMarket_m} \demand_{mp} \fare_{Rl} \shareVar_{Rpl}^* & \text{(Target Revenue Requirement)}
+        \text{Eq. \eqref{constr:main.choice.ratio}, \eqref{constr:main.choice.limit}, \eqref{constr:main.choice.capacity}, \eqref{constr:main.choice.covering}} & \text{（$\fleetAssignVar^*$ 下的完整模型约束）} \\
+        \sum_{m,p,l} \sum_{r \in \itinInMarket_m} \demand_{mp} \fare_{rl} \shareVar_{rpl} \;\ge\; \sum_{m,p,l} \sum_{R \in \itinSuperInMarket_m} \demand_{mp} \fare_{Rl} \shareVar_{Rpl}^* & \text{（目标收益要求）}
     \end{cases}
     \end{equation}
-    However, the Revenue Feasibility Subproblem (RFS) maximizes exactly the left-hand side of the revenue requirement subject to the four full-model constraints. Condition 3 ($\sum s_{Rpl}^* > 0$) guarantees that the maximum possible revenue is strictly bounded below the target. Therefore, for all $(\shareVar, \outsideShareVar)$ within the full-model constraints, the exact opposite inequality holds:
+    然而，收益可行性子问题（RFS）在四个完整模型约束下精确最大化收益要求的左端。条件 3（$\sum s_{Rpl}^* > 0$）保证最大可能收益严格低于目标。因此，对所有满足完整模型约束的 $(\shareVar, \outsideShareVar)$，精确相反的不等式成立：
     \begin{equation}
-        \sum_{m,p,l} \sum_{r \in \itinInMarket_m} \demand_{mp} \fare_{rl} \shareVar_{rpl} \;<\; \sum_{m,p,l} \sum_{R \in \itinSuperInMarket_m} \demand_{mp} \fare_{Rl} \shareVar_{Rpl}^* \quad \text{(Condition 3 Implication)}
+        \sum_{m,p,l} \sum_{r \in \itinInMarket_m} \demand_{mp} \fare_{rl} \shareVar_{rpl} \;<\; \sum_{m,p,l} \sum_{R \in \itinSuperInMarket_m} \demand_{mp} \fare_{Rl} \shareVar_{Rpl}^* \quad \text{（条件 3 的推论）}
     \end{equation}
-    This explicit contradiction proves the constraint system is algebraically infeasible. The solution is therefore illegal.
+    这一显式矛盾证明约束系统在代数上不可行。因此该解是非法的。
 \end{itemize}
 
-\textbf{Necessity (If the solution is illegal, at least one condition must hold):} \\
-Assume $\solution_{rel}$ is illegal. By Definition \ref{def:illegal_solution}, under the fixed assignment $\fleetAssignVar^*$, either the feasible space for passenger allocations in $\model{\discretizationFull}$ is empty, or the space is non-empty but the maximum achievable objective is strictly less than $Z_{rel}^*$.
+\textbf{必要性（若解是非法的，则至少一个条件必须成立）：} \\
+假设 $\solution_{rel}$ 是非法的。由定义 \ref{def:illegal_solution}，在固定分配 $\fleetAssignVar^*$ 下，要么 $\model{\discretizationFull}$ 中旅客分配的可行空间为空，要么空间非空但最大可达目标严格小于 $Z_{rel}^*$。
 \begin{itemize}
-    \item If the feasible space is empty, $\fleetAssignVar^*$ breaks the physical formulation of $\model{\discretizationFull}$. Since aggregate spatial flow and choice bounds are strictly preserved by the mapping (Theorem \ref{pro.valid_relaxation}), the algebraic contradiction must occur in the exact chronological constraints. It must either strictly violate the flow conservation limit (triggering Condition 1's inequality) or strictly violate the instantaneous separation capacity (triggering Condition 2's inequality).
-    \item If the feasible space is non-empty but the maximum achievable objective is $Z < Z_{rel}^*$, the illegality is entirely due to revenue overestimation. Because the RFS is mathematically equivalent to optimizing over the full-model constraints \eqref{constr:main.choice.ratio}-\eqref{constr:main.choice.covering}, an inability to meet the target revenue strictly forces the RFS penalty objective $\sum s_{Rpl}^*$ to be strictly positive (triggering Condition 3).
+    \item 若可行空间为空，则 $\fleetAssignVar^*$ 破坏了 $\model{\discretizationFull}$ 的物理公式。由于聚合空间流量和选择界由映射严格保持（定理 \ref{pro.valid_relaxation}），代数矛盾必须发生在精确时序约束中。它必须严格违反流量守恒限制（触发条件 1 的不等式）或严格违反瞬时间隔容量（触发条件 2 的不等式）。
+    \item 若可行空间非空但最大可达目标为 $Z < Z_{rel}^*$，则非法性完全由收益高估造成。因为 RFS 在数学上等价于在完整模型约束 \eqref{constr:main.choice.ratio}-\eqref{constr:main.choice.covering} 上优化，无法达到目标收益严格迫使 RFS 惩罚目标 $\sum s_{Rpl}^*$ 严格为正（触发条件 3）。
 \end{itemize}
-Therefore, an illegal solution must trigger at least one of the three mutually exhaustive conditions, completing the proof.
+因此，非法解必须触发三个互斥穷尽条件中的至少一个，证明完毕。
 \end{proof}

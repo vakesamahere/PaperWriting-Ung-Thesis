@@ -1,26 +1,26 @@
-\subsection{Inter-Departure Violations}
-In the relaxation model, multiple departures on the same segment may be scheduled within a segment's minimum inter-departure time, which violates operational separation constraints. To detect and quantify such violations we define the departure flow inside the window starting at time $t$ on segment $(i,j)$ and compare it with the allowable limit.
+\subsection{间隔出发违规}
+在松弛模型中，同一航段上的多次出发可能被安排在航段的最小间隔出发时间内，这违反了运营间隔约束。为检测和量化此类违规，我们定义在航段$(i,j)$上从时间$t$开始的窗口内的出发流，并将其与允许限制进行比较。
 
-Let the set of arcs on segment $s = (i,j)$ be denoted by $\segArcSet{s}$. For each arc $a\in\segArcSet{s}$ write $a=(i,t_a,j,t'_a)$ so that $t_a$ denotes the departure time of $a$. Using the resource assignment variables $\fleetAssignVar_{a,f}$, we define the aggregated departure flow in the interval $[t, t+\minInterdepTime_{s})$ as
+令航段$s = (i,j)$上的弧集合记为$\segArcSet{s}$。对于每条弧$a\in\segArcSet{s}$写作$a=(i,t_a,j,t'_a)$，使得$t_a$表示$a$的出发时间。使用资源分配变量$\fleetAssignVar_{a,f}$，我们定义区间$[t, t+\minInterdepTime_{s})$内的聚合出发流为
 \begin{equation}
     \arcDepartFlow_{ijt} = \sum_{a\in\segArcSet{s}} \mathbf{1}\{t_a \in [t,\, t+\minInterdepTime_{s})\} \sum_{f\in\fleetSet} \fleetAssignVar_{a,f}.
 \end{equation}
 
-Here $\arcDepartFlow_{ijt}$ denotes the total number of departures measured in assigned flow on segment $(i,j)$ inside the minimum-separation window starting at $t$. In the full-model scope the instantaneous capacity permits at most one departure per separation window, hence the allowable upper bound is $1$. A separation violation occurs when the actual flow exceeds $1$.
+此处$\arcDepartFlow_{ijt}$表示在从$t$开始的最小间隔窗口内航段$(i,j)$上以分配流衡量的总出发次数。在完整模型范围内，瞬时容量允许每个间隔窗口最多一次出发，因此允许上界为$1$。当实际流超过$1$时发生间隔违规。
 
-We quantify the excess by the Separation Violation Flow
+我们通过间隔违规流量化超额
 \begin{equation}
     \sepViolFlow_{ijt} = \max\bigl\{0,\; \arcDepartFlow_{ijt} - 1\bigr\}.
 \end{equation}
 
-Equivalently one may define the Separation Violation Amount
+等价地可以定义间隔违规量
 \begin{equation}
     \sepViolAmount_{ij}(t) = \arcDepartFlow_{ijt} - 1,
 \end{equation}
-and truncate to non-negative values when reporting violations.
+并在报告违规时截断为非负值。
 
-Detection procedure: compute $\sepViolAmount_{ijt}$ for all segments $(i,j)$ and all discretized start times $t\in\discretization$. If there exists any $t$ such that
+检测过程：对所有航段$(i,j)$和所有离散化起始时间$t\in\discretization$计算$\sepViolAmount_{ijt}$。如果存在任何$t$使得
 \begin{equation}
     \sepViolAmount_{ijt} > 0,
 \end{equation}
-then the solution contains an inter-departure violation (the second illegal condition in Theorem~\ref{thm:relax_illegal}). The metric identifies which segments and time windows require refinement or constraint tightening. By adding time points to the discretization $\discretization^{1}$ we can ensure that all these inter-departure violations will not occur in the refined model. Denote the refined discretization as $\discretization^{2}$. The refine procedure will be described in the Subsection~\ref{sec:refine_process}.
+则解包含间隔出发违规（定理~\ref{thm:relax_illegal}中的第二个非法条件）。该度量识别哪些航段和时间窗口需要细化或约束收紧。通过向离散化$\discretization^{1}$添加时间点，我们可以确保所有这些间隔出发违规在细化模型中不会发生。记细化后的离散化为$\discretization^{2}$。细化过程将在第~\ref{sec:refine_process}~小节中描述。

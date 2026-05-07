@@ -1,11 +1,11 @@
-\paragraph*{Constraint~(\ref{constr:relax.choice.capacity})} By the mapping of $\shareVar$ from $\bar{\shareVar}$, for any service arc $a \in \flightArc$, we have
+\paragraph*{约束~(\ref{constr:relax.choice.capacity})} 由 $\shareVar$ 从 $\bar{\shareVar}$ 的映射，对任意服务弧 $a \in \flightArc$，我们有
 \begin{equation*}
     \sum_{m\in \marketSet}\sum_{p\in \psgTypeSet}\sum_{\ell\in \fareClassSet}\sum_{r\in \itinSuperUsingArc{m}{a}} 
     \demand_{mp}\, \shareVar_{rp\ell} 
     = \sum_{m\in \marketSet}\sum_{p\in \psgTypeSet}\sum_{\ell\in \fareClassSet} 
     \demand_{mp} \sum_{r\in \itinSuperUsingArc{m}{a}} \sum_{r' \in \eqClassByPathSig_{(r)}}\, \bar{\shareVar}_{r'p\ell}
 \end{equation*}
-Because for any super-itinerary $r \in \itinSetSuper$,
+因为对任意超级行程 $r \in \itinSetSuper$，
 \begin{equation*}
 \begin{aligned}
     r\in \itinSuperUsingArc{m}{a}
@@ -14,11 +14,11 @@ Because for any super-itinerary $r \in \itinSetSuper$,
     & \iff \forall r' \in \eqClassByPathSig_{(r)}, r' \in \itinUsingArc{m}{a}
 \end{aligned}
 \end{equation*}
-Therefore,
+因此，
 \[
     \sum_{r\in \itinSuperUsingArc{m}{a}} \sum_{r' \in \eqClassByPathSig_{(r)}}\, \bar{\shareVar}_{r'p\ell} = \sum_{r' \in \itinUsingArc{m}{a}} \, \bar{\shareVar}_{r'p\ell}
 \]
-Thus, we have
+从而，我们有
 \begin{equation*}
 \begin{aligned}
     \sum_{m\in \marketSet}\sum_{p\in \psgTypeSet}\sum_{\ell\in \fareClassSet}\sum_{r\in \itinSuperUsingArc{m}{a}} 
@@ -28,4 +28,4 @@ Thus, we have
     & \le \sum_{f\in \fleetSet} \fleetCap_{f}\, \fleetAssignVar_{af}
 \end{aligned}
 \end{equation*}
-Therefore, constraint~(\ref{constr:relax.choice.capacity}) is satisfied.
+因此，约束~(\ref{constr:relax.choice.capacity}) 得到满足。

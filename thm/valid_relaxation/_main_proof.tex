@@ -1,21 +1,20 @@
 \begin{proof}
-We need to show that any feasible solution to the full model $\model{\discretizationFull}$
-is also feasible to the relaxation model $\model{\discretization, \itinSetSuper}$, and that the objective value is no worse in the relaxation.
+我们需要证明完整模型 $\model{\discretizationFull}$ 的任意可行解也是松弛模型 $\model{\discretization, \itinSetSuper}$ 的可行解，且松弛中的目标值不劣于原解。
 
-The proof proceeds in three main steps. First, we prepare the necessary definitions and essential analytical tools. This includes introducing a routing existence lemma that disaggregates macroscopic flows into individual cyclic routes, and analyzing the core properties of the aggregation mapping $\Phi$ that globally govern the structural relationship between the original and partial time-space networks. Additionally, specific auxiliary sets and relations are defined to specifically tackle the intricacies of the resource availability constraints. Second, we explicitly construct a solution for the relaxation model $\model{\discretization, \itinSetSuper}$ from an arbitrary feasible solution of the full model $\model{\discretizationFull}$ by the mapping mentioned in the theorem statement \eqref{eq:map_ori2rel}. Finally, equipped with the preliminary tools, we verify that the constructed solution is feasible to $\model{\discretization, \itinSetSuper}$ and yields a non-worse objective value by examining each constraint and the objective function systematically.
+证明分三个主要步骤进行。首先，我们准备必要的定义和基本分析工具。这包括引入一个路由存在性引理，将宏观流量分解为单独的循环路由，以及分析聚合映射 $\Phi$ 的核心性质，该映射全局地支配着原始网络与部分时空网络之间的结构关系。此外，还定义了特定的辅助集合和关系，以专门处理资源可用性约束的复杂性。其次，我们通过定理陈述中提到的映射 \eqref{eq:map_ori2rel}，从完整模型 $\model{\discretizationFull}$ 的任意可行解显式构造松弛模型 $\model{\discretization, \itinSetSuper}$ 的解。最后，借助预备工具，我们通过逐一检验每个约束和目标函数，验证所构造的解对 $\model{\discretization, \itinSetSuper}$ 可行且目标值不劣。
 
 \input{thm/valid_relaxation/prepare.tex}
 
-With the preliminary tools in place, we now formally map an arbitrary feasible solution from the full model to the relaxed model.
-Let $\bar{\solution}=(\bar{\fleetAssignVar}, \bar{\shareVar}, \bar{\outsideShareVar})$ be any feasible solution to $\model{\discretizationFull}$.
+预备工具就绪后，我们现在正式将完整模型的任意可行解映射到松弛模型。
+设 $\bar{\solution}=(\bar{\fleetAssignVar}, \bar{\shareVar}, \bar{\outsideShareVar})$ 为 $\model{\discretizationFull}$ 的任意可行解。
 
-\paragraph*{Constructing solution in relaxation model}
-We construct a solution $\solution = (\fleetAssignVar, \shareVar, \outsideShareVar)$ for $\model{\discretization, \itinSetSuper}$ from $\bar{\solution}$ by the mapping mentioned in the theorem statement \eqref{eq:map_ori2rel}. 
-By construction $\fleetAssignVar_{af}\in\mathbb{Z}_{\ge0}$,
-so the domain condition~\eqref{constr:relax.domain.x.flight} is satisfied.
-All other variable-domain requirements remain unchanged and therefore continue to hold.
+\paragraph*{在松弛模型中构造解}
+我们通过定理陈述中提到的映射 \eqref{eq:map_ori2rel}，从 $\bar{\solution}$ 构造 $\model{\discretization, \itinSetSuper}$ 的解 $\solution = (\fleetAssignVar, \shareVar, \outsideShareVar)$。
+由构造可知 $\fleetAssignVar_{af}\in\mathbb{Z}_{\ge0}$，
+因此定义域条件~\eqref{constr:relax.domain.x.flight} 得到满足。
+所有其他变量定义域要求保持不变，因此继续成立。
 
-It remains to verify that this constructed solution satisfies all operational and choice constraints of $\model{\discretization, \itinSetSuper}$ and maintains a valid lower bound for the objective function. We evaluate these requirements systematically below.
+剩下需要验证的是，所构造的解满足 $\model{\discretization, \itinSetSuper}$ 的所有运营约束和选择约束，并保持目标函数的有效下界。我们在下面逐一验证这些要求。
 \input{thm/valid_relaxation/assign_flow.tex}
 \input{thm/valid_relaxation/assign_fleet_available.tex}
 \input{thm/valid_relaxation/assign_cooldown.tex}
@@ -26,5 +25,5 @@ It remains to verify that this constructed solution satisfies all operational an
 \input{thm/valid_relaxation/choice_covering.tex}
 \input{thm/valid_relaxation/revenue_preserve.tex}
 
-Therefore for any feasible solution of the full model, there exists a feasible solution in the aggregated model with a non-inferior objective value, $\model{\discretization, \itinSetSuper}$ provides a valid lower bound.
+因此，对于完整模型的任意可行解，在聚合模型中存在目标值不劣的可行解，$\model{\discretization, \itinSetSuper}$ 提供了有效的下界。
 \end{proof}

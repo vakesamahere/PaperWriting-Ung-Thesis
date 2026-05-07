@@ -1,27 +1,27 @@
-\section{Upper Bound Generation}
+\section{上界生成}
 \label{sec:ub}
 
-While the LBM provides a valid lower bound, its formulation on a coarse time-space network often results in solutions that are physically infeasible when mapped back to exact operating times. We propose an MIP-based upper bound (UB) generation module that acts as a repair algorithm based on lower bound information. This approach is designed to reconstruct strict, high-quality feasible solutions from the relaxed state. This section details the UB module within our \algoNotation framework. Unlike purely data-driven heuristics that blindly prune active arcs based on pool statistics, we propose a structure-aware macro-locking strategy called Frequency Fixing, carefully enhanced by rigorous Itinerary Cuts. The upper bound model $\ubm(\discretizationFull,\model{\discretization, \itinSetSuper})$ is formulated on the full time-space network $\full{\net}$ to ensure that the generated solution is directly feasible for the original problem, thus providing a valid upper bound.
+虽然LBM提供了有效的下界，但其在粗糙时空网络上的公式通常导致当映射回精确运营时间时物理不可行的解。我们提出一个基于MIP的上界（UB）生成模块，作为基于下界信息的修复算法。该方法旨在从松弛状态重构严格的高质量可行解。本节详细介绍我们\algoNotation 框架中的UB模块。与盲目基于池统计数据修剪活跃弧的纯数据驱动启发式不同，我们提出一种称为频率固定的结构感知宏锁定策略，并通过严格的行程割加以增强。上界模型$\ubm(\discretizationFull,\model{\discretization, \itinSetSuper})$在完整时空网络$\full{\net}$上建立，以确保生成的解对原始问题直接可行，从而提供有效的上界。
 
-\subsection{Frequency Fixing Constraint}
-The core assumption of Frequency Fixing is that although the relaxation solution is defined on a coarse network—and thus potentially physically infeasible when mapped to exact timings—it makes highly accurate decisions regarding resource allocation. Therefore, the resource frequency determined by the relaxation model is highly trustworthy and can be locked in the current iteration.
+\subsection{频率固定约束}
+频率固定的核心假设是，虽然松弛解定义在粗糙网络上——因此当映射到精确时间时可能物理不可行——但它在资源分配方面做出了高度准确的决策。因此，松弛模型确定的资源频率是高度可信的，可以在当前迭代中锁定。
 
-Let $\fleetAssignVar^{*}$ be the integer optimal solution obtained from the relaxation model. We calculate the service frequency for each segment $s=(i,j)$ and resource type $f$:
+令$\fleetAssignVar^{*}$为从松弛模型获得的整数最优解。我们计算每个航段$s=(i,j)$和资源类型$f$的服务频率：
 \begin{equation}
     \freq_{s,f} = \sum_{a \in \segArcSet{s}} \fleetAssignVar_{a,f}^{*}  \quad \in \mathbb{Z}_{\ge 0}
 \end{equation}
 
-We then construct the Upper Bound Model by enforcing these counts. We replace the generic frequency constraint~\eqref{constr:main.seg_freq} in the original model $\model{\discretizationFull}$ with:
+然后我们通过强制执行这些计数来构造上界模型。我们将原始模型$\model{\discretizationFull}$中的通用频率约束~\eqref{constr:main.seg_freq}替换为：
 \begin{equation}
     \sum_{a \in \full{\segArcSet{s}}} \fleetAssignVar_{a,f} = \freq_{s,f}, \quad \forall s \in \segSet, f \in \fleetSet
     % temp-command \tag{3e}
     \label{constr:ubm.freq_fix}
 \end{equation}
 
-By forcing the solver to respect the volume of the relaxation solution, the solver's burden is reduced to finding the best feasible timings that satisfy flow balance. This effectively reduces the multi-faceted original model into a pure scheduling problem.
+通过强制求解器尊重松弛解的量，求解器的负担被减少为找到满足流平衡的最佳可行时间。这有效地将多方面的原始模型简化为纯调度问题。
 
-\subsection{Addressing Revenue Overestimation via Itinerary Cuts}
-The standard Frequency Fixing only locks macro-level resource frequencies but leaves the revenue overestimation problem, which makes the model difficult to solve. To mitigate this, we inject super itineraries from the relaxation model into the upper bound model. We introduce continuous market share variables $\shareSVar_{R,p,\ell} \in [0, 1]$ in the UB model to represent the proportion of the market demand choosing super itinerary $R$ for passenger type $p$ and fare class $\ell$. By adding cuts that link the super itinerary share variables $\shareSVar_{R,p,\ell}$ with the original fine-grained share variables $\shareVar_{r,p,\ell}$, we enforce that the revenue contribution of a super itinerary must dominate the total revenue of its constituent fine-grained itineraries, thereby significantly tightening the upper bound and accelerating convergence of the branch-and-bound search. The detailed formulation of these cuts is provided below:
+\subsection{通过行程割解决收入高估}
+标准频率固定仅锁定宏观层面的资源频率，但留下了使模型难以求解的收入高估问题。为缓解这一问题，我们将松弛模型中的超级行程注入上界模型。我们在UB模型中引入连续市场份额变量$\shareSVar_{R,p,\ell} \in [0, 1]$，表示旅客类型$p$在票价等级$\ell$下选择超级行程$R$的市场需求比例。通过添加将超级行程份额变量$\shareSVar_{R,p,\ell}$与原始细粒度份额变量$\shareVar_{r,p,\ell}$联系起来的割，我们强制超级行程的收入贡献必须支配其组成细粒度行程的总收入，从而显著收紧上界并加速分支定界搜索的收敛。这些割的详细公式如下：
 \begin{equation}
     \outAttr_{mp}\, \shareSVar_{Rp\ell} \;\le\; \attrSuper_{Rp\ell}\, \outsideShareVar_{mp}
     \quad \forall m\in \marketSet,\, \forall p\in \psgTypeSet,\, \forall R\in \itinSuperInMarket_{m},\, \forall \ell\in \fareClassSet
@@ -57,18 +57,18 @@ The standard Frequency Fixing only locks macro-level resource frequencies but le
    \label{constr:ubm.itinerary_cut.cut}
 \end{equation}
 
-Collectively, constraints \eqref{constr:ubm.itinerary_cut.choice.ratio}-\eqref{constr:ubm.itinerary_cut.choice.covering} make sure that the super itinerary share $\shareSVar_{R,p,\ell}$ represents the customer choice behavior at the macro level (time windows in the partial network) and yields no less share than the aggregated share of its constituent fine-grained itineraries. The cut \eqref{constr:ubm.itinerary_cut.cut} explicitly links the super itinerary share variable with the fine-grained share variables, ensuring that the revenue contribution of the super itinerary dominates the sum of its underlying itineraries. By enforcing these relationships between the super itinerary and its constituent itineraries, we effectively tighten the upper bound and guide the solver towards more promising regions of the solution space, thus accelerating convergence to the global optimum.
+总体而言，约束\eqref{constr:ubm.itinerary_cut.choice.ratio}-\eqref{constr:ubm.itinerary_cut.choice.covering}确保超级行程份额$\shareSVar_{R,p,\ell}$在宏观层面（部分网络中的时间窗口）表示客户选择行为，并产生不少于其组成细粒度行程聚合份额的份额。割\eqref{constr:ubm.itinerary_cut.cut}明确将超级行程份额变量与细粒度份额变量联系起来，确保超级行程的收入贡献支配其底层行程的总和。通过强制超级行程与其组成行程之间的这些关系，我们有效地收紧了上界并引导求解器朝向解空间中更有前景的区域，从而加速收敛到全局最优。
 
-Let $\textbf{c}^{\mathrm{LB}}$ denote the cost term of optimal objective value of $\model{\discretization, \itinSetSuper}$. Let $\textbf{r}^{\mathrm{LB}}$ denote the revenue term of optimal objective value of $\model{\discretization, \itinSetSuper}$. By Proposition~\ref{pro.valid_relaxation}, $\model{\discretization, \itinSetSuper}$ constitutes a valid relaxation of the full model; it follows that the optimal revenue of any feasible solution of the original problem is bounded below by $\textbf{r}^{\mathrm{LB}}$. We exploit this bound explicitly by appending the following valid inequality:
+令$\textbf{c}^{\mathrm{LB}}$表示$\model{\discretization, \itinSetSuper}$最优目标值的成本项。令$\textbf{r}^{\mathrm{LB}}$表示$\model{\discretization, \itinSetSuper}$最优目标值的收入项。由命题~\ref{pro.valid_relaxation}，$\model{\discretization, \itinSetSuper}$构成完整模型的有效松弛；由此可得原始问题任何可行解的最优收入以$\textbf{r}^{\mathrm{LB}}$为下界。我们通过附加以下有效不等式来明确利用这一界：
 \begin{equation}
     \sum_{m\in \marketSet}\sum_{p\in \psgTypeSet}\sum_{\ell\in \fareClassSet}\sum_{r\in \itinInMarket_m}
     \demand_{mp}\, \fare_{r\ell}\, \shareVar_{rp\ell} \;\le\; \textbf{r}^{\mathrm{LB}}
     % temp-command \tag{3o}
     \label{constr:ubm.obj_cut}
 \end{equation}
-This cut explicitly excludes all LP solutions whose total revenue falls strictly below the known lower bound, thereby tightening the feasible region and reducing the effective search space of the branch-and-bound procedure.
+该割明确排除了总收入严格低于已知下界的所有LP解，从而收紧可行域并减少分支定界过程的有效搜索空间。
 
-Thus, we have a upper bound generation module that synergistically combines frequency fixing and itinerary cuts, effectively repairing the relaxed LB solution into a high-quality feasible solution that guides the exact solver towards global optimality, which is written as follows:
+因此，我们有一个协同结合频率固定和行程割的上界生成模块，有效地将松弛LB解修复为高质量可行解，引导精确求解器朝向全局最优，写作如下：
 \begin{equation}\begin{aligned}
     \ubm(\discretizationFull,\model{\discretization, \itinSetSuper}) = \min_{\shareSVar, \shareVar, \fleetAssignVar} \quad & \textbf{c}^{\mathrm{LB}} - \sum_{m\in \marketSet}\sum_{p\in \psgTypeSet}\sum_{\ell\in \fareClassSet}\sum_{r\in \itinInMarket_m} \demand_{mp}\, \shareVar_{rp\ell} \fare_{r,\ell}
     % temp-command \tag{3a}
@@ -83,35 +83,35 @@ Thus, we have a upper bound generation module that synergistically combines freq
 \\&
     \eqref{constr:ubm.freq_fix}, \eqref{constr:ubm.itinerary_cut.choice.ratio}, \eqref{constr:ubm.itinerary_cut.choice.limit}, \eqref{constr:ubm.itinerary_cut.choice.capacity}, \eqref{constr:ubm.itinerary_cut.choice.covering}, \eqref{constr:ubm.itinerary_cut.cut}, \eqref{constr:ubm.obj_cut} \notag
 \end{aligned}\end{equation}
-The following theorem guarantees the validity of the upper bound generated by $\ubm(\discretizationFull,\model{\discretization, \itinSetSuper})$ for the original model $\model{\discretizationFull}$.
+以下定理保证$\ubm(\discretizationFull,\model{\discretization, \itinSetSuper})$为原始模型$\model{\discretizationFull}$生成的上界的有效性。
 \input{thm/valid_upper_bound/_main.tex}
-% --- Explicit note about UBM infeasibility handling ---
-% If locked aggregated frequencies cannot be realized on the full time-space network,
-% UBM is infeasible; in our algorithm this corresponds to an objective of +\infty
-% and the candidate upper bound is ignored by the master algorithm (Algorithm~1).
-% We state this explicitly to clarify that no additional fallback repair is required:
-If the UB model $\ubm(\discretizationFull,\model{\discretization, \itinSetSuper})$ becomes infeasible under the locked aggregated frequencies $\freq_{s,f}$, the solver effectively returns an outcome (treated as an upper bound of $+\infty$ in our algorithm logic). In such cases the algorithm does not update the incumbent UB and proceeds to the refinement phase driven by LBM-infeasibilities.
-\subsection{Variable Reduction}
-To accelerate the solution process, we apply a series of exact variable reductions based on the fixed aggregated frequencies $\freq_{s,f}$. Because $\freq_{s,f}$ dictates the available network capacity, any segment with zero assigned services fundamentally breaks connectivity, allowing us to safely fix many variables to zero and eliminate redundant downstream variables and constraints prior to sending the model to the solver.
+% --- 关于UBM不可行性处理的明确说明 ---
+% 如果锁定的聚合频率无法在完整时空网络上实现，
+% UBM不可行；在我们的算法中这对应于+\infty的目标值
+% 候选上界被主算法（算法1）忽略。
+% 我们明确声明这一点以澄清不需要额外的后备修复：
+如果UB模型$\ubm(\discretizationFull,\model{\discretization, \itinSetSuper})$在锁定的聚合频率$\freq_{s,f}$下变得不可行，求解器有效地返回一个结果（在我们的算法逻辑中视为$+\infty$的上界）。在这种情况下，算法不更新现有UB，而是进入由LBM不可行性驱动的细化阶段。
+\subsection{变量缩减}
+为加速求解过程，我们基于固定的聚合频率$\freq_{s,f}$应用一系列精确的变量缩减。由于$\freq_{s,f}$决定了可用网络容量，任何零分配服务的航段从根本上破坏了连通性，使我们能够安全地将许多变量固定为零，并在将模型发送给求解器之前消除冗余的下游变量和约束。
 
-For any segment $s \in \segSet$ and resource type $f \in \fleetSet$, if the locked frequency $\freq_{s,f} = 0$, it implies that no services of type $f$ can be operated on segment $s$. Consequently, we immediately cascade this zero assignment to all underlying service assignment variables:
+对于任何航段$s \in \segSet$和资源类型$f \in \fleetSet$，如果锁定频率$\freq_{s,f} = 0$，则意味着不能在航段$s$上运营$f$型服务。因此，我们立即将此零分配级联到所有底层服务分配变量：
 \begin{equation}
     \fleetAssignVar_{a,f} = 0, \quad \forall a \in \full{\segArcSet{s}} \text{ if } \freq_{s,f} = 0
 \end{equation}
-This satisfies the frequency constraint \eqref{constr:ubm.freq_fix} intrinsically for these combinations, allowing us to remove these variables and constraints from the domain.
+这对这些组合内在地满足频率约束\eqref{constr:ubm.freq_fix}，使我们能够从域中移除这些变量和约束。
 
-Since an itinerary $r$ (or super itinerary $R$) fundamentally consists of a sequence of time-space service arcs, removing all capacity from any of its underlying spatial segments directly severs these physical paths. For notational convenience, we write $s \in r$ (or $s \in R$) to indicate that the spatial segment $s$ is traversed by the time-space arcs of itinerary $r$ (or super itinerary $R$). If an itinerary relies on a segment $s$ where no services of any resource type are assigned (i.e., $\sum_{f\in\fleetSet} \freq_{s,f} = 0$), the itinerary becomes physically impossible. Due to the covering constraints \eqref{constr:main.choice.covering} and \eqref{constr:ubm.itinerary_cut.choice.covering}, the market share associated with such itineraries falls to zero:
+由于行程$r$（或超级行程$R$）从根本上由一系列时空服务弧组成，移除其任何底层空间航段的所有容量直接切断了这些物理路径。为记号方便，我们写$s \in r$（或$s \in R$）表示空间航段$s$被行程$r$（或超级行程$R$）的时空弧所经过。如果行程依赖于没有任何资源类型分配服务的航段$s$（即$\sum_{f\in\fleetSet} \freq_{s,f} = 0$），则该行程变得物理不可能。由于覆盖约束\eqref{constr:main.choice.covering}和\eqref{constr:ubm.itinerary_cut.choice.covering}，与此类行程相关的市场份额降为零：
 \begin{equation}
     \shareVar_{r,p,\ell} = 0, \quad \text{if } \exists s \in r \text{ s.t. } \sum_{f\in\fleetSet} \freq_{s,f} = 0
 \end{equation}
 \begin{equation}
     \shareSVar_{R,p,\ell} = 0, \quad \text{if } \exists s \in R \text{ s.t. } \sum_{f\in\fleetSet} \freq_{s,f} = 0
 \end{equation}
-These zero-valued variables can be explicitly removed from the model. As a consequence, the itinerary cut constraint \eqref{constr:ubm.itinerary_cut.cut} for a given super itinerary $R$ can be completely deleted only if all of its constituent fine-grained itineraries $r \in R$ are closed (i.e., fixed to zero). If only a subset of $r \in R$ are removed, the constraint \eqref{constr:ubm.itinerary_cut.cut} must be retained to bind the super itinerary variable $sw_R$ with the remaining active fine-grained itineraries.
+这些零值变量可以从模型中明确移除。因此，给定超级行程$R$的行程割约束\eqref{constr:ubm.itinerary_cut.cut}只有在其所有组成细粒度行程$r \in R$都被关闭（即固定为零）时才能完全删除。如果只有$r \in R$的子集被移除，约束\eqref{constr:ubm.itinerary_cut.cut}必须保留以将超级行程变量$sw_R$与剩余活跃的细粒度行程绑定。
 
-For any market $m \in \marketSet$, if all its constituent active itineraries $r \in \itinInMarket_{m}$ and super itineraries $R \in \itinSuperInMarket_{m}$ are eliminated by the reduction above, a purely unserved scenario is triggered. Passengers in this market simply have no available service options to choose from.
-According to the choice limit identity constraint \eqref{constr:main.choice.limit}, the outside option share variable $\outsideShareVar_{mp}$ inevitably becomes a deterministic constant bounded entirely by the respective utilities:
+对于任何市场$m \in \marketSet$，如果其所有组成活跃行程$r \in \itinInMarket_{m}$和超级行程$R \in \itinSuperInMarket_{m}$都被上述缩减消除，则触发纯未服务场景。该市场中的旅客根本没有可选择的可用服务选项。
+根据选择限制恒等约束\eqref{constr:main.choice.limit}，外部选项份额变量$\outsideShareVar_{mp}$不可避免地变为完全由相应效用限制的确定性常数：
 \begin{equation}
     \outsideShareVar_{mp} = \frac{\outAttr_{mp}}{\adjOutAttr_{mp}}, \quad \text{if } \shareVar_{r,p,\ell} = 0 \; \forall r \in \itinInMarket_m
 \end{equation}
-Therefore, we can completely eliminate $\outsideShareVar_{mp}$ as a variable and remove market $m$'s related choice limit \eqref{constr:main.choice.limit} and ratio limits \eqref{constr:main.choice.ratio} entirely from the optimization framework, significantly compressing the constraint matrix dimensions.
+因此，我们可以将$\outsideShareVar_{mp}$作为变量完全消除，并将市场$m$相关的选择限制约束\eqref{constr:main.choice.limit}和比率限制约束\eqref{constr:main.choice.ratio}从优化框架中完全移除，显著压缩约束矩阵维度。

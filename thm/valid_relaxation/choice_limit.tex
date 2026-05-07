@@ -1,26 +1,26 @@
-\paragraph*{Constraint~(\ref{constr:relax.choice.limit})} Because $(\bar{\fleetAssignVar}, \bar{\shareVar}, \bar{\outsideShareVar})$ is feasible to $\model{\discretizationFull}$, by constraint~(\ref{constr:main.choice.limit}) we have:
+\paragraph*{约束~(\ref{constr:relax.choice.limit})} 因为 $(\bar{\fleetAssignVar}, \bar{\shareVar}, \bar{\outsideShareVar})$ 对 $\model{\discretizationFull}$ 可行，由约束~(\ref{constr:main.choice.limit}) 我们有：
 \[
     \left(\frac{\adjOutAttr_{mp}}{\outAttr_{mp}}\right) \bar{\outsideShareVar}_{mp}
     + \sum_{r' \in \itinInMarket_{m}} \sum_{\ell \in \fareClassSet} \left(\frac{\adjAttr_{r'p\ell}}{\attr_{r'p\ell}}\right) \bar{\shareVar}_{r'p\ell}
     = 1
 \]
-By the disjointness and exhaustiveness of the equivalence classes in $\eqClassByPathSig$, we have
+由 $\eqClassByPathSig$ 中等价类的不相交性和穷尽性，我们有
 \[
     \left(\frac{\adjOutAttr_{mp}}{\outAttr_{mp}}\right) \bar{\outsideShareVar}_{mp}
     + \sum_{r \in \itinSuperInMarket_{m}}\sum_{r' \in \eqClassByPathSig_{(r)}} \sum_{\ell \in \fareClassSet} \left(\frac{\adjAttr_{r'p\ell}}{\attr_{r'p\ell}}\right) \bar{\shareVar}_{r'p\ell}
     = 1
 \]
-By definition~(\ref{def:relax.shadowAttrSuper}), obviously we have
+由定义~(\ref{def:relax.shadowAttrSuper})，显然有
 \[
     \frac{\adjAttrSuper_{rp\ell}}{\attrSuper_{rp\ell}} \le \frac{\adjAttr_{r'p\ell}}{\attr_{r'p\ell}} \quad \forall r' \in \eqClassByPathSig_{(r)}
 \]
 \[
     \sum_{r' \in \eqClassByPathSig_{(r)}} \left(\frac{\adjAttr_{r'p\ell}}{\attr_{r'p\ell}}\right) \bar{\shareVar}_{r'p\ell} \ge \left(\frac{\adjAttrSuper_{rp\ell}}{\attrSuper_{rp\ell}}\right) \sum_{r' \in \eqClassByPathSig_{(r)}} \bar{\shareVar}_{r'p\ell} = \left(\frac{\adjAttrSuper_{rp\ell}}{\attrSuper_{rp\ell}}\right) \shareVar_{rp\ell}
 \]
-Thus, we have
+因此，我们有
 \[
     \left(\frac{\adjOutAttr_{mp}}{\outAttr_{mp}}\right) \outsideShareVar_{mp}
     + \sum_{r \in \itinSuperInMarket_{m}} \sum_{\ell \in \fareClassSet} \left(\frac{\adjAttrSuper_{rp\ell}}{\attrSuper_{rp\ell}}\right) \shareVar_{rp\ell}
     \le 1
 \]
-Therefore, constraint~(\ref{constr:relax.choice.limit}) is satisfied.
+因此，约束~(\ref{constr:relax.choice.limit}) 得到满足。

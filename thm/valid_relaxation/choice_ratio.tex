@@ -1,4 +1,4 @@
-\paragraph*{Constraint~(\ref{constr:relax.choice.ratio})} For any super-itinerary $r \in \itinSetSuper$, market $m \in \marketSet$, passenger type $p \in \psgTypeSet$, and fare class $\ell \in \fareClassSet$, we have
+\paragraph*{约束~(\ref{constr:relax.choice.ratio})} 对任意超级行程 $r \in \itinSetSuper$、市场 $m \in \marketSet$、旅客类型 $p \in \psgTypeSet$ 和票价等级 $\ell \in \fareClassSet$，我们有
 \begin{equation*}
 \begin{aligned}
     \outAttr_{mp}\, \shareVar_{rp\ell}
@@ -9,19 +9,19 @@
     % \\ & = \outsideShareVar_{mp} \sum_{r' \in S_r} \attr_{r'p\ell}
 \end{aligned}
 \end{equation*}
-Because $(\bar{\fleetAssignVar}, \bar{\shareVar}, \bar{\outsideShareVar})$ is feasible to $\model{\discretizationFull}$, by constraint~(\ref{constr:main.choice.covering}) we have:
+因为 $(\bar{\fleetAssignVar}, \bar{\shareVar}, \bar{\outsideShareVar})$ 对 $\model{\discretizationFull}$ 可行，由约束~(\ref{constr:main.choice.covering}) 我们有：
 \[
     \sum_{r' \in \eqClassByOrigPath} \bar{\shareVar}_{r'p\ell} > 0 \implies \forall a=(o,t,d,t'), (o,d,t)\in\origPath{r'} \\qquad \sum_{f\in\fleetSet}\bar{\fleetAssignVar}_{af} = 1
 \]
 
-Denote the $i$th leg of itinerary $r'$ by $a_i^{r'}$.
-For the equivalence class $\eqClassByPathSig_{(r)}$, each original itinerary $r' \in \eqClassByPathSig_{(r)}$ shares the same discreted path signature, which means for any given $i$, the $i$th leg $a_i^{r'}, a_i^{r''}$ of any two original itineraries $r', r'' \in \eqClassByPathSig_{(r)}$, they are mapped to the same time-arc in the aggregated network, i.e., $\Phi_{\arcSet}(a_i^{r'}) = \Phi_{\arcSet}(a_i^{r''})$, which also means there is some time point $t_i$ in the discretization set $\discretization_{o_i}$ such that all $i$th legs $\{a_i^{r'}\}_{r'\in\eqClassByPathSig_{(r)}}$ of original itineraries in $\eqClassByPathSig_{(r)}$ are mapped to time-arc $(o_i, t_i, d_i, t'_i)$ in the aggregated network, which implies $\{\Phi_{\arcSet}(a_i^{r'})\}_{r'\in\eqClassByPathSig_{(r)}}\subseteq\arcDuringSepTime_{o_i,d_i,t_i}^{\discretization}$. Therefore, we have
+记行程 $r'$ 的第 $i$ 段航程为 $a_i^{r'}$。
+对于等价类 $\eqClassByPathSig_{(r)}$，每条原始行程 $r' \in \eqClassByPathSig_{(r)}$ 共享相同的离散化路径签名，这意味着对任意给定的 $i$，任意两条原始行程 $r', r'' \in \eqClassByPathSig_{(r)}$ 的第 $i$ 段航程 $a_i^{r'}, a_i^{r''}$ 在聚合网络中映射到相同的时间弧，即 $\Phi_{\arcSet}(a_i^{r'}) = \Phi_{\arcSet}(a_i^{r''})$，这也意味着在离散化集 $\discretization_{o_i}$ 中存在某个时间点 $t_i$，使得 $\eqClassByPathSig_{(r)}$ 中所有原始行程的第 $i$ 段航程 $\{a_i^{r'}\}_{r'\in\eqClassByPathSig_{(r)}}$ 都映射到聚合网络中的时间弧 $(o_i, t_i, d_i, t'_i)$，这意味着 $\{\Phi_{\arcSet}(a_i^{r'})\}_{r'\in\eqClassByPathSig_{(r)}}\subseteq\arcDuringSepTime_{o_i,d_i,t_i}^{\discretization}$。因此，我们有
 \[
     \sum_{f\in\fleetSet}\sum_{a\in\{a_i^{r'}\}_{r'\in\eqClassByPathSig_{(r)}}} \bar{\fleetAssignVar}_{af}
     \le \sum_{f\in\fleetSet}\sum_{a\in\arcDuringSepTime_{o_i,d_i,t_i}^{\discretization}} \fleetAssignVar_{af}
     \le \departLimit_{o_i,d_i,t_i} := \departLimit
 \]
-Thus $|\{\eqClassByOrigPath \in \eqClassByPathSig_{(r)}/\eqRelByOrigPath\mid \sum_{r' \in \eqClassByOrigPath} \bar{\shareVar}_{r'p\ell} > 0\}| \le \departLimit$, so we have
+因此 $|\{\eqClassByOrigPath \in \eqClassByPathSig_{(r)}/\eqRelByOrigPath\mid \sum_{r' \in \eqClassByOrigPath} \bar{\shareVar}_{r'p\ell} > 0\}| \le \departLimit$，所以我们有
 \begin{equation*}
 \begin{aligned}
     \outAttr_{mp} \sum_{\eqClassByOrigPath \in \eqClassByPathSig_{(r)}/\eqRelByOrigPath} \sum_{r' \in \eqClassByOrigPath} \bar{\shareVar}_{r'p\ell}
@@ -30,4 +30,4 @@ Thus $|\{\eqClassByOrigPath \in \eqClassByPathSig_{(r)}/\eqRelByOrigPath\mid \su
     & = \attrSuper_{rp\ell} \outsideShareVar_{mp}
 \end{aligned}
 \end{equation*}
-Thus, constraint~(\ref{constr:relax.choice.ratio}) is satisfied.
+因此，约束~(\ref{constr:relax.choice.ratio}) 得到满足。

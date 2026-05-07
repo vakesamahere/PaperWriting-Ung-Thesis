@@ -1,8 +1,8 @@
-\paragraph*{Flow-balance constraints \eqref{constr:relax.flow}.}
-For any node $(i,t)\in\nodeSet$, the outgoing arc set
-$\outArcSet{(i,t)}$ is the image of $\biguplus_{(i,\tau)\in\Phi_{\nodeSet}^{-1}(i,t)}\outArcSet{(i,\tau)}$ and the ingoing arc set
-$\inArcSet{(i,t)}$ is the image of $\biguplus_{(i,\tau)\in\Phi_{\nodeSet}^{-1}(i,t)}\inArcSet{(i,\tau)}$.
-Hence,
+\paragraph*{流量平衡约束 \eqref{constr:relax.flow}。}
+对任意节点 $(i,t)\in\nodeSet$，出弧集
+$\outArcSet{(i,t)}$ 是 $\biguplus_{(i,\tau)\in\Phi_{\nodeSet}^{-1}(i,t)}\outArcSet{(i,\tau)}$ 的像，入弧集
+$\inArcSet{(i,t)}$ 是 $\biguplus_{(i,\tau)\in\Phi_{\nodeSet}^{-1}(i,t)}\inArcSet{(i,\tau)}$ 的像。
+因此，
 \begin{equation*}
 \begin{aligned}
     \sum_{a\in\outArcSet{(i,t)}}\fleetAssignVar_{af}
@@ -13,10 +13,9 @@ Hence,
     &= \sum_{(i,\tau)\in\Phi_{\nodeSet}^{-1}(i,t)}\ \sum_{a'\in\inArcSet{(i,\tau)}}\bar{\fleetAssignVar}_{a'f}.
 \end{aligned}
 \end{equation*}
-Each node $(i,\tau)\in\full{\nodeSet}$ satisfies the full-model
-flow balance, so summing over $\Phi_{\nodeSet}^{-1}(i,t)$ yields zero.
-The arcs in $\Phi_{\arcSet}^{-1}(\bot)$ start and end within the same set $\Phi_{\nodeSet}^{-1}(i,t)$, hence their contributions cancel out, ensuring that no residual flow remains.
+完整网络中每个节点 $(i,\tau)\in\full{\nodeSet}$ 满足完整模型的流量平衡，因此对 $\Phi_{\nodeSet}^{-1}(i,t)$ 求和得零。
+$\Phi_{\arcSet}^{-1}(\bot)$ 中的弧起止于同一集合 $\Phi_{\nodeSet}^{-1}(i,t)$ 内，因此其贡献相互抵消，确保无残余流量。
 \[
 \sum_{a\in\outArcSet{(i,t)}}\fleetAssignVar_{af} - \sum_{a\in\inArcSet{(i,t)}}\fleetAssignVar_{af} = \sum_{(i,\tau)\in\Phi_{\nodeSet}^{-1}(i,t)} (\sum_{a'\in\outArcSet{(i,\tau)}}\bar{\fleetAssignVar}_{a'f} - \sum_{a'\in\inArcSet{(i,\tau)}}\bar{\fleetAssignVar}_{a'f}) = 0.
 \]
-Therefore \eqref{constr:relax.flow} holds in $\model{\discretization, \itinSetSuper}$.
+因此 \eqref{constr:relax.flow} 在 $\model{\discretization, \itinSetSuper}$ 中成立。

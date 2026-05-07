@@ -1,6 +1,6 @@
 
 \begin{lemma}\label{lem:fleet_avail.expand}
-For every resource type $f\in\fleetSet$ and cut time $\checkTime$,
+对每种资源类型 $f\in\fleetSet$ 和截断时间 $\checkTime$，
 \begin{equation*}
 \begin{aligned}
     &\sum_{a\in\holdingArcTc{\checkTime}}\fleetAssignVar_{af}
@@ -16,8 +16,7 @@ For every resource type $f\in\fleetSet$ and cut time $\checkTime$,
 \end{equation*}
 \end{lemma}
 \begin{proof}
-Using \eqref{eq:fleet_avail.aggregate} and the disjointness of the family
-$\{\Phi_{\arcSet}^{-1}(a)\}_{a\in\arcSet}$ we obtain
+利用 \eqref{eq:fleet_avail.aggregate} 和族 $\{\Phi_{\arcSet}^{-1}(a)\}_{a\in\arcSet}$ 的不相交性，我们得到
 \begin{equation*}
 \begin{aligned}
     &\sum_{a\in\holdingArcTc{\checkTime}}\fleetAssignVar_{af}
@@ -29,7 +28,7 @@ $\{\Phi_{\arcSet}^{-1}(a)\}_{a\in\arcSet}$ we obtain
     -\sum_{a'\in\Phi_{\arcSet}^{-1}(\invertArcTc{\checkTime})}\bar{\fleetAssignVar}_{a'f}.
 \end{aligned}
 \end{equation*}
-Inserting the route decomposition~\eqref{eq:fleet_avail.route_decomp} and exchanging summations yields
+代入路由分解~\eqref{eq:fleet_avail.route_decomp} 并交换求和顺序得到
 \begin{equation*}
 \begin{aligned}
     &\sum_{a\in\holdingArcTc{\checkTime}}\fleetAssignVar_{af}
@@ -62,7 +61,7 @@ Inserting the route decomposition~\eqref{eq:fleet_avail.route_decomp} and exchan
         \right).
 \end{aligned}
 \end{equation*}
-For notational convenience lift every arrival time across the planning horizon:
+为记号方便，将每个到达时间提升到规划时域上：
 \[
     \widetilde{t}_o(a) := t_o(a),\qquad
     \widetilde{t}_d(a) :=
@@ -71,7 +70,7 @@ For notational convenience lift every arrival time across the planning horizon:
             t_d(a)+H, & t_o(a)+\travelTime_a \ge \planningEnd.
         \end{cases}
 \]
-Then the circular relations used in the definitions of $\arcPosi$ and $\arcNega$ rewrite as
+则 $\arcPosi$ 和 $\arcNega$ 定义中使用的循环关系改写为
 \begin{equation*}
 \begin{aligned}
     a\in\arcPosi
@@ -80,32 +79,32 @@ Then the circular relations used in the definitions of $\arcPosi$ and $\arcNega$
         &\iff \widetilde{t}_d(a) \le \checkTime < \widetilde{t}_o(a) \wedge t_o(a)+\travelTime_a < \planningEnd.
 \end{aligned}
 \end{equation*}
-Fix $r$ and abbreviate $a:=a_{k,r}$. We compare the lifted inequalities with the constraint sets:
+固定 $r$ 并简记 $a:=a_{k,r}$。我们将提升不等式与约束集进行比较：
 \begin{itemize}
-    \item If $a\in\flightArcTc{\checkTime}$, then either
-    $t_o(a)\le \checkTime < t_d(a)$ (non wrap) or
-    $t_d(a)<t_o(a)\le \checkTime < \planningEnd \le t_o(a)+\travelTime_a$ (wrap case).
-    In both situations $\widetilde{t}_o(a) \le \checkTime < \widetilde{t}_d(a)$, hence $a\in\arcPosi$.
-    The same implication holds for holding arcs.
-    Conversely, if $a\in\arcPosi$ and $t_o(a)+\travelTime_a < \planningEnd$, then $\checkTime$ lies between $t_o(a)$ and $t_d(a)$ without wrapping, so $a$ belongs to $\holdingArcTc{\checkTime}\cup\flightArcTc{\checkTime}$.
-    If $a\in\arcPosi$ and $t_o(a)+\travelTime_a \ge \planningEnd$, then $\checkTime$ sits between $\widetilde{t}_o(a)=t_o(a)$ and $\widetilde{t}_d(a)=t_d(a)+H$, forcing the wrap-around condition in $\holdingArcTc{\checkTime}$ or $\flightArcTc{\checkTime}$. Thus
+    \item 若 $a\in\flightArcTc{\checkTime}$，则要么
+    $t_o(a)\le \checkTime < t_d(a)$（非环绕），要么
+    $t_d(a)<t_o(a)\le \checkTime < \planningEnd \le t_o(a)+\travelTime_a$（环绕情况）。
+    在两种情况下 $\widetilde{t}_o(a) \le \checkTime < \widetilde{t}_d(a)$，因此 $a\in\arcPosi$。
+    对停留弧同样成立。
+    反之，若 $a\in\arcPosi$ 且 $t_o(a)+\travelTime_a < \planningEnd$，则 $\checkTime$ 位于 $t_o(a)$ 和 $t_d(a)$ 之间且无环绕，因此 $a$ 属于 $\holdingArcTc{\checkTime}\cup\flightArcTc{\checkTime}$。
+    若 $a\in\arcPosi$ 且 $t_o(a)+\travelTime_a \ge \planningEnd$，则 $\checkTime$ 位于 $\widetilde{t}_o(a)=t_o(a)$ 和 $\widetilde{t}_d(a)=t_d(a)+H$ 之间，迫使 $\holdingArcTc{\checkTime}$ 或 $\flightArcTc{\checkTime}$ 中的环绕条件成立。因此
     \[
         a\in\holdingArcTc{\checkTime}\cup\flightArcTc{\checkTime}
         \iff a\in\arcPosi.
     \]
-    \item If $a\in\invertArcTc{\checkTime}$, Definition~\ref{def:relax.invertArcTc} furnishes
-    $t_d(a)\le \checkTime < t_o(a)$ together with $t_o(a)+\travelTime_a<\planningEnd$.
-    Hence $\widetilde{t}_d(a)=t_d(a)$, yielding $\widetilde{t}_d(a) \le \checkTime < \widetilde{t}_o(a)$, i.e.\ $a\in\arcNega$.
-    Conversely, if $a\in\arcNega$ then by definition $t_o(a)+\travelTime_a<\planningEnd$ and
-    $\widetilde{t}_d(a) \le \checkTime < \widetilde{t}_o(a)$.
-    Because the wrap condition excludes $\widetilde{t}_d(a)=t_d(a)+H$, the lifted inequality collapses to $t_d(a)\le \checkTime < t_o(a)$, so $a\in\invertArcTc{\checkTime}$.
+    \item 若 $a\in\invertArcTc{\checkTime}$，定义~\ref{def:relax.invertArcTc} 给出
+    $t_d(a)\le \checkTime < t_o(a)$ 以及 $t_o(a)+\travelTime_a<\planningEnd$。
+    因此 $\widetilde{t}_d(a)=t_d(a)$，得到 $\widetilde{t}_d(a) \le \checkTime < \widetilde{t}_o(a)$，即 $a\in\arcNega$。
+    反之，若 $a\in\arcNega$，则由定义 $t_o(a)+\travelTime_a<\planningEnd$ 且
+    $\widetilde{t}_d(a) \le \checkTime < \widetilde{t}_o(a)$。
+    因为环绕条件排除了 $\widetilde{t}_d(a)=t_d(a)+H$，提升不等式化简为 $t_d(a)\le \checkTime < t_o(a)$，因此 $a\in\invertArcTc{\checkTime}$。
 \end{itemize}
-Therefore
+因此
 \[
     \#\{r \mid a_{k,r}\in\holdingArcTc{\checkTime}\cup\flightArcTc{\checkTime}\}=|\arcPosi|,
     \qquad
     \#\{r \mid a_{k,r}\in\invertArcTc{\checkTime}\}=|\arcNega|,
 \]
-and the parenthesis equals $|\arcPosi|-|\arcNega|$.
-This proves the lemma.
+括号内等于 $|\arcPosi|-|\arcNega|$。
+引理得证。
 \end{proof}

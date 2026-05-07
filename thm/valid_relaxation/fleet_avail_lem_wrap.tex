@@ -1,29 +1,29 @@
 
 \begin{lemma}\label{lem:fleet_avail.wrap}
-For every resource type $f$ and route $\pathInRoute{f}{k}$,
-$|\arcPosi|-|\arcNega|=\wrapnum_{fk}$.
+对每种资源类型 $f$ 和路由 $\pathInRoute{f}{k}$，
+$|\arcPosi|-|\arcNega|=\wrapnum_{fk}$。
 \end{lemma}
 \begin{proof}
 
-We only consider a fixed $k\in K_f$ in the following proof and omit the subscript $k$ for brevity. Denote $\widetilde{\pathInRoute{f}{k}}$ as $(a_{1},a_{2},\ldots,a_{Q})$. Denote $\wrapSet = \wrapSet_{fk}$.
-Define operations $\oplus,\,\ominus$ for indexes as follows:
+以下证明中我们仅考虑固定的 $k\in K_f$，为简洁省略下标 $k$。记 $\widetilde{\pathInRoute{f}{k}}$ 为 $(a_{1},a_{2},\ldots,a_{Q})$。记 $\wrapSet = \wrapSet_{fk}$。
+定义索引运算 $\oplus,\,\ominus$ 如下：
 \[
     a\oplus b := a+b \mod Q,
     \qquad
     a\ominus b := a-b \mod Q.
 \]
 
-Define the sign profile recording the position of the departure time of arc $a_{r}$ relative to the cut at $\checkTime$:
+定义符号序列，记录弧 $a_{r}$ 的出发时间相对于截断点 $\checkTime$ 的位置：
 \[
     \sign_{r} :=
     \begin{cases}
         0, & t_o(a_{r})\le\checkTime,\\
-        1, & \text{otherwise}
+        1, & \text{其他}
     \end{cases}
     \qquad r=1,\ldots,Q.
 \]
 
-Because the route is continuous, $t_o(a_{r})$ and $t_d(a_{r\ominus1})$ must be equal at the cut. Consider the combination of two consecutive signs, by definitions above, define:
+因为路由是连续的，$t_o(a_{r})$ 和 $t_d(a_{r\ominus1})$ 在截断处必须相等。考虑两个连续符号的组合，由上述定义，定义：
 \[
     \slr{r} := (\sign_{r\ominus1},\sign_{r}) = (0,1)\qquad( \iff t_o(a_r)\le\checkTime < t_d(a_r))
 \]
@@ -46,8 +46,8 @@ Because the route is continuous, $t_o(a_{r})$ and $t_d(a_{r\ominus1})$ must be e
     a_r\in\arcNega \iff \srl{r} \wedge \neg(a_r\in\wrapSet)
 \]
 
-Define set $\wrapTc = \arcPosi \cap \wrapSet$. Therefore, we can derive the following equations.
-First, we derive that $a_r\in\arcPosi\setminus\wrapTc$ is equivalent to $\slr{r}$:
+定义集合 $\wrapTc = \arcPosi \cap \wrapSet$。因此，我们可以推导出以下等式。
+首先，我们推导 $a_r\in\arcPosi\setminus\wrapTc$ 等价于 $\slr{r}$：
 \begin{equation*}
 \begin{aligned}
     a_r\in\arcPosi\setminus\wrapTc
@@ -86,7 +86,7 @@ First, we derive that $a_r\in\arcPosi\setminus\wrapTc$ is equivalent to $\slr{r}
     & \iff \slr{r}
 \end{aligned}
 \end{equation*}
-The equivalence marked with $(*)$ holds because:
+标记 $(*)$ 的等价关系成立，因为：
 \begin{equation*}
 \begin{aligned}
     a_r\in\arcPosi - (\srr{r} \wedge a_r\in\arcPosi) 
@@ -107,7 +107,7 @@ and
 \end{aligned}
 \end{equation*}
 
-Second, we derive that $a_r\in(\wrapSet\setminus\wrapTc)\cup\arcNega$ is equivalent to $\srl{r}$:
+其次，我们推导 $a_r\in(\wrapSet\setminus\wrapTc)\cup\arcNega$ 等价于 $\srl{r}$：
 \begin{equation*}
 \begin{aligned}
     a_r\in\wrapSet\setminus\wrapTc
@@ -120,7 +120,7 @@ Second, we derive that $a_r\in(\wrapSet\setminus\wrapTc)\cup\arcNega$ is equival
 \end{aligned}
 \end{equation*}
 
-Thus,
+从而，
 \begin{equation*}
 \begin{aligned}
     a_r\in(\wrapSet\setminus\wrapTc)\cup\arcNega
@@ -129,7 +129,7 @@ Thus,
 \end{aligned}
 \end{equation*}
 
-Now we have two important results:
+现在我们有两个重要结果：
 \[
     a_r\in\arcPosi\setminus\wrapTc \iff \slr{r}
 \]
@@ -137,14 +137,14 @@ Now we have two important results:
     a_r\in(\wrapSet\setminus\wrapTc)\cup\arcNega \iff \srl{r}
 \]
 
-Because the route is cyclic and continuous, the number of $\slr{r}$ equals the number of $\srl{r}$ when scanning through the sequence:
+因为路由是循环且连续的，遍历序列时 $\slr{r}$ 的个数等于 $\srl{r}$ 的个数：
 \[
     \#\{r\mid \slr{r}\} = \#\{r\mid \srl{r}\}
 \]
 
-which means $\lvert\arcPosi\setminus\wrapTc\rvert = \lvert(\wrapSet\setminus\wrapTc)\cup\arcNega\rvert$
+即 $\lvert\arcPosi\setminus\wrapTc\rvert = \lvert(\wrapSet\setminus\wrapTc)\cup\arcNega\rvert$
 
-Therefore, we have:
+因此，我们有：
 \[
 \begin{array}{rl}
 \because & \wrapTc = \arcPosi \cap \wrapSet,\; \wrapSet \cap \arcNega = \emptyset \\ [4pt]
@@ -157,12 +157,12 @@ Therefore, we have:
     \wrapSet = \wrapTc \biguplus (\wrapSet\setminus\wrapTc) \implies \lvert\wrapSet\rvert = \lvert\wrapTc\rvert + \lvert\wrapSet\setminus\wrapTc\rvert \\
     \arcPosi = \wrapTc \biguplus (\arcPosi\setminus\wrapTc) \implies \lvert\arcPosi\rvert = \lvert\wrapTc\rvert + \lvert\arcPosi\setminus\wrapTc\rvert
 \end{cases} \\ [14pt]
-\therefore & (\lvert\wrapSet\setminus\wrapTc\rvert + \lvert\arcNega\rvert) + \lvert\wrapTc\rvert = (\lvert\arcPosi\setminus\wrapTc\rvert) + \lvert\wrapTc\rvert \quad\text{(add $\lvert\arcNega\rvert$ in both sides)}\\ [4pt]
+\therefore & (\lvert\wrapSet\setminus\wrapTc\rvert + \lvert\arcNega\rvert) + \lvert\wrapTc\rvert = (\lvert\arcPosi\setminus\wrapTc\rvert) + \lvert\wrapTc\rvert \quad\text{（两边加 $\lvert\arcNega\rvert$）}\\ [4pt]
 \implies & \lvert\wrapSet\rvert + \lvert\arcNega\rvert = \lvert\arcPosi\rvert \\ [4pt]
 \implies & \lvert\arcPosi\rvert = \lvert\arcNega\rvert + \wrapnum_{fk} \\ [4pt]
 \end{array}
 \]
-The conclusion follows
+结论得证
 
 % Traverse $\widetilde{\pathInRoute{f}{k}}$ once in its chronological order and record the binary sequence
 % \[

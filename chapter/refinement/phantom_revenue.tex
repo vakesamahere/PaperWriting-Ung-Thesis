@@ -1,9 +1,9 @@
-\subsection{Phantom Revenue}
-When the relaxation solution $\solution = (\fleetAssignVar^*, \shareVar^*, \outsideShareVar^*)$ satisfies both resource availability and inter-departure constraints, it might still be illegal if it relies on "Phantom Revenue." This occurs when the revenue claimed by the aggregated super itineraries cannot be physically realized by any valid combination of their constituent original itineraries in the full discretization network.
+\subsection{虚假收入}
+当松弛解$\solution = (\fleetAssignVar^*, \shareVar^*, \outsideShareVar^*)$同时满足资源可用性和间隔出发约束时，如果它依赖于"虚假收入"，仍可能是非法的。当聚合超级行程声称的收入无法由其组成原始行程在完全离散化网络中的任何有效组合物理实现时，就会发生这种情况。
 
-Due to the highly coupled nature of the Sales-Based Linear Program (SBLP), the outside option share $\outsideShareVar$ acts as a dynamic variable. A local decrease in the attractiveness of available itineraries can shift demand to the outside option, thereby implicitly raising the choice bounds for other itineraries and reallocating passenger flows. Because of this endogeneity, evaluating Phantom Revenue via static slack analysis is insufficient. Instead, we formulate a Revenue Feasibility Subproblem (RFS) to establish a strict necessary and sufficient condition.
+由于基于销售的线性规划（SBLP）的高度耦合性质，外部选项份额$\outsideShareVar$作为动态变量。可用行程吸引力的局部降低可以将需求转移到外部选项，从而隐式地提高其他行程的选择界并重新分配旅客流。由于这种内生性，通过静态松弛分析评估虚假收入是不充分的。相反，我们建立一个收入可行性子问题（RFS）来建立严格的充要条件。
 
-Given the fixed physical service assignment $\fleetAssignVar^*$, we seek to detect whether the target revenue contribution of each super itinerary $R$, defined as $Rev_{Rpl}^* = \demand_{mp} \fare_{Rl} \shareVar_{Rpl}^*$, can be attained by assigning valid shares $\shareVar_{rpl}$ to its constituent original itineraries $r \in \eqClassByPathSig_{(R)}$. We introduce continuous slack variables $s_{Rpl} \ge 0$ to capture the revenue shortfall for each super itinerary. The RFS is formulated as the following linear program:
+给定固定的物理服务分配$\fleetAssignVar^*$，我们寻求检测每条超级行程$R$的目标收入贡献（定义为$Rev_{Rpl}^* = \demand_{mp} \fare_{Rl} \shareVar_{Rpl}^*$）是否可以通过将有效份额$\shareVar_{rpl}$分配给其组成原始行程$r \in \eqClassByPathSig_{(R)}$来实现。我们引入连续松弛变量$s_{Rpl} \ge 0$来捕获每条超级行程的收入缺口。RFS被表述为以下线性规划：
 \full{\begin{align}
 RFS(\solution)=\min_{\shareVar, \outsideShareVar, s} \quad & \sum_{m\in \marketSet} \sum_{p\in \psgTypeSet} \sum_{l\in \fareClassSet} \sum_{R \in \itinSuperInMarket_m} s_{Rpl} \label{eq:rfs_obj}\\
 \text{s.t.} \quad & \sum_{r \in \eqClassByPathSig_{(R)}} \demand_{mp} \fare_{rl} \shareVar_{rpl} + s_{Rpl} = \demand_{mp} \fare_{Rl} \shareVar_{Rpl}^* \quad \forall R \in \itinSuperInMarket_m, p\in \psgTypeSet, l\in \fareClassSet \label{eq:rfs_target}\\
@@ -13,6 +13,6 @@ RFS(\solution)=\min_{\shareVar, \outsideShareVar, s} \quad & \sum_{m\in \marketS
 & \shareVar_{rpl} \ge 0, \quad \outsideShareVar_{mp} \ge 0, \quad s_{Rpl} \ge 0 \nonumber
 \end{align}}
 
-Constraint (\ref{eq:rfs_target}) forces the underlying original itineraries to meet the relaxation revenue, using $s_{Rpl}$ to absorb any unavoidable deficit. Constraints (\ref{eq:rfs_ratio})-(\ref{eq:rfs_cap}) ensure that the recovered passenger flow strictly adheres to the physical capacity of $\fleetAssignVar^*$ and the original discrete choice bounds. 
+约束(\ref{eq:rfs_target})强制底层原始行程满足松弛收入，使用$s_{Rpl}$吸收任何不可避免的赤字。约束(\ref{eq:rfs_ratio})-(\ref{eq:rfs_cap})确保恢复的旅客流严格遵守$\fleetAssignVar^*$的物理容量和原始离散选择界。
 
-The relaxation solution $\solution$ contains Phantom Revenue (and is therefore illegal) \textit{if and only if} the optimal objective value of the RFS is strictly greater than zero (i.e., $\sum s_{Rpl}^* > 0$). The time slots (i.e. a set of segment-time pairs) corresponding to the super itineraries with positive slack $s_{Rpl}^* > 0$ are the culprits that contribute to the Phantom Revenue. By adding time points to the discretization $\discretization^{2}$ we can ensure that all these phantom revenue violations will not occur in the refined model. Denote the refined discretization as $\discretization^{3}$. The refine procedure will be described in the Subsection~\ref{sec:refine_process}.
+松弛解$\solution$包含虚假收入（因此是非法的）当且仅当RFS的最优目标值严格大于零（即$\sum s_{Rpl}^* > 0$）。对应于正松弛$s_{Rpl}^* > 0$的超级行程的时间槽（即一组航段-时间对）是导致虚假收入的罪魁祸首。通过向离散化$\discretization^{2}$添加时间点，我们可以确保所有这些虚假收入违规在细化模型中不会发生。记细化后的离散化为$\discretization^{3}$。细化过程将在第~\ref{sec:refine_process}~小节中描述。

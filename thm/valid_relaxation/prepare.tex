@@ -1,10 +1,10 @@
-We begin our preliminary analysis by breaking down the structure of a general ATFP solution to a flat structure of cyclic routes.
+我们首先将一般 ATFP 解的结构分解为循环路由的平坦结构，以此开始预备分析。
 
-For a ATFP solution $\solution = (\fleetAssignVar, \shareVar, \outsideShareVar)$, we can define its corresponding routing plan $\routingPlan(\solution)$ or $\routingPlan(\fleetAssignVar)$ as follows:
+对于 ATFP 解 $\solution = (\fleetAssignVar, \shareVar, \outsideShareVar)$，我们可以定义其对应的路由方案 $\routingPlan(\solution)$ 或 $\routingPlan(\fleetAssignVar)$ 如下：
 \[
     \routingPlan(\solution) = \{\route{f}\mid\forall f\in\fleetSet\}
 \]
-which represents the routing plan for each resource type, where $\route{f}$ is defined as follows for any resource type $f\in\fleetSet$ denoting its routes:
+表示每种资源类型的路由方案，其中 $\route{f}$ 对任意资源类型 $f\in\fleetSet$ 定义如下，表示其路由：
 \[
     \route{f} = \{\pathInRoute{f}{k}, \routeAmount{\pathInRoute{f}{k}}\mid k=1,2,\ldots,K\}
 \]
@@ -20,35 +20,35 @@ which represents the routing plan for each resource type, where $\route{f}$ is d
     ,\qquad
     \pathInRoute{f}{k}(\positionArc) = \{a\in\positionArc\mid a\in\pathInRoute{f}{k}\}
 \]
-$\pathInRoute{f}{k}$ denotes the $k$-th route of resource type $f$. $\routeAmount{\pathInRoute{f}{k}}$ denotes how many times $\pathInRoute{f}{k}$ happens in the solution. Note that $\routeAmount{\pathInRoute{f}{k}}$ does not refer to the number of resource units assigned to this route, but the number of times this route is used in the solution. We define $\wrapnum_{fk}$ as the number of wraps of route $\pathInRoute{f}{k}$, i.e., how many times the route crosses the planning horizon. Therefore, the number of resource units assigned to route $\pathInRoute{f}{k}$ is $\routeAmount{\pathInRoute{f}{k}} \cdot \wrapnum_{fk}$.
+$\pathInRoute{f}{k}$ 表示资源类型 $f$ 的第 $k$ 条路由。$\routeAmount{\pathInRoute{f}{k}}$ 表示 $\pathInRoute{f}{k}$ 在解中出现的次数。注意 $\routeAmount{\pathInRoute{f}{k}}$ 不是指分配到该路由的资源单位数，而是该路由在解中被使用的次数。我们定义 $\wrapnum_{fk}$ 为路由 $\pathInRoute{f}{k}$ 的环绕次数，即该路由跨越规划时域的次数。因此，分配到路由 $\pathInRoute{f}{k}$ 的资源单位数为 $\routeAmount{\pathInRoute{f}{k}} \cdot \wrapnum_{fk}$。
 
 % ========================
 
-Then, we establish the core properties of the aggregation mapping $\Phi$.
+然后，我们建立聚合映射 $\Phi$ 的核心性质。
 \input{thm/valid_relaxation/aggregation_properties.tex}
 
-Next, we introduce the routing existence lemma, which guarantees that any flow-balanced resource type assignment can be disaggregated into concrete cyclic routes.
+接下来，我们引入路由存在性引理，该引理保证任何流量平衡的资源类型分配都可以分解为具体的循环路由。
 \input{thm/pro_exist_routing_plan.tex}
 \input{thm/pro_exist_routing_plan_proof.tex}
 
-With the routing decomposition established, we define several auxiliary relations and sets to facilitate the subsequent evaluation of resource counts across time sections.
+路由分解建立后，我们定义若干辅助关系和集合，以便于后续对跨时间截面的资源计数进行评估。
 
-\subparagraph*{Pre-image notation induced by $\Phi_{\arcSet}$.}
-Let $\Phi_{\arcSet}:\full{\arcSet}\to\widetilde{\arcSet}$ denote the arc mapping constructed when defining the relaxation solution.
-For $\forall \mathcal{B}\subseteq\arcSet$ write
+\subparagraph*{由 $\Phi_{\arcSet}$ 导出的原像记号。}
+设 $\Phi_{\arcSet}:\full{\arcSet}\to\widetilde{\arcSet}$ 为定义松弛解时构造的弧映射。
+对 $\forall \mathcal{B}\subseteq\arcSet$ 记
 \[
     \Phi_{\arcSet}^{-1}(\mathcal{B})
         := \biguplus_{a\in\mathcal{B}}\Phi_{\arcSet}^{-1}(a)
         \subseteq \full{\arcSet}.
 \]
-Obviously,
+显然，
 \[
     a'\in\Phi_{\arcSet}^{-1}(\mathcal{B})
         \iff \Phi_{\arcSet}(a')\in\mathcal{B}.
 \]
 
-\subparagraph*{Auxiliary sets.}
-Anticipating the mapping from a full-network solution $\bar{\fleetAssignVar}$ to the relaxed solution $\fleetAssignVar$, consider the aggregation formula:
+\subparagraph*{辅助集合。}
+预期从完整网络解 $\bar{\fleetAssignVar}$ 到松弛解 $\fleetAssignVar$ 的映射，考虑聚合公式：
 \[
     \fleetAssignVar_{af}
         = \sum_{a'\in\Phi_{\arcSet}^{-1}(a)}\bar{\fleetAssignVar}_{a'f},
@@ -56,7 +56,7 @@ Anticipating the mapping from a full-network solution $\bar{\fleetAssignVar}$ to
     x_{af}\ge0,
     \label{eq:fleet_avail.aggregate}
 \]
-By the routing existence lemma established above, the full-network flow $\bar{\fleetAssignVar}_{\cdot f}$ admits a route decomposition:
+由上述路由存在性引理，完整网络流 $\bar{\fleetAssignVar}_{\cdot f}$ 允许路由分解：
 \[
     \bar{\fleetAssignVar}_{a'f}
         = \sum_{k\in K_f}
@@ -64,10 +64,9 @@ By the routing existence lemma established above, the full-network flow $\bar{\f
           \nu_{fk}(a'),
     \label{eq:fleet_avail.route_decomp}
 \]
-where $\pathInRoute{f}{k}=(a'_{k,1},\ldots,a'_{k,q_k})$ denotes the $k$-th closed walk of resource type $f$ in chronological order and
-$\nu_{fk}(a')=\#\{r\mid a'_{k,r}=a'\}$.
-Applying $\Phi_{\arcSet}$ componentwise yields the cyclic sequence of partial arcs $\widetilde{\pathInRoute{f}{k}}=(a_{k,1},\ldots,a_{k,Q_k})$ with $a_{k,r}=\Phi_{\arcSet}(a'_{k,r})$ whenever the image is not $\bot$.
-For every $k$ define:
+其中 $\pathInRoute{f}{k}=(a'_{k,1},\ldots,a'_{k,q_k})$ 表示资源类型 $f$ 按时间顺序排列的第 $k$ 条闭合游走，且 $\nu_{fk}(a')=\#\{r\mid a'_{k,r}=a'\}$。
+逐分量应用 $\Phi_{\arcSet}$ 得到部分弧的循环序列 $\widetilde{\pathInRoute{f}{k}}=(a_{k,1},\ldots,a_{k,Q_k})$，其中当像不为 $\bot$ 时 $a_{k,r}=\Phi_{\arcSet}(a'_{k,r})$。
+对每个 $k$ 定义：
 \begin{equation}
 \label{eq:aux_sets_def}
 \begin{aligned}
@@ -85,15 +84,15 @@ For every $k$ define:
                  t_o(a_{k,r})+\travelTime_{a_{k,r}} < \planningEnd\right\},
 \end{aligned}
 \end{equation}
-and denote $\wrapnum_{fk}=|\wrapSet_{fk}|$.
-Let $H:=\planningEnd-\planningStart$ be the horizon length.
-For every pivot $u$ define circular relations on $[0,H)$ by
+并记 $\wrapnum_{fk}=|\wrapSet_{fk}|$。
+设 $H:=\planningEnd-\planningStart$ 为时域长度。
+对每个基准点 $u$，在 $[0,H)$ 上定义循环关系如下：
 \begin{equation*}
 \begin{aligned}
-    \text{(earlier)}\qquad t_1\prec_u t_2 &\iff t_1-u < t_2-u \pmod{H},\\
-    \text{(not later)}\qquad t_1\preceq_u t_2 &\iff t_1-u \le t_2-u \pmod{H},\\
-    \text{(later)}\qquad t_1\succ_u t_2 &\iff t_1-u > t_2-u \pmod{H},\\
-    \text{(not earlier)}\qquad t_1\succeq_u t_2 &\iff t_1-u \ge t_2-u \pmod{H}.
+    \text{（更早）}\qquad t_1\prec_u t_2 &\iff t_1-u < t_2-u \pmod{H},\\
+    \text{（不晚于）}\qquad t_1\preceq_u t_2 &\iff t_1-u \le t_2-u \pmod{H},\\
+    \text{（更晚）}\qquad t_1\succ_u t_2 &\iff t_1-u > t_2-u \pmod{H},\\
+    \text{（不早于）}\qquad t_1\succeq_u t_2 &\iff t_1-u \ge t_2-u \pmod{H}.
 \end{aligned}
 \end{equation*}
 

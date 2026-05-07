@@ -1,18 +1,18 @@
-\chapter{Solution Methodology}\label{sec:solution_methodology}
+\chapter{求解方法}\label{sec:solution_methodology}
 
-\section{Overall Solution Algorithm}
+\section{总体求解算法}
 \label{sec:algorithm}
 
-As discussed in Section~\ref{sec:complexity}, the full \problemName formulation is NP-hard and becomes computationally challenging in practice due to the combined growth of the time-space network and the itinerary-choice layer. While the standard Dynamic Discretization Discovery (DDD) method efficiently compresses physical network nodes and arcs, it lacks the mechanism to handle the highly coupled, itinerary-based passenger choice behavior. To bridge this gap, we propose the Itinerary Aggregation and Dynamic Refinement (\algoNotation). The fundamental departure from standard DDD is that \algoNotation extends the dynamic aggregation from the physical network dimension to the logical passenger dimension. By introducing the concept of path signatures, \algoNotation groups millions of constituent itineraries into a compact set of super itineraries without losing the structural integrity of the choice model and the optimality of the solution. By establishing tight lower bounds through this dual-aggregation, recovering logically valid upper bounds, and precisely inserting missing time points to correct both physical chronological violations and itinerary-level phantom revenues, this algorithmic framework guarantees convergence to the exact global optimal solution.
+如第~\ref{sec:complexity}~节所讨论的，完整的\problemName 公式是NP-难的，由于时空网络和行程选择层的组合增长，在实践中变得计算困难。虽然标准的动态离散化发现（DDD）方法高效地压缩物理网络节点和弧，但它缺乏处理高度耦合的基于行程的旅客选择行为的机制。为弥合这一差距，我们提出行程聚合与动态细化（\algoNotation）。与标准DDD的根本区别在于，\algoNotation 将动态聚合从物理网络维度扩展到逻辑旅客维度。通过引入路径签名的概念，\algoNotation 将数百万条组成行程分组为紧凑的超级行程集合，而不丧失选择模型的结构完整性和解的最优性。通过这种双重聚合建立紧的下界、恢复逻辑有效的上界，以及精确插入缺失的时间点以纠正物理时序违规和行程级虚假收入，该算法框架保证收敛到精确的全局最优解。
 
-This section outlines the cohesive exact solution framework, establishing the foundation for the three essential algorithmic building blocks: a relaxation model (Section \ref{sec:lbm}) which provides a valid lower bound, an upper bound generation process acting as a repair algorithm (Section \ref{sec:ub}), and a discretization refinement strategy (Section \ref{sec:refinement}) ensuring convergence to the global optimum over iterations. 
+本节概述了这一完整的精确求解框架，为三个基本算法构建模块奠定基础：提供有效下界的松弛模型（第~\ref{sec:lbm}~节）、作为修复算法的上界生成过程（第~\ref{sec:ub}~节）以及确保在迭代中收敛到全局最优的离散化细化策略（第~\ref{sec:refinement}~节）。
 
-\subsection{Initial Discretization}\label{sec:initial_discretization}
+\subsection{初始离散化}\label{sec:initial_discretization}
 
-The \algoNotation algorithm begins with an initial discretization $\discretization$ that is deliberately coarse to keep the relaxation model small. However, the choice of initial step sizes has a profound impact on the quality of the relaxation. As will be detailed in Section~\ref{sec:lbm}, the floor-mapping rule used to construct service arcs in the relaxed network (Property~\ref{def:relax.flightArc}) can produce physically meaningless inverse arcs when the grid is too coarse relative to the travel time of a segment. To eliminate this pathology from the outset, we adopt an initial discretization in which each node $i \in \airportSet$ receives an individual step size $\initStep_i$ calibrated to its shortest inbound travel time. The precise construction and its theoretical justification are presented in Section~\ref{sec:init_disc_detail}.
+\algoNotation 算法从一个刻意粗糙的初始离散化$\discretization$开始，以保持松弛模型的小规模。然而，初始步长的选择对松弛质量有深远影响。如第~\ref{sec:lbm}~节将详细介绍的，用于在松弛网络中构造服务弧的下取整映射规则（性质~\ref{def:relax.flightArc}）在网格相对于航段旅行时间过于粗糙时可能产生物理上无意义的逆弧。为从一开始就消除这种病态，我们采用一种初始离散化，其中每个节点$i \in \airportSet$获得一个根据其最短入站旅行时间校准的个体步长$\initStep_i$。精确的构造及其理论证明在第~\ref{sec:init_disc_detail}~节中给出。
 
-\subsection{Iterative Framework}
-We start with an initial discretization and iteratively solve the lower bound model to obtain a relaxation solution and its corresponding lower bound. Then, we use the relaxation solution to generate an upper bound through an MIP-based repair algorithm. If the gap between the upper and lower bounds is within a predefined threshold $\epsilon>0$, we terminate the algorithm. Otherwise, we refine the discretization based on the current solution and repeat the process, which ensures convergence to the global optimal solution of the full model. The algorithm is summarized in Algorithm~\ref{alg:refinement}. 
+\subsection{迭代框架}
+我们从初始离散化开始，迭代求解下界模型以获得松弛解及其对应的下界。然后，我们使用松弛解通过基于MIP的修复算法生成上界。如果上界和下界之间的间隙在预定义阈值$\epsilon>0$内，则终止算法。否则，我们根据当前解细化离散化并重复该过程，这确保收敛到完整模型的全局最优解。算法总结在算法~\ref{alg:refinement}中。
 
 \begin{algorithm}[ht]
 \caption{Iterative Refinement Algorithm for $\problemNotation$}
@@ -63,15 +63,15 @@ We start with an initial discretization and iteratively solve the lower bound mo
 \end{algorithmic}
 \end{algorithm}
 
-\section{Attraction Balancing Pre-conditioning}\label{sec:preconditioning_solution}
+\section{吸引力平衡预处理}\label{sec:preconditioning_solution}
 
-To stabilize the optimization process, we propose a market-specific numerical pre-conditioning technique termed \textit{Attraction Balancing}. For each market $m \in \marketSet$ and passenger type $p \in \psgTypeSet$, we identify the minimum non-zero absolute attraction value among all attraction-related parameters:
+为稳定优化过程，我们提出一种市场特定的数值预处理技术，称为吸引力平衡。对于每个市场$m \in \marketSet$和旅客类型$p \in \psgTypeSet$，我们在所有吸引力相关参数中识别最小非零绝对吸引力值：
 \begin{equation*}
     \attrMin_{mp} = \min \left\{ \left|\outAttr_{mp}\right|, \, \left|\attr_{rp\ell}\right|, \, \left|\adjAttr_{rp\ell}\right| \mid r \in \itinInMarket_m, \, \ell \in \fareClassSet, \, \text{value} \neq 0 \right\}
     \label{eq:attr_min}
 \end{equation*}
 
-We then apply a scaling factor $\attrScale_{mp} = 1.0 / \attrMin_{mp}$ to uniformly scale all attraction parameters within that market-passenger combination. Since $\adjAttr_{rp\ell} = \attr_{rp\ell} - \shadowAttr_{rp\ell}$ by the GAM definition, we scale the underlying nominal and shadow attractions:
+然后我们应用缩放因子$\attrScale_{mp} = 1.0 / \attrMin_{mp}$来均匀缩放该市场-旅客组合内的所有吸引力参数。由于根据GAM定义$\adjAttr_{rp\ell} = \attr_{rp\ell} - \shadowAttr_{rp\ell}$，我们缩放底层的名义吸引力和影子吸引力：
 \begin{equation*}
 \begin{aligned}
     \outAttr_{mp} &\leftarrow \attrScale_{mp} \cdot \outAttr_{mp}\\
@@ -79,17 +79,17 @@ We then apply a scaling factor $\attrScale_{mp} = 1.0 / \attrMin_{mp}$ to unifor
     \shadowAttr_{rp\ell} &\leftarrow \attrScale_{mp} \cdot \shadowAttr_{rp\ell} \quad \forall r \in \itinInMarket_m, \, \ell \in \fareClassSet
 \end{aligned}
 \end{equation*}
-Consequently, the adjusted attractions are also scaled by the same factor, i.e., $\adjAttr_{rp\ell} \leftarrow \attrScale_{mp} \cdot \adjAttr_{rp\ell}$ and $\adjOutAttr_{mp} \leftarrow \attrScale_{mp} \cdot \adjOutAttr_{mp}$.
+因此，调整吸引力也按相同因子缩放，即$\adjAttr_{rp\ell} \leftarrow \attrScale_{mp} \cdot \adjAttr_{rp\ell}$和$\adjOutAttr_{mp} \leftarrow \attrScale_{mp} \cdot \adjOutAttr_{mp}$。
 
-Mathematically, since the choice constraints \eqref{constr:main.choice.ratio} and \eqref{constr:main.choice.limit} are homogeneous in the attraction parameters within each market-passenger combination, multiplying all attraction values by a positive constant $\attrScale_{mp}$ strictly preserves the feasible region and the optimal solution. To verify this, observe that constraint \eqref{constr:main.choice.ratio} becomes:
+从数学上看，由于选择约束\eqref{constr:main.choice.ratio}和\eqref{constr:main.choice.limit}在每个市场-旅客组合内对吸引力参数是齐次的，将所有吸引力值乘以正常数$\attrScale_{mp}$严格保持可行域和最优解。为验证这一点，观察约束\eqref{constr:main.choice.ratio}变为：
 \begin{equation*}
     (\attrScale_{mp} \cdot \outAttr_{mp})\, \shareVar_{rp\ell} \;\le\; (\attrScale_{mp} \cdot \attr_{rp\ell})\, \outsideShareVar_{mp}
 \end{equation*}
-which is equivalent to the original constraint after canceling the common positive factor $\attrScale_{mp}$ from both sides. Similarly, constraint \eqref{constr:main.choice.limit} remains valid because both the numerator and denominator in the coefficients are scaled by the same factor, preserving the ratios $\adjAttr_{rp\ell}/\attr_{rp\ell}$ and $\adjOutAttr_{mp}/\outAttr_{mp}$.
+这在从两边消去公共正因子$\attrScale_{mp}$后等价于原始约束。类似地，约束\eqref{constr:main.choice.limit}仍然有效，因为系数中的分子和分母按相同因子缩放，保持了比率$\adjAttr_{rp\ell}/\attr_{rp\ell}$和$\adjOutAttr_{mp}/\outAttr_{mp}$。
 
-Computationally, this pre-conditioning ensures that the smallest non-zero coefficient in the choice constraints is exactly $1.0$, effectively eliminating matrix ill-conditioning. This simple yet critical transformation serves as a catalyst in both the lower bounding model and upper bounding model components of our solution framework, drastically accelerating the convergence of the lower bound and robustifying the overall algorithmic stability. All experimental results reported in this paper employ this attraction balancing pre-processing step uniformly across all instances.
+在计算上，这种预处理确保选择约束中最小的非零系数恰好为$1.0$，有效消除了矩阵病态。这一简单但关键的变换在我们求解框架的下界模型和上界模型组件中都起到催化剂作用，大幅加速了下界的收敛并增强了整体算法稳定性。本文报告的所有实验结果均在所有实例上统一采用了这一吸引力平衡预处理步骤。
 
-An alternative approach to address the numerical instability is to replace the $\shareVar_{rp\ell}$ with $\demand_{mp} \shareVar_{rp\ell}$ where the unique $m$ meets $r\in \itinInMarket_m$ and remove the $\demand_{mp}$ from the objective function and constraints. Meanwhile, the doamin of $\shareVar_{rp\ell}$ and $\outsideShareVar_{mp}$ is changed to $[0, \demand_{mp}]$ (or simply $[0,+\infty]$). This approach can effectively eliminate the large coefficients in the objective function and choice constraints, specifically the $\demand_{mp}\fare_{r\ell}$ terms. The value of new $\shareVar$ variables represents the actual number of passengers choosing itinerary $r$ under fare $\ell$, rather than the share of demand, which is often a small fraction in $[10^{-5}, 10^{-4}]$.
+一种解决数值不稳定性的替代方法是将$\shareVar_{rp\ell}$替换为$\demand_{mp} \shareVar_{rp\ell}$，其中唯一的$m$满足$r\in \itinInMarket_m$，并从目标函数和约束中移除$\demand_{mp}$。同时，$\shareVar_{rp\ell}$和$\outsideShareVar_{mp}$的域变为$[0, \demand_{mp}]$（或简单地$[0,+\infty]$）。这种方法可以有效消除目标函数和选择约束中的大系数，特别是$\demand_{mp}\fare_{r\ell}$项。新$\shareVar$变量的值表示选择行程$r$在票价$\ell$下的实际旅客数量，而非需求份额，后者通常是$[10^{-5}, 10^{-4}]$中的小分数。
 
 \input{chapter/lbm/relaxation.tex}
 

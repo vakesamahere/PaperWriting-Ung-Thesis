@@ -1,4 +1,4 @@
-Moreover, using the similar logic in the proof of constraint~(\ref{constr:relax.choice.capacity}), we can show that the revenue term of the constructed solution $(\fleetAssignVar, \shareVar, \outsideShareVar)$ in $\model{\discretization, \itinSetSuper}$ is no less than that of $(\bar{\fleetAssignVar}, \bar{\shareVar}, \bar{\outsideShareVar})$ in $\model{\discretizationFull}$. The cost term is preserved:
+此外，利用证明约束~(\ref{constr:relax.choice.capacity}) 中的类似逻辑，可以证明在 $\model{\discretization, \itinSetSuper}$ 中构造的解 $(\fleetAssignVar, \shareVar, \outsideShareVar)$ 的收益项不小于 $\model{\discretizationFull}$ 中 $(\bar{\fleetAssignVar}, \bar{\shareVar}, \bar{\outsideShareVar})$ 的收益项。成本项得到保持：
 
 \[
     \sum_{a\in\arcSet}\sum_{f\in\fleetSet}\cost_{af}\fleetAssignVar_{af}
@@ -6,7 +6,7 @@ Moreover, using the similar logic in the proof of constraint~(\ref{constr:relax.
       \sum_{a'\in\Phi_{\arcSet}^{-1}(a)}\bar{\fleetAssignVar}_{a'f}
     = \sum_{a'\in\full{\arcSet}}\sum_{f\in\fleetSet}\cost_{a'f}\bar{\fleetAssignVar}_{a'f},
 \]
-and
+且
 \[
     \sum_{m,p,r,\ell}\demand_{mp}\fare_{r\ell}\shareVar_{rp\ell}
     \ge \sum_{m,p,r,\ell}\demand_{mp}\fare_{r\ell}\bar{\shareVar}_{rp\ell},

@@ -1,5 +1,5 @@
-\paragraph*{Frequency constraints \eqref{constr:relax.fleet_available}.}
-Combining Lemmas~\ref{lem:fleet_avail.expand} and~\ref{lem:fleet_avail.wrap} yields
+\paragraph*{频率约束 \eqref{constr:relax.fleet_available}。}
+结合引理~\ref{lem:fleet_avail.expand} 和~\ref{lem:fleet_avail.wrap} 得到
 \[
     \sum_{a\in\holdingArcTc{\checkTime}}\fleetAssignVar_{af}
     + \sum_{a\in\flightArcTc{\checkTime}}\fleetAssignVar_{af}
@@ -7,13 +7,13 @@ Combining Lemmas~\ref{lem:fleet_avail.expand} and~\ref{lem:fleet_avail.wrap} yie
     =
     \sum_{k\in K_f}\routeAmount{\pathInRoute{f}{k}}\wrapnum_{fk}.
 \]
-Applying the same counting argument directly to the fine discretization routes $(a'_{k,1},\ldots,a'_{k,q_k})$ shows that
+对精细离散化路由 $(a'_{k,1},\ldots,a'_{k,q_k})$ 直接应用相同的计数论证表明
 \[
     \sum_{a'\in\holdingArcTc{\checkTime}}\bar{\fleetAssignVar}_{a'f}
     + \sum_{a'\in\flightArcTc{\checkTime}}\bar{\fleetAssignVar}_{a'f}
     = \sum_{k\in K_f}\routeAmount{\pathInRoute{f}{k}}\wrapnum_{fk},
 \]
-To evaluate the right-hand side of \eqref{constr:main.fleet_available}, expand
+为计算 \eqref{constr:main.fleet_available} 的右端，展开
 \[
     \sum_{a'\in\holdingArcTc{\checkTime}}\bar{\fleetAssignVar}_{a'f}
     + \sum_{a'\in\flightArcTc{\checkTime}}\bar{\fleetAssignVar}_{a'f}
@@ -24,8 +24,8 @@ To evaluate the right-hand side of \eqref{constr:main.fleet_available}, expand
             + \#\{r \mid a'_{k,r}\in\flightArcTc{\checkTime}\}
         \right),
 \]
-with $a'_{k,r}$ denoting the $r$-th arc of the fine route.
-Introduce lifted times for the fine discretization as before:
+其中 $a'_{k,r}$ 表示精细路由的第 $r$ 条弧。
+如前所述，为精细离散化引入提升时间：
 \[
     \widetilde{t}_o(a') := t_o(a'),\qquad
     \widetilde{t}_d(a') :=
@@ -34,20 +34,20 @@ Introduce lifted times for the fine discretization as before:
         t_d(a')+H, & t_o(a')+\travelTime_{a'} \ge \planningEnd.
     \end{cases}
 \]
-Applying the same case distinction used in Lemma~\ref{lem:fleet_avail.expand}, we obtain for every $r$,
+应用引理~\ref{lem:fleet_avail.expand} 中使用的相同情况讨论，对每个 $r$ 得到
 \[
     a'_{k,r}\in\holdingArcTc{\checkTime}\cup\flightArcTc{\checkTime}
     \iff \widetilde{t}_o(a'_{k,r}) \le \checkTime < \widetilde{t}_d(a'_{k,r}).
 \]
-Define
+定义
 \[
     \arcPosi^{\mathrm{full}}
         := \{a'_{k,r}\mid \widetilde{t}_o(a'_{k,r}) \le \checkTime < \widetilde{t}_d(a'_{k,r})\}.
 \]
-Because inverse arcs in the fine route are all wrapped, which means $\arcNega^{\mathrm{full}}$ is empty, $|\arcPosi^{\mathrm{full}}|=\wrapnum_{fk}$ follows from Lemma~\ref{lem:fleet_avail.wrap}.
-Since $\bar{\fleetAssignVar}_{\cdot f}$ satisfies \eqref{constr:main.fleet_available}, we have
+因为精细路由中的反向弧都是环绕的，即 $\arcNega^{\mathrm{full}}$ 为空，由引理~\ref{lem:fleet_avail.wrap} 可得 $|\arcPosi^{\mathrm{full}}|=\wrapnum_{fk}$。
+由于 $\bar{\fleetAssignVar}_{\cdot f}$ 满足 \eqref{constr:main.fleet_available}，我们有
 \[
     \sum_{k\in K_f}\routeAmount{\pathInRoute{f}{k}}\wrapnum_{fk}
     \le \fleetAvail_f.
 \]
-Therefore the aggregated variables $\fleetAssignVar_{af}$ fulfil \eqref{constr:relax.fleet_available}.
+因此聚合变量 $\fleetAssignVar_{af}$ 满足 \eqref{constr:relax.fleet_available}。

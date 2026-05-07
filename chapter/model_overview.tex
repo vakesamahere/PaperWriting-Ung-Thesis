@@ -1,14 +1,14 @@
-\chapter{Problem Description}\label{sec:model_overview}
+\chapter{问题描述}\label{sec:model_overview}
 
-This study addresses a service network design problem that simultaneously considers service scheduling, resource assignment, and passenger choice behavior. Before presenting the mathematical formulations, we formally introduce the core terminology and parameters characterizing the problem.
+本研究解决一个同时考虑服务调度、资源分配和旅客选择行为的服务网络设计问题。在给出数学公式之前，我们正式引入表征该问题的核心术语和参数。
 
-\section{Concepts and Parameters}
+\section{概念与参数}
 
-A spatial origin-destination (OD) pair and its associated demand characterization define a market, denoted by the set $m \in \marketSet$. Within each market, the total passenger demand is initially given as $\demand_{mp}$ for different passenger types $p \in \psgTypeSet$ (e.g., business or leisure), representing differing utility preferences and travel urgencies. Furthermore, ticket offerings are divided into fare classes $\ell \in \fareClassSet$, capturing pricing structures.
+一个空间起讫点（OD）对及其相关的需求特征定义了一个市场，用集合$m \in \marketSet$表示。在每个市场中，总旅客需求初始给定为$\demand_{mp}$，对应不同旅客类型$p \in \psgTypeSet$（例如商务或休闲），代表不同的效用偏好和出行紧迫性。此外，票务产品按票价等级$\ell \in \fareClassSet$划分，以捕获定价结构。
 
-The physical, time-independent trajectory between two nodes in the network is termed a spatial segment $s \in \segSet$. For each segment $s$, the operator typically dictates a predetermined number of required service operations $\freq_s$ across the planning horizon to maintain market presence. Additionally, to ensure stable operations, services departing on the same segment $s=(i,j)$ must obey a minimum separation time; we define $\arcDuringSepTime_{ijt}$ as the set of service arcs departing on segment $s$ within this separation interval starting from time $t$. The operator deploys a set of service resource types $f \in \fleetSet$. Each resource type has a restricted maximum available number of units $\fleetAvail_f$, alongside specific capacities $\fleetCap_{f}$ and operating costs.
+网络中两个节点之间的物理、时间无关的轨迹称为空间航段$s \in \segSet$。对于每个航段$s$，运营商通常规定在规划时域内需要执行的预定服务运营次数$\freq_s$以维持市场存在。此外，为确保稳定运营，在同一航段$s=(i,j)$上出发的服务必须遵守最小间隔时间；我们定义$\arcDuringSepTime_{ijt}$为从时间$t$开始在该间隔时间内在航段$s$上出发的服务弧集合。运营商部署一组服务资源类型$f \in \fleetSet$。每种资源类型有一个受限的最大可用单位数$\fleetAvail_f$，以及特定的容量$\fleetCap_{f}$和运营成本。
 
-To schedule services precisely, we represent the operation over a time-space network. While the time domain is continuous in reality, we computationally structure it using a discretization $\discretization$. A discretization defines a finite (and not necessarily uniform) set of time nodes for each spatial node in the network. Given a discretization $\discretization$, we establish a specific time-space network $\net = (\nodeSet, \arcSet)$ where $\nodeSet$ denotes the set of all time-space nodes and $\arcSet$ denotes the set of all time-space arcs under this temporal granularity. We respectively define $\outArcSet{i,t}$ and $\inArcSet{i,t}$ as the sets of time-space arcs departing from and arriving at a specific time-space node $(i, t)$. A time-space service arc $a \in \flightArc$ defines a specific service operation executed on a spatial segment $s$ with exact departure and arrival times drawn from the nodes in $\discretization$. The set of all service arcs associated with a segment $s$ is denoted as $\segArcSet{s}$. Similarly, resources remaining idle at a node between services are modeled by time-space holding arcs $a \in \holdingArc$. The total arc set $\arcSet$ is the union of service arcs and holding arcs, i.e., $\arcSet = \flightArc \uplus \holdingArc$. Finally, to monitor resource utilization, we track resources across the timeline: by picking an arbitrary snapshot count time $\checkTime$, we define $\flightArcTc{\checkTime}$ and $\holdingArcTc{\checkTime}$ as the respective sets of service arcs and holding arcs that cross this specific moment as follows:
+为精确调度服务，我们在时空网络上表示运营。虽然时间域在现实中是连续的，但我们在计算上使用离散化$\discretization$来构造它。离散化为网络中每个空间节点定义了一个有限的（且不一定均匀的）时间节点集合。给定离散化$\discretization$，我们建立一个特定的时空网络$\net = (\nodeSet, \arcSet)$，其中$\nodeSet$表示所有时空节点的集合，$\arcSet$表示该时间粒度下所有时空弧的集合。我们分别定义$\outArcSet{i,t}$和$\inArcSet{i,t}$为从特定时空节点$(i, t)$出发和到达的时空弧集合。时空服务弧$a \in \flightArc$定义了在空间航段$s$上执行的具有精确出发和到达时间（取自$\discretization$中的节点）的特定服务运营。与航段$s$相关的所有服务弧的集合记为$\segArcSet{s}$。类似地，在服务之间在节点处空闲等待的资源由时空持有弧$a \in \holdingArc$建模。总弧集$\arcSet$是服务弧和持有弧的并集，即$\arcSet = \flightArc \uplus \holdingArc$。最后，为监控资源利用率，我们在时间线上跟踪资源：通过选取任意快照计数时间$\checkTime$，我们定义$\flightArcTc{\checkTime}$和$\holdingArcTc{\checkTime}$分别为跨越该特定时刻的服务弧和持有弧集合，如下所示：
 \begin{equation}
     \flightArcTc{\checkTime} = 
     \{a=((i,t)\rightarrow(j,t^\prime))\;\forall a\in\flightArc\mid t\leq t_c<t^\prime\cup t^\prime<t\leq t_c<\beta\leq t+\travelTime_{ij}\}
@@ -20,32 +20,31 @@ To schedule services precisely, we represent the operation over a time-space net
     \label{def:main.holdingArcTc}
 \end{equation}
 
-The full discretization, denoted as $\discretizationFull$, represents the complete timeline formulated with a minimum standard temporal resolution $\discretizationStep$ (e.g., 5 minutes), containing every conceivable operational timing. The sets of graphs, nodes and arcs generated over this complete timeline represent the true, unrelaxed full problem space. By convention in this paper, when we discuss time-space networks, nodes or arcs (like $\net$, $\nodeSet$ or $\flightArc$) without a hat notation, they usually belong to a general, potentially reduced discretization $\discretization$. When we explicitly wish to refer to the sets under the full discretization $\discretizationFull$, we add a hat notation to the sets (e.g., $\full{\net}$, $\full{\flightArc}$ or $\full{\segArcSet{s}}$) to clearly differentiate the exact, original problem domain from any working subsets.
+完全离散化，记为$\discretizationFull$，表示以最小标准时间分辨率$\discretizationStep$（例如5分钟）制定的完整时间线，包含每一个可能的运营时刻。在该完整时间线上生成的图、节点和弧的集合代表了真实的、未松弛的完整问题空间。本文中按照惯例，当我们讨论时空网络、节点或弧（如$\net$、$\nodeSet$或$\flightArc$）而不带帽子记号时，它们通常属于一般的、可能缩减的离散化$\discretization$。当我们明确希望引用完全离散化$\discretizationFull$下的集合时，我们在集合上添加帽子记号（例如$\full{\net}$、$\full{\flightArc}$或$\full{\segArcSet{s}}$），以清楚区分精确的原始问题域与任何工作子集。
 
-Passengers accomplish their travel by selecting an itinerary $r \in \itinSet$. Instead of being merely a series of spatial segments, an itinerary in our model is strictly defined as a chronological, connectable sequence of service arcs established over the full discretization $\discretizationFull$. The set of all valid itineraries serving market $m$ is denoted as $\itinInMarket_m$. If the operator's schedule provides no attractive or feasible itineraries, passengers drop out of the system by choosing the outside option.
+旅客通过选择行程$r \in \itinSet$来完成其旅行。在我们的模型中，行程不仅仅是一系列空间航段，而是严格定义为在完全离散化$\discretizationFull$上建立的按时间顺序可连接的服务弧序列。服务市场$m$的所有有效行程的集合记为$\itinInMarket_m$。如果运营商的时刻表未提供有吸引力或可行的行程，旅客通过选择外部选项退出系统。
 
-To endogenously capture passenger choice behavior within the optimization framework, we adopt the Sales-Based Linear Program (SBLP) based on the General Attraction Model (GAM) proposed by \cite{gallego2015general}. In this context, the preference of a passenger type $p$ in market $m$ for a specific itinerary-fare combination $(r, \ell)$ is quantified by a deterministic nominal attraction parameter, denoted as $\attr_{rp\ell}$. Similarly, the outside option is assigned a nominal attraction value $\outAttr_{mp}$. These parameters are typically derived from discrete choice models, such as the Multinomial Logit (MNL) model, where $\attr_{rp\ell} = \exp(V_{rp\ell})$ where $V_{rp\ell}$ is the systematic utility of itinerary $r$ under fare class $\ell$ for passenger type $p$ in market $m$.
+为在优化框架中内生地捕获旅客选择行为，我们采用\cite{gallego2015general}提出的基于广义吸引力模型（GAM）的基于销售的线性规划（SBLP）。在此背景下，市场$m$中旅客类型$p$对特定行程-票价组合$(r, \ell)$的偏好由确定性名义吸引力参数量化，记为$\attr_{rp\ell}$。类似地，外部选项被赋予名义吸引力值$\outAttr_{mp}$。这些参数通常从离散选择模型导出，例如多项Logit（MNL）模型，其中$\attr_{rp\ell} = \exp(V_{rp\ell})$，$V_{rp\ell}$是市场$m$中旅客类型$p$在票价等级$\ell$下行程$r$的系统效用。
 
-As demonstrated by \cite{gallego2015general}, standard attraction models (such as the Basic Attraction Model and the Multinomial
-Logit Model) often overestimate the recapture rate when preferred options are unavailable. To address this, the GAM framework introduces the concept of shadow attractions to provide a more flexible representation of substitution behavior.
-Following this framework, we define $\adjAttr_{rp\ell}$ as the adjusted attraction for itinerary $r$ under fare $\ell$, and $\adjOutAttr_{mp}$ as the adjusted attraction for the outside option.
+如\cite{gallego2015general}所示，标准吸引力模型（如基本吸引力模型和多项Logit模型）在偏好选项不可用时往往高估回收率。为解决这一问题，GAM框架引入了影子吸引力的概念，以提供更灵活的替代行为表示。
+遵循该框架，我们定义$\adjAttr_{rp\ell}$为行程$r$在票价$\ell$下的调整吸引力，$\adjOutAttr_{mp}$为外部选项的调整吸引力。
 
-According to the GAM definition, the adjusted attraction $\adjAttr_{rp\ell}$ represents the nominal attraction reduced by the corresponding shadow attraction $\shadowAttr_{rp\ell}$, i.e., $\adjAttr_{rp\ell} = \attr_{rp\ell} - \shadowAttr_{rp\ell}$. Therefore $0 \le \adjAttr_{rp\ell} \le \attr_{rp\ell}$. Conversely, the adjusted outside attraction $\adjOutAttr_{mp} = \outAttr_{mp} + \sum_{r\in \itinSet}\sum_{\ell\in \fareClassSet} \shadowAttr_{rp\ell}$, satisfying $\adjOutAttr_{mp} \ge \outAttr_{mp}$. These adjusted parameters are then directly employed in the demand balance constraints of the SBLP formulation to accurately model spill and recapture effects.
+根据GAM定义，调整吸引力$\adjAttr_{rp\ell}$表示名义吸引力减去相应的影子吸引力$\shadowAttr_{rp\ell}$，即$\adjAttr_{rp\ell} = \attr_{rp\ell} - \shadowAttr_{rp\ell}$。因此$0 \le \adjAttr_{rp\ell} \le \attr_{rp\ell}$。相反，调整后的外部吸引力$\adjOutAttr_{mp} = \outAttr_{mp} + \sum_{r\in \itinSet}\sum_{\ell\in \fareClassSet} \shadowAttr_{rp\ell}$，满足$\adjOutAttr_{mp} \ge \outAttr_{mp}$。这些调整参数随后直接用于SBLP公式的需求平衡约束中，以准确建模溢出和回收效应。
 
-\section{Baseline Mathematical Model}
+\section{基准数学模型}
 
-To formulate the problem mathematically, we introduce the following main decision variables representing service operations and passenger choices.
+为对问题进行数学表述，我们引入以下表示服务运营和旅客选择的主要决策变量。
 
-The primary operational decision captures the assignment of service resources over the time-space network. We define $\fleetAssignVar_{af}$ as the number of type-$f$ resources ($f \in \fleetSet$) assigned to traverse arc $a \in \arcSet$. For a service arc $a \in \flightArc$, $\fleetAssignVar_{af} \in \{0, 1\}$ acts as a binary variable indicating whether that specific service is operated by resource type $f$. For a holding arc $a \in \holdingArc$, $\fleetAssignVar_{af} \ge 0$ is a continuous variable representing the number of idle resources waiting at a node.
+主要运营决策捕获了时空网络上服务资源的分配。我们定义$\fleetAssignVar_{af}$为分配到弧$a \in \arcSet$上的$f$型资源（$f \in \fleetSet$）的数量。对于服务弧$a \in \flightArc$，$\fleetAssignVar_{af} \in \{0, 1\}$作为二元变量，指示该特定服务是否由资源类型$f$运营。对于持有弧$a \in \holdingArc$，$\fleetAssignVar_{af} \ge 0$是连续变量，表示在节点处等待的空闲资源数量。
 
-Additionally, to capture market demand fulfillment, we define $\shareVar_{rp\ell} \ge 0$ as the number of passengers of type $p \in \psgTypeSet$ within market $m$ that book itinerary $r \in \itinInMarket_{m}$ under fare class $\ell \in \fareClassSet$. Correspondingly, $\outsideShareVar_{mp} \ge 0$ represents the volume of passengers of type $p$ in market $m$ selecting the ``outside option'' (i.e., not purchasing any service from the operator).
+此外，为捕获市场需求满足情况，我们定义$\shareVar_{rp\ell} \ge 0$为市场$m$中旅客类型$p \in \psgTypeSet$在票价等级$\ell \in \fareClassSet$下预订行程$r \in \itinInMarket_{m}$的旅客数量。相应地，$\outsideShareVar_{mp} \ge 0$表示市场$m$中旅客类型$p$选择"外部选项"（即不从运营商处购买任何服务）的旅客量。
 
-\section{Mathematical Formulation}
+\section{数学公式}
 
-We adopt the mathematical formulation $\model{\discretizationFull}$ proposed by \citet{wei2020airline} for the integrated service network design problem with passenger choice. This model simultaneously optimizes resource assignment decisions and passenger demand allocation under a discrete-choice framework, capturing the interdependencies between operational scheduling and revenue generation.
+我们采用\citet{wei2020airline}提出的数学公式$\model{\discretizationFull}$来处理考虑旅客选择的综合服务网络设计问题。该模型在离散选择框架下同时优化资源分配决策和旅客需求分配，捕获运营调度与收入生成之间的相互依赖关系。
 
 \full{
-\noindent\textbf{Objective Function}
+\noindent\textbf{目标函数}
 \begin{equation}
     \min \;\; 
     \sum_{a\in \flightArc}\sum_{f\in \fleetSet} \cost_{af}\, \fleetAssignVar_{af}
@@ -55,7 +54,7 @@ We adopt the mathematical formulation $\model{\discretizationFull}$ proposed by 
     % temp-command \tag{1a}
     \label{objfun:main}
 \end{equation}
-\noindent\textbf{Resource Assignment Constraints}
+\noindent\textbf{资源分配约束}
 \begin{equation}
   \sum_{a\in \outArcSet{i,t}} \fleetAssignVar_{af} - \sum_{a\in \inArcSet{i,t}} \fleetAssignVar_{af} = 0 
   \quad \forall (i,t)\in \nodeSet,\; \forall f\in \fleetSet
@@ -68,7 +67,7 @@ We adopt the mathematical formulation $\model{\discretizationFull}$ proposed by 
     % temp-command \tag{1c}
     \label{constr:main.fleet_available}
 \end{equation}
-\noindent\textbf{Service Frequency Constraints}
+\noindent\textbf{服务频率约束}
 \begin{equation}
     \sum_{f\in \fleetSet}\sum_{a\in \arcDuringSepTime_{ijt}} \fleetAssignVar_{af} \le 1 
     \quad \forall (i,j)\in \segSet,\; \forall t \in \discretization_i
@@ -81,7 +80,7 @@ We adopt the mathematical formulation $\model{\discretizationFull}$ proposed by 
     % temp-command \tag{1e}
     \label{constr:main.seg_freq}
 \end{equation}
-\noindent\textbf{Passenger Choice Constraints}
+\noindent\textbf{旅客选择约束}
 \begin{equation}
     \outAttr_{mp}\, \shareVar_{rp\ell} \;\le\; \attr_{rp\ell}\, \outsideShareVar_{mp}
     \quad \forall m\in \marketSet,\, \forall p\in \psgTypeSet,\, \forall r\in \itinInMarket_{m},\, \forall \ell\in \fareClassSet
@@ -98,7 +97,7 @@ We adopt the mathematical formulation $\model{\discretizationFull}$ proposed by 
     % temp-command \tag{1g}
     \label{constr:main.choice.limit}
 \end{equation}
-\noindent\textbf{Capacity and Availability Constraints}
+\noindent\textbf{容量与可用性约束}
 \begin{equation}
     \sum_{m\in \marketSet}\sum_{p\in \psgTypeSet}\sum_{\ell\in \fareClassSet}\sum_{r\in \itinUsingArc{m}{a}} 
     \demand_{mp}\, \shareVar_{rp\ell}\;\le\; \sum_{f\in \fleetSet} \fleetCap_{f}\, \fleetAssignVar_{af}
@@ -112,7 +111,7 @@ We adopt the mathematical formulation $\model{\discretizationFull}$ proposed by 
     % temp-command \tag{1i}
     \label{constr:main.choice.covering}
 \end{equation}
-\noindent\textbf{Variable Domains}
+\noindent\textbf{变量域}
 \begin{equation}
     \fleetAssignVar_{af}\in\{0,1\} \quad \forall a\in \flightArc, \; \forall f\in \fleetSet
     % temp-command \tag{1j}
@@ -135,15 +134,15 @@ We adopt the mathematical formulation $\model{\discretizationFull}$ proposed by 
 \end{equation}
 }
 
-The model defines a comprehensive plan matching services to passenger itineraries under resource and time constraints. The objective function \eqref{objfun:main} minimizes the total operating cost minus the total ticket revenue, effectively maximizing the operator's overall profit. For resource assignment, constraint \eqref{constr:main.flow} ensures flow conservation, meaning the number of type-$f$ resources arriving at any time-space node $(i, t)$ exactly equals those departing. Constraint \eqref{constr:main.fleet_available} bounds the resource utilization, ensuring that the total number of resources engaged in services ($\flightArcTc{\checkTime}$) and holdings ($\holdingArcTc{\checkTime}$) crossing a designated count time $\checkTime$ does not exceed the available resource limit $\fleetAvail_f$. To manage operational density, let $\arcDuringSepTime_{ijt} = \{a=((i,t^\prime)\rightarrow(j,t^{\prime\prime}))\;\forall a\in\flightArc\mid t\leq t^\prime<t+\minInterdepTime_{ij} \}$ denote the set of service arcs departing on segment $s=(i,j)$ within the minimum separation time starting from time $t$. Then constraint \eqref{constr:main.cooldown} enforces a minimum departure separation time, preventing multiple services from departing on the same spatial segment $(i,j)$ within the duration specified by the set $\arcDuringSepTime_{ijt}$, while constraint \eqref{constr:main.seg_freq} forces the schedule to exactly meet the required predetermined operation frequency $\freq_s$ for each segment $s$. Constraints \eqref{constr:main.choice.ratio}-\eqref{constr:main.choice.covering} represent the passenger choice constraints. Finally, constraints \eqref{constr:main.domain.x.flight} to \eqref{constr:main.domain.w} restrict the resource assignment and passenger allocation variables to their appropriate domains.
+该模型定义了在资源和时间约束下将服务与旅客行程匹配的综合计划。目标函数\eqref{objfun:main}最小化总运营成本减去总票务收入，有效地最大化运营商的整体利润。对于资源分配，约束\eqref{constr:main.flow}确保流守恒，即到达任何时空节点$(i, t)$的$f$型资源数量恰好等于离开的数量。约束\eqref{constr:main.fleet_available}限制资源利用率，确保在指定计数时间$\checkTime$处从事服务（$\flightArcTc{\checkTime}$）和持有（$\holdingArcTc{\checkTime}$）的资源总数不超过可用资源限制$\fleetAvail_f$。为管理运营密度，令$\arcDuringSepTime_{ijt} = \{a=((i,t^\prime)\rightarrow(j,t^{\prime\prime}))\;\forall a\in\flightArc\mid t\leq t^\prime<t+\minInterdepTime_{ij} \}$表示从时间$t$开始在最小间隔时间内在航段$s=(i,j)$上出发的服务弧集合。则约束\eqref{constr:main.cooldown}强制执行最小出发间隔时间，防止多个服务在集合$\arcDuringSepTime_{ijt}$指定的时间段内在同一空间航段$(i,j)$上出发，而约束\eqref{constr:main.seg_freq}强制时刻表恰好满足每个航段$s$所需的预定运营频率$\freq_s$。约束\eqref{constr:main.choice.ratio}-\eqref{constr:main.choice.covering}表示旅客选择约束。最后，约束\eqref{constr:main.domain.x.flight}至\eqref{constr:main.domain.w}将资源分配和旅客分配变量限制在其适当的域中。
 
-\section{Computational Complexity and Scale}\label{sec:complexity}\label{sec:preconditioning}
+\section{计算复杂性与规模}\label{sec:complexity}\label{sec:preconditioning}
 
-The \problemName problem is NP-hard. To see this, consider a restricted version in which passenger choice is removed: each market has fixed demand, a single admissible itinerary, and fixed revenue, and the choice-consistency constraints \eqref{constr:main.choice.ratio}--\eqref{constr:main.choice.limit} are inactive. The remaining problem is a service network design problem on a time-space network with binary service-activation and resource-assignment decisions subject to capacity and flow-balance constraints. This class contains the capacitated fixed-charge multicommodity network design problem as a special case, which is known to be NP-hard. Therefore, \problemName, which generalizes this restricted problem by adding itinerary-level choice variables and choice-consistency constraints, is NP-hard.
+\problemName 问题是NP-难的。为证明这一点，考虑一个去除旅客选择的受限版本：每个市场具有固定需求、单一可接受行程和固定收入，选择一致性约束\eqref{constr:main.choice.ratio}--\eqref{constr:main.choice.limit}不活跃。剩余问题是时空网络上具有二元服务激活和资源分配决策、受容量和流平衡约束的服务网络设计问题。该类包含有容量固定费用多商品网络设计问题作为特例，已知其为NP-难。因此，\problemName 通过添加行程级选择变量和选择一致性约束推广了该受限问题，是NP-难的。
 
-A central challenge lies in the combinatorial explosion of feasible itineraries. Each market admits a set of itineraries composed of one or more service arcs connected at intermediate nodes. The number of such itineraries grows rapidly with network size, the number of allowed connections, and the temporal resolution of the discretization. Consider a network with $|\airportSet|$ nodes and $|\segSet|$ directed segments. Under a discretization step of $\discretizationStep$ minutes over a 24-hour planning horizon, each segment admits up to $\lfloor 24 \times 60 / \discretizationStep \rfloor$ candidate departure times. For multi-leg itineraries with up to $k$ connections and a maximum connection window of $W$ minutes, the number of feasible itineraries scales combinatorially: each additional leg multiplies the possibilities by the number of compatible onward departures within the connection window. The exact count depends on the network topology, segment frequencies, connection-time rules, and the OD market set.
+核心挑战在于可行行程的组合爆炸。每个市场允许由一个或多个在中间节点连接的服务弧组成的行程集合。此类行程的数量随网络规模、允许的中转次数和离散化的时间分辨率快速增长。考虑一个具有$|\airportSet|$个节点和$|\segSet|$条有向航段的网络。在24小时规划时域上以$\discretizationStep$分钟的离散化步长，每个航段允许最多$\lfloor 24 \times 60 / \discretizationStep \rfloor$个候选出发时间。对于最多$k$次中转和最大中转窗口$W$分钟的多段行程，可行行程的数量呈组合增长：每增加一段将可能性乘以中转窗口内兼容的后续出发数量。确切数量取决于网络拓扑、航段频率、中转时间规则和OD市场集合。
 
-To illustrate, we consider a real-world airline scheduling instance that will be detailed in Section~\ref{sec:comp_study}. This network contains $60$ airports and $259$ directed segments. With a $15$-minute discretization, up to $2$ connections, and a $3$-hour maximum connection window, the enumeration yields $475{,}776$ feasible itineraries across the OD markets. Coupling this many itinerary variables with binary resource assignment constraints produces an extremely dense mixed-integer program that pushes the limits of state-of-the-art solvers.
+为说明这一点，我们考虑一个将在第~\ref{sec:comp_study}~节中详细介绍的真实世界航空排班实例。该网络包含$60$个机场和$259$条有向航段。以$15$分钟离散化、最多$2$次中转和$3$小时最大中转窗口，枚举产生跨OD市场的$475{,}776$条可行行程。将如此多的行程变量与二元资源分配约束耦合产生了极其稠密的混合整数规划，推动了最先进求解器的极限。
 
-Beyond worst-case complexity and practical scale, the formulation also presents numerical challenges. While the SBLP formulation elegantly linearizes the choice probabilities, directly feeding the raw attraction values (e.g., $\attr_{rp\ell}$) derived from discrete choice models into the solver can lead to severe numerical intractability. Specifically, in a typical Multinomial Logit (MNL) computation $\attr_{rp\ell} = \exp(V_{rp\ell})$, the raw attraction values are often exponentially small when the systematic utility $V_{rp\ell}$ is negative. This introduces extremely tiny coefficients into the constraint matrix, particularly in the choice ratio constraint \eqref{constr:main.choice.ratio}. As a consequence, the resulting constraint matrix becomes highly ill-conditioned, leading to numerical instability in the simplex method and severe tail-off effects during bound computation.
+除了最坏情况复杂性和实际规模外，该公式还呈现数值挑战。虽然SBLP公式优雅地线性化了选择概率，但将从离散选择模型导出的原始吸引力值（例如$\attr_{rp\ell}$）直接输入求解器可能导致严重的数值不可处理性。具体而言，在典型的多项Logit（MNL）计算$\attr_{rp\ell} = \exp(V_{rp\ell})$中，当系统效用$V_{rp\ell}$为负时，原始吸引力值通常指数级地小。这在约束矩阵中引入了极小的系数，特别是在选择比率约束\eqref{constr:main.choice.ratio}中。因此，所产生的约束矩阵变得高度病态，导致单纯形法中的数值不稳定性和界计算中的严重尾部效应。
 % \clearpage

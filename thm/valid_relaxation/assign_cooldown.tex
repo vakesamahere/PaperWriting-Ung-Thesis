@@ -1,21 +1,21 @@
-\paragraph*{Seperation constraints \eqref{constr:relax.cooldown}.}
-Fix any segment $(i,j)$ and $t\in\discretization_i$ and let $t^{+}$ be the next time in $\discretization_i$ following $t$.
-Define the set of fine-grained departure times aggregated at $(i,t)$ as
+\paragraph*{间隔约束 \eqref{constr:relax.cooldown}。}
+固定任意航段 $(i,j)$ 和 $t\in\discretization_i$，设 $t^{+}$ 为 $\discretization_i$ 中 $t$ 之后的下一个时间点。
+定义在 $(i,t)$ 处聚合的精细出发时间集合为
 \[
     \Theta_{ijt}=\{\tau\in\discretizationFull_i\mid t\le\tau<t^{+}\},
 \]
-and let $H=\planningEnd-\planningStart$ be the length of the planning horizon.
-Consider all full-model service arcs
+并设 $H=\planningEnd-\planningStart$ 为规划时域的长度。
+考虑所有完整模型服务弧
 \[
     \mathcal{A}_{ijt}=\bigcup_{a\in\arcDuringSepTime_{ijt}^\discretization}\Phi_{\arcSet}^{-1}(a),
 \]
-and denote by $\delta(a')$ the departure time of $a'\in\mathcal{A}_{ijt}$.
-For each resource type $f$ we replicate $\delta(a')$ exactly $\bar{\fleetAssignVar}_{a'f}$ times and obtain a multiset
+并记 $\delta(a')$ 为 $a'\in\mathcal{A}_{ijt}$ 的出发时间。
+对每种资源类型 $f$，将 $\delta(a')$ 精确复制 $\bar{\fleetAssignVar}_{a'f}$ 次，得到多重集
 \[
     \Delta=\{\tilde{\delta}_1,\tilde{\delta}_2,\ldots,\tilde{\delta}_K\},
     \qquad K=\sum_{f\in\fleetSet}\sum_{a\in \arcDuringSepTime_{ijt}^\discretization}\fleetAssignVar_{af},
 \]
-where every element of $\Delta$ is defined without wraparound by
+其中每个 $\Delta$ 的元素通过去除环绕定义为
 \[
     \tilde{\delta}=
     \begin{cases}
@@ -23,22 +23,22 @@ where every element of $\Delta$ is defined without wraparound by
         \delta(a') + H\cdot\mathbf{1}\{\delta(a')<t^{+}\}, & t^{+}<t.
     \end{cases}
 \]
-In both cases $\tilde{\delta}\in[t,\,t^{+}]$ (if $t^{+}\ge t$) or $\tilde{\delta}\in[t,\,t^{+}+H]$ (if $t^{+}<t$).
-Sort $\Delta$ in nondecreasing order: $\tilde{\delta}_1\le\tilde{\delta}_2\le\cdots\le\tilde{\delta}_K$.
+在两种情况下 $\tilde{\delta}\in[t,\,t^{+}]$（若 $t^{+}\ge t$）或 $\tilde{\delta}\in[t,\,t^{+}+H]$（若 $t^{+}<t$）。
+将 $\Delta$ 按非递减顺序排列：$\tilde{\delta}_1\le\tilde{\delta}_2\le\cdots\le\tilde{\delta}_K$。
 
-We claim that consecutive elements of $\Delta$ are separated by at least $\minInterdepTime_{ij}$.
-Indeed, suppose $\tilde{\delta}_r$ and $\tilde{\delta}_{r+1}$ correspond to arcs $a'_r$ and $a'_{r+1}$ departing at times $\tau_r$ and $\tau_{r+1}$ in the fine discretization (after undoing the unwrapping when $t^{+}<t$).
-If $\tilde{\delta}_{r+1}-\tilde{\delta}_r<\minInterdepTime_{ij}$, then $\tau_{r}\le\tau_{r+1}<\tau_r+\minInterdepTime_{ij}$ (modulo $H$), hence both arcs belong to $\arcDuringSepTime_{ij\tau_r}^{\discretizationFull}$.
-Constraint~\eqref{constr:main.cooldown} of the full model would then force
+我们断言 $\Delta$ 的连续元素之间至少相隔 $\minInterdepTime_{ij}$。
+事实上，假设 $\tilde{\delta}_r$ 和 $\tilde{\delta}_{r+1}$ 对应于在精细离散化中分别以时间 $\tau_r$ 和 $\tau_{r+1}$ 出发的弧 $a'_r$ 和 $a'_{r+1}$（在 $t^{+}<t$ 时撤销展开后）。
+若 $\tilde{\delta}_{r+1}-\tilde{\delta}_r<\minInterdepTime_{ij}$，则 $\tau_{r}\le\tau_{r+1}<\tau_r+\minInterdepTime_{ij}$（模 $H$），因此两条弧都属于 $\arcDuringSepTime_{ij\tau_r}^{\discretizationFull}$。
+完整模型的约束~\eqref{constr:main.cooldown} 将强制
 \[
     \sum_{f\in\fleetSet}\sum_{a'\in \arcDuringSepTime_{ij\tau_r}^{\discretizationFull}}\bar{\fleetAssignVar}_{a'f} \ge 2,
 \]
-contradicting feasibility of $\solution$.
-Therefore,
+这与 $\solution$ 的可行性矛盾。
+因此，
 \[
     \tilde{\delta}_{r+1}-\tilde{\delta}_r \ge \minInterdepTime_{ij},\qquad r=1,\ldots,K-1.
 \]
-Let
+设
 \[
     L=
     \begin{cases}
@@ -46,21 +46,21 @@ Let
         H+t^{+}-t, & t^{+}<t,
     \end{cases}
 \]
-which is exactly the numerator appearing in Definition~\eqref{def:relax.departLimit}.
-Because all elements of $\Delta$ lie in an interval of length $L$, we obtain
+这恰好是定义~\eqref{def:relax.departLimit} 中出现的分子。
+因为 $\Delta$ 的所有元素都位于长度为 $L$ 的区间内，我们得到
 \[
     (K-1)\,\minInterdepTime_{ij} \le \tilde{\delta}_K-\tilde{\delta}_1 \le L,
 \]
-and consequently
+从而
 \[
     K \le 1 + \frac{L}{\minInterdepTime_{ij}}
       = \left\lceil \frac{L}{\minInterdepTime_{ij}} \right\rceil
       = \departLimit_{ijt}.
 \]
-Hence
+因此
 \[
     \sum_{f\in\fleetSet}\sum_{a\in \arcDuringSepTime_{ijt}^\discretization}\fleetAssignVar_{af}
     = K
     \le \departLimit_{ijt},
 \]
-which establishes constraint~\eqref{constr:relax.cooldown}.
+这证明了约束~\eqref{constr:relax.cooldown}。

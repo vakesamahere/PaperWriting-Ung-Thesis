@@ -1,26 +1,26 @@
-\paragraph*{Properties of $\Phi_{\arcSet}$.}
-Because $\Phi_{\arcSet}$ is a function, the family $\{\Phi_{\arcSet}^{-1}(a)\}_{a\in\arcSet}\cup\{\Phi_{\arcSet}^{-1}(\bot)\}$ forms a partition of $\full{\arcSet}$.
-Furthermore, every service arc $a'\in\full{\flightArc}$ maps to a unique element of $\flightArc$. Hence
+\paragraph*{$\Phi_{\arcSet}$ 的性质。}
+因为 $\Phi_{\arcSet}$ 是一个函数，族 $\{\Phi_{\arcSet}^{-1}(a)\}_{a\in\arcSet}\cup\{\Phi_{\arcSet}^{-1}(\bot)\}$ 构成 $\full{\arcSet}$ 的一个划分。
+此外，每条服务弧 $a'\in\full{\flightArc}$ 映射到 $\flightArc$ 的唯一元素。因此
 \[
     \full{\flightArc} = \biguplus_{a\in\flightArc}\Phi_{\arcSet}^{-1}(a).
 \]
-For holding arcs we obtain the disjoint decomposition
+对于停留弧，我们得到不相交分解
 \[
     \full{\holdingArc} = \left(\biguplus_{a\in\holdingArc}\Phi_{\arcSet}^{-1}(a)\right) \uplus \Phi_{\arcSet}^{-1}(\bot),
 \]
-where $\Phi_{\arcSet}^{-1}(\bot)$ comprises the short ground waits that are entirely absorbed at a single partial time node.
-The node mapping $\Phi_{\nodeSet}$ enjoys the same partition property: $\full{\nodeSet} = \biguplus_{(i,t)\in\nodeSet} \Phi_{\nodeSet}^{-1}(i,t)$.
+其中 $\Phi_{\arcSet}^{-1}(\bot)$ 包含完全被吸收在单个部分时间节点处的短暂地面等待。
+节点映射 $\Phi_{\nodeSet}$ 具有相同的划分性质：$\full{\nodeSet} = \biguplus_{(i,t)\in\nodeSet} \Phi_{\nodeSet}^{-1}(i,t)$。
 
-\paragraph*{Compatibility of pre-images.}
-Fix $a=((i,t)\rightarrow(j,t'))\in\arcSet$ and let $a'=((i,\tau)\rightarrow(j,\tau'))$ be an arc in the full network.
-By the definition of $\Phi_{\arcSet}$ we have
+\paragraph*{原像的相容性。}
+固定 $a=((i,t)\rightarrow(j,t'))\in\arcSet$，设 $a'=((i,\tau)\rightarrow(j,\tau'))$ 为完整网络中的一条弧。
+由 $\Phi_{\arcSet}$ 的定义，我们有
 \[
     a'\in\Phi_{\arcSet}^{-1}(a)
     \iff 
     \Phi_{\nodeSet}((i,\tau))=(i,t)\ \text{and}\ \Phi_{\nodeSet}((j,\tau'))=(j,t').
 \]
-Thus the tail of $a'$ automatically lies in $\Phi_{\nodeSet}^{-1}(i,t)$ and its head in $\Phi_{\nodeSet}^{-1}(j,t')$, and conversely any arc leaving $(i,\tau)\in\Phi_{\nodeSet}^{-1}(i,t)$ and arriving at $(j,\tau')\in\Phi_{\nodeSet}^{-1}(j,t')$ must map to $a$ (rather than to $\bot$).
-Equivalently,
+因此 $a'$ 的尾部自动位于 $\Phi_{\nodeSet}^{-1}(i,t)$ 中，其头部位于 $\Phi_{\nodeSet}^{-1}(j,t')$ 中，反之，任何从 $(i,\tau)\in\Phi_{\nodeSet}^{-1}(i,t)$ 出发到达 $(j,\tau')\in\Phi_{\nodeSet}^{-1}(j,t')$ 的弧必须映射到 $a$（而非 $\bot$）。
+等价地，
 \[
     a\in\outArcSet{(i,t)},\ a'\in\Phi_{\arcSet}^{-1}(a)
     \iff \exists (i,\tau)\in\Phi_{\nodeSet}^{-1}(i,t)\ \text{s.t.}\ a'\in\outArcSet{(i,\tau)},
@@ -30,14 +30,14 @@ and similarly
     a\in\inArcSet{(j,t')},\ a'\in\Phi_{\arcSet}^{-1}(a)
     \iff \exists (j,\tau')\in\Phi_{\nodeSet}^{-1}(j,t')\ \text{s.t.}\ a'\in\inArcSet{(j,\tau')}.
 \]
-This compatibility allows us to swap sums between partial arcs and their full-network pre-images.
+这种相容性使我们能够在部分弧与其完整网络原像之间交换求和。
 
-In particular, since the pre-image family $\{\Phi_{\arcSet}^{-1}(a)\}_{a\in\flightArc}$ constitutes a mathematically strict partition of the full service arc set $\full{\flightArc}$, the Law of Total Summation holds. For any real-valued parameters or variables $y_{a'}$ indexed by the full service arcs $a'\in\full{\flightArc}$, we have:
+特别地，由于原像族 $\{\Phi_{\arcSet}^{-1}(a)\}_{a\in\flightArc}$ 构成完整服务弧集 $\full{\flightArc}$ 的严格数学划分，全求和律成立。对于以完整服务弧 $a'\in\full{\flightArc}$ 为索引的任意实值参数或变量 $y_{a'}$，我们有：
 \[
     \sum_{a\in\flightArc}\ \sum_{a'\in\Phi_{\arcSet}^{-1}(a)} y_{a'} 
     = \sum_{a'\in\full{\flightArc}} y_{a'}.
 \]
 
-The final component of our preliminaries is the routing existence lemma, which is essential for disaggregating macroscopic flows into concrete cycles.
+预备工作的最后一个组成部分是路由存在性引理，它对于将宏观流量分解为具体循环至关重要。
 \input{thm/pro_exist_routing_plan.tex}
 \input{thm/pro_exist_routing_plan_proof.tex}

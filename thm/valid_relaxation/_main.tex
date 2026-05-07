@@ -1,6 +1,6 @@
 \begin{theorem}
 \label{pro.valid_relaxation}
-    The relaxation model $\model{\discretization, \itinSetSuper}$ is a valid relaxation of the full model $\model{\discretizationFull}$. For any feasible solution $\bar{\solution}=(\bar{\fleetAssignVar}, \bar{\shareVar}, \bar{\outsideShareVar})$ to $\model{\discretizationFull}$, there exists a corresponding solution $\bar{\solution}$ to $\solution$ with the non-worse objective value. The mapping from $(\bar{\fleetAssignVar},\bar{\shareVar})$ to $(\fleetAssignVar, \shareVar, \outsideShareVar)$ is given by
+    松弛模型 $\model{\discretization, \itinSetSuper}$ 是完整模型 $\model{\discretizationFull}$ 的有效松弛。对于 $\model{\discretizationFull}$ 的任意可行解 $\bar{\solution}=(\bar{\fleetAssignVar}, \bar{\shareVar}, \bar{\outsideShareVar})$，存在对应的解 $\bar{\solution}$ 到 $\solution$，且目标值不劣于原解。从 $(\bar{\fleetAssignVar},\bar{\shareVar})$ 到 $(\fleetAssignVar, \shareVar, \outsideShareVar)$ 的映射如下：
     \begin{equation}
     \begin{aligned}
         \fleetAssignVar_{af} &= \sum_{a^\prime\in\Phi_{\arcSet}^{-1}(a)} \bar{\fleetAssignVar}_{a^\prime f},
@@ -10,5 +10,5 @@
     \end{aligned}
     \label{eq:map_ori2rel}
     \end{equation}
-where $\eqClassByPathSig_{(r)}$ is the equivalence class of original itineraries mapped to super-itinerary $r$ based on path signature.
+其中 $\eqClassByPathSig_{(r)}$ 是基于路径签名映射到超级行程 $r$ 的原始行程等价类。
 \end{theorem}

@@ -1,9 +1,9 @@
-\paragraph*{Segment-frequency constraints \eqref{constr:relax.seg_freq}.}
-Since $\Phi_{\arcSet}$ preserves the segment index, each $\segArcSet{s}$ is the image of $\full{\segArcSet{s}}$.
-Therefore
+\paragraph*{航段频率约束 \eqref{constr:relax.seg_freq}。}
+由于 $\Phi_{\arcSet}$ 保持航段索引不变，每个 $\segArcSet{s}$ 是 $\full{\segArcSet{s}}$ 的像。
+因此
 \[
     \sum_{f\in\fleetSet}\sum_{a\in\segArcSet{s}}\fleetAssignVar_{af}
     = \sum_{f\in\fleetSet}\sum_{a'\in\full{\segArcSet{s}}}\bar{\fleetAssignVar}_{a'f}
     = \freq_s,
 \]
-and \eqref{constr:relax.seg_freq} holds.
+故 \eqref{constr:relax.seg_freq} 成立。

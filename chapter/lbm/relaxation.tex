@@ -1,12 +1,12 @@
-\section{Relaxation Model $\model{\discretization, \itinSetSuper}$ via Discritization and Itinerary Aggregation}
+\section{通过离散化和行程聚合的松弛模型$\model{\discretization, \itinSetSuper}$}
 \label{sec:lbm}
 
-To address the tractability issues of the full time-space network, we introduce a time relaxation approach. The central idea of this step is to formulate a relaxed model on a much coarser, partially discretized time-space network, thereby drastically reducing the problem size while still guaranteeing a valid theoretical lower bound for the exact algorithm. This base model ignores certain strict timing feasibility requirements which are subsequently resolved in later algorithm stages. The model proposed in this section is called the Lower Bound Model (LBM) or the relaxation model in the rest of the paper.
+为解决完整时空网络的可处理性问题，我们引入一种时间松弛方法。该步骤的核心思想是在一个更粗糙的、部分离散化的时空网络上建立松弛模型，从而大幅减小问题规模，同时仍为精确算法保证有效的理论下界。该基础模型忽略了某些严格的时间可行性要求，这些要求在后续算法阶段中得到解决。本节提出的模型在本文其余部分称为下界模型（LBM）或松弛模型。
 
 % \section*{Understanding $\discretization$}
-We consider $\discretization$ as a transformation of $\discretizationFull$. The transformation can be seen as aggregations of time-arcs. 
-Every time-arc in $\full{\net}$ have a corresponding arc in $\net$.That means, we have some time-nodes $(i,t)$ in $\discretization$. All time-arcs $\full{\net}$ will exist in $\net$, and their start time, end time, and travel time may change because they can only use time-nodes in $\discretization$. In order to ensure the optimality, we can let the travel time be shorter than what they are. And there may even be inverse arcs whose start time is later than finish time.
-The time-expanded network $\net = (\nodeSet, \arcSet)$, where $\nodeSet = \{(i,t)\mid \forall i\in\airportSet, t\in\discretization_i\},\;\arcSet = \holdingArc \cup \flightArc$, constructed from time discretization $\discretization$ satisfies the following properties:
+我们将$\discretization$视为$\discretizationFull$的一种变换。该变换可以看作时间弧的聚合。
+$\full{\net}$中的每条时间弧在$\net$中都有对应的弧。这意味着，我们在$\discretization$中有一些时间节点$(i,t)$。$\full{\net}$中的所有时间弧将存在于$\net$中，它们的起始时间、结束时间和旅行时间可能改变，因为它们只能使用$\discretization$中的时间节点。为确保最优性，我们可以让旅行时间比实际更短。甚至可能存在起始时间晚于结束时间的逆弧。
+从时间离散化$\discretization$构造的时间扩展网络$\net = (\nodeSet, \arcSet)$，其中$\nodeSet = \{(i,t)\mid \forall i\in\airportSet, t\in\discretization_i\},\;\arcSet = \holdingArc \cup \flightArc$，满足以下性质：
 % \[
 %     \net = (\nodeSet, \arcSet)
 % \]
@@ -16,43 +16,43 @@ The time-expanded network $\net = (\nodeSet, \arcSet)$, where $\nodeSet = \{(i,t
 % \[
 %     \net = \Phi(\netFlat, \discretization) = \Phi(\airportSet,\segSet,\discretization)
 % \]
-\begin{property}[Domain of Discretization $\discretization$]
+\begin{property}[离散化$\discretization$的域]
     $\forall i\in\airportSet,\,\{\planningStart\}\subseteq\discretization_i\subseteq\discretizationFull_i$
 \end{property}
-\begin{property}[Nodes $\nodeSet = \Phi_{\nodeSet}(\netFlat, \discretization)$]
-    Node set $N$ contains node $(i,\planningStart)\;\forall i\in\airportSet$
+\begin{property}[节点 $\nodeSet = \Phi_{\nodeSet}(\netFlat, \discretization)$]
+    节点集$N$包含节点$(i,\planningStart)\;\forall i\in\airportSet$
 \end{property}
-\begin{property}[Holding Arcs]
+\begin{property}[持有弧]
     \label{def:relax.holdingArc}
-    Each ground arc $a\in\holdingArc$ is defined as $a=((i,t),(i,t^{+}))$, where
+    每条地面弧$a\in\holdingArc$定义为$a=((i,t),(i,t^{+}))$，其中
     $$t^{+}=\begin{cases}
             \min\{\bar{t}\mid\bar{t}>t,\bar{t}\in\discretization_i\} & ,\exists\bar{t}>t,\bar{t}\in\discretization_i\\
             \planningStart & ,\text{otherwise}
     \end{cases}$$
 \end{property}
-\begin{property}[Service Arcs]
+\begin{property}[服务弧]
     \label{def:relax.flightArc}
-    Each flight arc $a\in\flightArc$ is defined as $a=((i,t),(j,t^\prime)),\;\forall (i,j)\in\segSet,t\in\discretization_i$, where
+    每条服务弧$a\in\flightArc$定义为$a=((i,t),(j,t^\prime)),\;\forall (i,j)\in\segSet,t\in\discretization_i$，其中
     $$t^\prime=\max\{\bar{t}\mid\bar{t}\leq(t+\travelTime_{ij})\;\text{mod}\;(\planningEnd-\planningStart)+\planningStart,\bar{t}\in\discretization_j\}$$
 \end{property}
 
-Denote the arc mapping induced by the discretization transformation as
-$\Phi_{\arcSet}:\full{\arcSet}\to \widetilde{\arcSet}$,
-where $\widetilde{\arcSet}:=\arcSet\cup\{\bot\}$ augments the partial network with a virtual symbol $\bot$ capturing collapsed holding arcs.
-For $a\in\arcSet$ define its pre-image
-$\Phi_{\arcSet}^{-1}(a)=\{a'\in\full{\arcSet}\mid\Phi_{\arcSet}(a')=a\}$, and let
-$\Phi_{\arcSet}^{-1}(\bot)$ collect the arcs mapped to the virtual element.
-Define analogously $\Phi_{\nodeSet}:\full{\nodeSet}\twoheadrightarrow\nodeSet$
-and $\Phi_{\nodeSet}^{-1}(i,t)=\{(i,\tau)\in\full{\nodeSet}\mid\Phi_{\nodeSet}(i,\tau)=(i,t)\}$.
+记由离散化变换诱导的弧映射为
+$\Phi_{\arcSet}:\full{\arcSet}\to \widetilde{\arcSet}$，
+其中$\widetilde{\arcSet}:=\arcSet\cup\{\bot\}$用虚拟符号$\bot$扩充部分网络以捕获折叠的持有弧。
+对$a\in\arcSet$定义其原像
+$\Phi_{\arcSet}^{-1}(a)=\{a'\in\full{\arcSet}\mid\Phi_{\arcSet}(a')=a\}$，并令
+$\Phi_{\arcSet}^{-1}(\bot)$收集映射到虚拟元素的弧。
+类似地定义$\Phi_{\nodeSet}:\full{\nodeSet}\twoheadrightarrow\nodeSet$
+和$\Phi_{\nodeSet}^{-1}(i,t)=\{(i,\tau)\in\full{\nodeSet}\mid\Phi_{\nodeSet}(i,\tau)=(i,t)\}$。
 
-For every node $i\in\airportSet$, Property~1 gives $\{\planningStart\}\subseteq\discretization_i\subseteq\discretizationFull_i$,
-so we may introduce the projection
+对每个节点$i\in\airportSet$，性质~1给出$\{\planningStart\}\subseteq\discretization_i\subseteq\discretizationFull_i$，
+因此我们可以引入投影
 \[
     \phi_i:\discretizationFull_i\to\discretization_i,\qquad 
     \phi_i(\tau)=\max\{\bar{t}\in\discretization_i\mid \bar{t}\le \tau\}.
 \]
-Property~2 yields $\Phi_{\nodeSet}((i,\tau))=(i,\phi_i(\tau))$.
-Using Properties~3 and 4, the arc mapping of $(i,\tau)\rightarrow(j,\tau')$ is specified as
+性质~2给出$\Phi_{\nodeSet}((i,\tau))=(i,\phi_i(\tau))$。
+利用性质~3和4，$(i,\tau)\rightarrow(j,\tau')$的弧映射指定为
 \begin{equation}
     \Phi_{\arcSet}(((i,\tau)\rightarrow(j,\tau'))) =
     \begin{cases}
@@ -61,31 +61,31 @@ Using Properties~3 and 4, the arc mapping of $(i,\tau)\rightarrow(j,\tau')$ is s
         \bot, & \text{if } i=j,\ \phi_i(\tau)=\phi_i(\tau').
     \end{cases}
 \end{equation}
-Each service arc keeps its tail on the rounded-down partial times and sets its head to the latest partial time point that the travel time is not increased, whereas a holding arc bridges to the next partial node if one exists, and otherwise collapses into $\bot$ when both endpoints project to the same partial node.
+每条服务弧将其尾部保持在向下取整的部分时间上，并将其头部设置为旅行时间不增加的最晚部分时间点，而持有弧桥接到下一个部分节点（如果存在），否则当两个端点投影到同一部分节点时折叠为$\bot$。
 
-\section*{Variables}
-\subsection*{Fleet Assignment Variable $\fleetAssignVar_{af} = \fleetAssignVar_{a^{\discretization},f}^{\net}$}
+\section*{变量}
+\subsection*{机队分配变量 $\fleetAssignVar_{af} = \fleetAssignVar_{a^{\discretization},f}^{\net}$}
 \[
     \fleetAssignVar_{a^{\discretization},f}^{\net} = \sum_{a^{\discretizationFull}:\, \Phi(a^{\discretizationFull}) = a^{\discretization}}\fleetAssignVar_{a^{\discretizationFull},f}^{\full{\net}}
 \]
-\subparagraph*{Domain}
+\subparagraph*{域}
 \begin{equation}
     \fleetAssignVar_{af}\in\mathbb{Z}_{\ge0} \quad \forall a\in \flightArc, \; \forall f\in \fleetSet
     % temp-command \tag{2j}
     \label{constr:relax.domain.x.flight}
 \end{equation}
-which ensures optimality.
-Therefore domains of some $\fleetAssignVar_{a,f}$ need to change.
+以确保最优性。
+因此某些$\fleetAssignVar_{a,f}$的域需要改变。
 
-\section*{Constraints Transformation}
-Below we show systematically about the algorithmical influence of applying the partial discretization.
-Considering each constraint. (\ref{constr:main.flow}, \ref{constr:main.seg_freq}) keeps. (\ref{constr:main.choice.ratio}, \ref{constr:main.choice.limit}, \ref{constr:main.choice.capacity}, \ref{constr:main.choice.covering}) keeps. The only differences of constraints above are the sets of arcs and nodes are changed to the ones in the partial network. However, some constraints need to be modified to ensure the optimality of the relaxation model.
+\section*{约束变换}
+下面我们系统地展示应用部分离散化的算法影响。
+考虑每个约束。(\ref{constr:main.flow}, \ref{constr:main.seg_freq})保持不变。(\ref{constr:main.choice.ratio}, \ref{constr:main.choice.limit}, \ref{constr:main.choice.capacity}, \ref{constr:main.choice.covering})保持不变。上述约束的唯一区别是弧和节点的集合变为部分网络中的集合。然而，某些约束需要修改以确保松弛模型的最优性。
 
 % (\ref{constr:main.fleet_available}) may have problems when there are inverse arcs. Right hand sides of (\ref{constr:main.cooldown}) need to be the value of the maximum flights of next time periods.
 
-An resource unit may be counted twice when traveling through blue paths. The blue service arcs are not counted directly, but their two blue holding arcs are, each adding 1 to the total.
+当资源单位通过蓝色路径行进时可能被计数两次。蓝色服务弧不被直接计数，但其两条蓝色持有弧各自向总数贡献1。
 \input{figure/inverse_arc.tex}
-Let set $\invertArcTc{t_c}$ denotes inverse(except wrapped) arcs across $t_c$:
+令集合$\invertArcTc{t_c}$表示跨越$t_c$的逆弧（不含环绕弧）：
 \begin{equation}
 \begin{aligned}
     \invertArcTc{t_c} = \{a=((i,t)\rightarrow(j,t^\prime))\;\forall a\in\flightArc\mid t^\prime\leq t_c<t<t+\travelTime_{ij}<\planningEnd\}
@@ -93,7 +93,7 @@ Let set $\invertArcTc{t_c}$ denotes inverse(except wrapped) arcs across $t_c$:
     \label{def:relax.invertArcTc}
 \end{aligned}
 \end{equation}
-Therefore, the fleet availability constraints are modified to
+因此，机队可用性约束修改为
 \begin{equation}
     \sum_{a\in \holdingArcTc{\checkTime}} \fleetAssignVar_{af} + \sum_{a\in \flightArcTc{\checkTime}} \fleetAssignVar_{af} - \sum_{a\in \invertArcTc{\checkTime}} \fleetAssignVar_{af} \le \fleetAvail_{f}
     \quad \forall f\in \fleetSet
@@ -101,8 +101,8 @@ Therefore, the fleet availability constraints are modified to
     \label{constr:relax.fleet_available}
 \end{equation}
 
-Aggregation may cause numbers of services which are originally far away from each other depart at same or relative closer time in the relaxation model. In order to ensure the optimality of the relaxation model, we need to enable departure-pairs which are legal in the full network.
-Right hand sides of (\ref{constr:main.cooldown}) need to be the value of the maximum services of next time periods.
+聚合可能导致原本在完整网络中相距较远的服务在松弛模型中在相同或相对更近的时间出发。为确保松弛模型的最优性，我们需要允许在完整网络中合法的出发对。
+(\ref{constr:main.cooldown})的右端需要为下一时间段最大服务数的值。
 % \subparagraph*{Set of arcs for segment $(i,j)$ at time $t$: $\arcDuringSepTime_{ijt}^\discretization$}
 % % \begin{align}
 % %     \arcDuringSepTime_{ijt}^\discretization = \{&a=((i,t^\prime)\rightarrow(j,t^{\prime\prime}))\;\forall a\in\flightArc\mid
@@ -118,7 +118,7 @@ Right hand sides of (\ref{constr:main.cooldown}) need to be the value of the max
 %     \arcDuringSepTime_{ijt}^\discretization = \{a=((i,t^\prime)\rightarrow(j,t^{\prime\prime}))\;\forall a\in\flightArc\mid t\leq t^\prime<t+\minInterdepTime_{ij} \}
 %     \label{def:relax.arcDuringSepTime}
 % \end{equation}
-The upper bound of the number of services which can depart in the interval $[t, t+\minInterdepTime_{ij})$, $\departLimit_{ijt}$ is defined as:
+在区间$[t, t+\minInterdepTime_{ij})$内可以出发的服务数量上界$\departLimit_{ijt}$定义为：
 \begin{equation}
 \begin{aligned}
     \departLimit_{ijt} & = \begin{cases}
@@ -130,11 +130,11 @@ The upper bound of the number of services which can depart in the interval $[t, 
     \label{def:relax.departLimit}
 \end{aligned}
 \end{equation}
-where
+其中
 $
     t^{+}=\min\{\bar{t}\in\discretization_i\mid\bar{t}>\max\{\bar{\bar{t}}\mid(i,\bar{\bar{t}},j,\bar{\bar{t}}^\prime)\in\arcDuringSepTime_{ijt}^\discretization\}\}
 $
-Therefore, the frequency constraints are modified to
+因此，频率约束修改为
 \begin{equation}
     \sum_{f\in \fleetSet}\sum_{a\in \arcDuringSepTime_{ijt}} \fleetAssignVar_{af} \le \departLimit_{ijt}
     \quad \forall (i,j)\in \segSet,\; \forall t \in \discretization_i
@@ -142,102 +142,101 @@ Therefore, the frequency constraints are modified to
     \label{constr:relax.cooldown}
 \end{equation}
 
-\subsection{Topology-Aware Heterogeneous Initial Discretization}\label{sec:init_disc_detail}
+\subsection{拓扑感知异构初始离散化}\label{sec:init_disc_detail}
 
-The arc-mapping rules defined in Properties~\ref{def:relax.holdingArc}--\ref{def:relax.flightArc} reveal a structural vulnerability of uniform coarse discretizations. Under Property~\ref{def:relax.flightArc}, the arrival time of a service arc on segment $(j,i)$ departing at $t \in \discretization_j$ is set to the latest grid point in $\discretization_i$ no later than $t + \travelTime_{ji}$ (floor mapping). If a uniform step size $\discretizationStep$ is applied across all nodes and $\discretizationStep > \travelTime_{ji}$ for some segment $(j,i)$, the mapped arrival time $t'$ may satisfy $t' \le t$, producing an inverse arc in which a resource unit appears to arrive no later than it departs. As shown in Equation~\eqref{def:relax.invertArcTc} and Constraint~\eqref{constr:relax.fleet_available}, inverse arcs require dedicated correction terms in the fleet availability constraints. More critically, they open up a large region of physically infeasible solutions in the relaxation, severely degrading the lower bound quality.
+性质~\ref{def:relax.holdingArc}--\ref{def:relax.flightArc}中定义的弧映射规则揭示了均匀粗糙离散化的结构脆弱性。在性质~\ref{def:relax.flightArc}下，在航段$(j,i)$上从$t \in \discretization_j$出发的服务弧的到达时间被设置为$\discretization_i$中不晚于$t + \travelTime_{ji}$的最晚网格点（下取整映射）。如果对所有节点应用均匀步长$\discretizationStep$且对某些航段$(j,i)$有$\discretizationStep > \travelTime_{ji}$，则映射的到达时间$t'$可能满足$t' \le t$，产生资源单位看起来到达不晚于出发的逆弧。如公式~\eqref{def:relax.invertArcTc}和约束~\eqref{constr:relax.fleet_available}所示，逆弧需要在机队可用性约束中添加专门的修正项。更关键的是，它们在松弛中打开了大量物理不可行解的区域，严重降低了下界质量。
 
-To eliminate inverse arcs at their source, we adopt a topology-aware heterogeneous initial discretization. Instead of a single global step, each node $i \in \airportSet$ receives an individual initial step size $\initStep_i$ defined as the minimum inbound travel time:
+为从源头消除逆弧，我们采用拓扑感知的异构初始离散化。每个节点$i \in \airportSet$不使用单一全局步长，而是获得一个定义为最小入站旅行时间的个体初始步长$\initStep_i$：
 \begin{equation}\label{eq:init_step}
     \initStep_i = \min_{j:\,(j,i)\in\segSet} \left\{ \travelTime_{ji} \right\}.
 \end{equation}
-For nodes with no inbound segments, we set $\initStep_i = \planningEnd - \planningStart$ as a safe default. The initial time point set for node $i$ is then generated as the arithmetic progression
+对于没有入站航段的节点，我们设置$\initStep_i = \planningEnd - \planningStart$作为安全默认值。节点$i$的初始时间点集合随后生成为等差数列
 \begin{equation}\label{eq:init_discretization}
     \discretization_i = \left\{ t \;\middle|\; t = \planningStart + k \cdot \initStep_i,\quad k \in \mathbb{Z}_{\ge 0},\quad t < \planningEnd \right\}.
 \end{equation}
 
-\begin{proposition}[Elimination of Inverse Arcs]\label{prop:no_inverse}
-    Under the initial discretization defined by \eqref{eq:init_step}--\eqref{eq:init_discretization}, the relaxed network $\net$ contains no inverse arcs, i.e., for every flight arc $a = ((j,t) \to (i,t')) \in \flightArc$ with $(j,i) \in \segSet$, we have $t' > t$.
+\begin{proposition}[消除逆弧]\label{prop:no_inverse}
+    在由\eqref{eq:init_step}--\eqref{eq:init_discretization}定义的初始离散化下，松弛网络$\net$不包含逆弧，即对于每条服务弧$a = ((j,t) \to (i,t')) \in \flightArc$且$(j,i) \in \segSet$，有$t' > t$。
 \end{proposition}
 \begin{proof}
-    By Property~\ref{def:relax.flightArc}, $t' = \max\{\bar{t} \in \discretization_i \mid \bar{t} \le t + \travelTime_{ji}\}$. Since $\discretization_i$ is an arithmetic progression with common difference $\initStep_i \le \travelTime_{ji}$ (by \eqref{eq:init_step}), the interval $(t,\, t + \travelTime_{ji}]$ has length $\travelTime_{ji} \ge \initStep_i$ and therefore contains at least one grid point of $\discretization_i$. Hence $t' \ge t + \initStep_i > t$ (noting $\initStep_i > 0$ by construction).
+    由性质~\ref{def:relax.flightArc}，$t' = \max\{\bar{t} \in \discretization_i \mid \bar{t} \le t + \travelTime_{ji}\}$。由于$\discretization_i$是公差为$\initStep_i \le \travelTime_{ji}$（由\eqref{eq:init_step}）的等差数列，区间$(t,\, t + \travelTime_{ji}]$的长度为$\travelTime_{ji} \ge \initStep_i$，因此包含$\discretization_i$的至少一个网格点。故$t' \ge t + \initStep_i > t$（注意$\initStep_i > 0$由构造保证）。
 \end{proof}
 
-Beyond ensuring physical feasibility, this strategy provides two additional benefits.
+除了确保物理可行性外，该策略还提供两个额外好处。
 
-\paragraph{Topology-adaptive variable compression.}
-The heterogeneous step sizes naturally adapt to the hub-and-spoke structure of real-world service networks. Hub nodes, which receive many short-haul services, obtain a small $\initStep_i$ and hence a finer grid that preserves temporal precision. Spoke nodes served predominantly by long-haul segments receive a large $\initStep_i$ and a correspondingly coarser grid. This self-adaptive behavior keeps the total number of initial time points---and consequently the number of decision variables---compact without sacrificing the physical validity of the network, avoiding out-of-memory failures that arise when a uniformly fine grid is applied to large-scale instances.
+\paragraph{拓扑自适应变量压缩。}
+异构步长自然适应真实世界服务网络的枢纽辐射结构。接收许多短途服务的枢纽节点获得较小的$\initStep_i$，因此获得保持时间精度的更细网格。主要由长途航段服务的辐射节点获得较大的$\initStep_i$和相应更粗的网格。这种自适应行为在不牺牲网络物理有效性的情况下保持初始时间点总数——从而保持决策变量数量——紧凑，避免了当均匀精细网格应用于大规模实例时出现的内存溢出故障。
 
-\paragraph{Tighter initial relaxation.}
-By precluding inverse arcs, the initial relaxation model operates over a solution space that is already free of the most egregious chronological violations. This yields a substantially tighter lower bound from the very first iteration, reducing the number of refinement iterations required for convergence.
+\paragraph{更紧的初始松弛。}
+通过排除逆弧，初始松弛模型在已经免除最严重时序违规的解空间上运行。这从第一次迭代就产生了显著更紧的下界，减少了收敛所需的细化迭代次数。
 
-\subsection{Itinerary Aggregation}
-The full model typically exhibits a large optimality gap, as its LP relaxation allows fractional resource flows to be split across multiple adjacent departure-time arcs.
-This enables a single resource unit to be reused fractionally, collecting revenue from several nearby time-arcs.
-Moreover, some time-arcs generate revenue only when the corresponding resource flow increases from zero to a small positive value.
-As a result, the LP relaxation can exploit the high initial revenue portions of multiple time-arcs without paying the full operating cost on any individual arc, leading to significant revenue overestimation.
+\subsection{行程聚合}
+完整模型通常表现出较大的最优性间隙，因为其LP松弛允许分数资源流在多个相邻出发时间弧之间分割。
+这使得单个资源单位可以被分数地重复使用，从多个相邻时间弧收集收入。
+此外，某些时间弧仅在相应资源流从零增加到小正值时才产生收入。
+因此，LP松弛可以利用多个时间弧的高初始收入部分而无需在任何单个弧上支付全部运营成本，导致显著的收入高估。
 
-The relaxation model based on time-arc aggregation we have introduced above, in which each time-arc represents a larger time interval is a valid relaxation of the original model and is designed to be solved efficiently, is not introduced to address the revenue-overestimation issue. The structural revenue-overestimation problem caused by fractional resource reuse is inherited by the relaxation model.
-Moreover, due to the nature of the aggregation, this issue may persist even in the integer solutions of the relaxation model.
-Consequently, although the relaxation is computationally attractive, it does not by itself eliminate the artificial revenue gains arising from fractional resource flows.
+我们上面引入的基于时间弧聚合的松弛模型，其中每条时间弧代表更大的时间区间，是原始模型的有效松弛且设计为高效求解，并非为解决收入高估问题而引入。由分数资源重用引起的结构性收入高估问题被松弛模型继承。
+此外，由于聚合的性质，即使在松弛模型的整数解中，这一问题也可能持续存在。
+因此，虽然松弛在计算上具有吸引力，但它本身并不能消除由分数资源流产生的人为收入增益。
 
-The resulting relaxation value remains close to that of the LP relaxation of the full model, which still permits fractional resource flows to exploit multiple revenue-generating opportunities.
-This issue is therefore difficult to resolve by refining the time discretization alone.
+由此产生的松弛值仍然接近完整模型LP松弛的值，后者仍然允许分数资源流利用多个收入生成机会。
+因此，这一问题难以仅通过细化时间离散化来解决。
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\linewidth]{figure/illustrate_rev_overestimation/rev_distribution}
-    \caption{Illustration of Revenue Overestimation and Persistency in Discretization Aggregation}
+    \caption{收入高估及其在离散化聚合中持续性的示意图}
     \label{fig:rev_overestimation}
 \end{figure}
 
-Figure~\ref{fig:rev_overestimation} provides a visual demonstration of this overestimation phenomenon using a specific case. In the diagram, blue arrows represent service assignments, orange bars represent the captured passengers, and gray lines (in Panel 3) indicate the underlying original services.
-In the Base Case (Panel 1), the optimal integer solution selects one service $f_0$ ($x=1$), which captures the yield portion of the service (the first third), generating revenue $r_0$.
-In the LP Relaxation (Panel 2), the solver exploits fractional variables by assigning three services $f_1, f_2, f_3$ each at value $x=\frac{1}{3}$. Thus each fractional assignment includes the first third of the service, resulting in a revenue of $3r_0$. This erroneously implies that we can serve all potential demand with just one resource unit equivalent of capacity spread over time.
-Panel 3 illustrates that our relaxation model defined above inherits this flaw when time points $t_1, t_2, t_3$ are merged into a single window. The model might allow the aggregated service $f_{agg}$ ($x=1$) to claim the summed demand of the underlying original services, again resulting in $3r_0$ revenue as the same way as in the LP relaxation of the full model.
+图~\ref{fig:rev_overestimation}使用一个具体案例直观展示了这种高估现象。在图中，蓝色箭头表示服务分配，橙色条表示捕获的旅客，灰色线（面板3中）表示底层原始服务。
+在基准情况（面板1）中，最优整数解选择一个服务$f_0$（$x=1$），捕获该服务的收益部分（前三分之一），产生收入$r_0$。
+在LP松弛（面板2）中，求解器通过分配三个服务$f_1, f_2, f_3$各取值$x=\frac{1}{3}$来利用分数变量。因此每个分数分配包含服务的前三分之一，产生收入$3r_0$。这错误地暗示我们可以用仅一个资源单位等价的容量分散在时间上来服务所有潜在需求。
+面板3说明当时间点$t_1, t_2, t_3$合并为单个窗口时，我们上面定义的松弛模型继承了这一缺陷。模型可能允许聚合服务$f_{agg}$（$x=1$）声称底层原始服务的总需求，以与完整模型LP松弛相同的方式再次产生$3r_0$收入。
 
-However, under our proposed Itinerary Aggregation, the situation depicted in Panel 3 is eliminated.
-The super-itinerary construction explicitly checks the feasibility of combining original itineraries.
-Since the departures at $t_1, t_2, t_3$ are too close to be legally operated by a single resource unit (violating minimum separation time), they form an illegal combination for a single super-itinerary.
-Our method restricts the attraction summation to valid subsets of original itineraries (using the $\departLimit$ parameter defined in Equation~\ref{def:relax.departLimit}), thereby stripping out the artificial revenue gains and restoring a realistic objective value.
+然而，在我们提出的行程聚合下，面板3中描述的情况被消除。
+超级行程构造明确检查组合原始行程的可行性。
+由于$t_1, t_2, t_3$处的出发过于接近，无法由单个资源单位合法运营（违反最小间隔时间），它们构成单个超级行程的非法组合。
+我们的方法将吸引力求和限制在原始行程的有效子集上（使用公式~\ref{def:relax.departLimit}中定义的$\departLimit$参数），从而剥离人为收入增益并恢复现实的目标值。
 
-To address this challenge, we introduce an \emph{itinerary aggregation} procedure that complements the time-arc aggregation.
+为解决这一挑战，我们引入一个与时间弧聚合互补的\emph{行程聚合}过程。
 
-\paragraph{Itinerary aggregation procedure.}
-Given a time-arc aggregation defined by the discretization $\discretization$, we further perform an itinerary-level aggregation that is consistent with the aggregated time-arcs.
-Let $\itinSet$ denote the original set of itineraries in the full network.
-Each itinerary $r \in \itinSet$ consists of an ordered sequence of legs, and each leg uses a time-arc $(o,d,t)$ in the original discretization. Every original itinerary $r$ can thus be represented as a path
+\paragraph{行程聚合过程。}
+给定由离散化$\discretization$定义的时间弧聚合，我们进一步执行与聚合时间弧一致的行程级聚合。
+令$\itinSet$表示完整网络中的原始行程集合。
+每条行程$r \in \itinSet$由有序的航段序列组成，每个航段使用原始离散化中的时间弧$(o,d,t)$。因此每条原始行程$r$可以表示为路径
 \begin{equation}
 \origPath{r} = \bigl( (o_1,d_1,t_1), (o_2,d_2,t_2), \dots \bigr)
 \end{equation}
-where $(o_k,d_k,t_k)$ denotes the origin, destination, and departure time of leg $k$ in itinerary $r$. We refer to this ordered tuple as the \emph{original path signature} of itinerary $r$.
+其中$(o_k,d_k,t_k)$表示行程$r$中第$k$段的起点、终点和出发时间。我们将这个有序元组称为行程$r$的\emph{原始路径签名}。
 
-Under the aggregated discretization, each original departure time $t$ is mapped to the beginning of its corresponding time window.
-As a result, every original itinerary $r$ induces a discretized path
+在聚合离散化下，每个原始出发时间$t$被映射到其对应时间窗口的起始。
+因此，每条原始行程$r$诱导一个离散化路径
 \begin{equation}
 \pathSig{r} = \bigl( (o_1,d_1,\bar t_1), (o_2,d_2,\bar t_2), \dots \bigr)
 \end{equation}
-where $\bar t_k$ denotes the aggregated departure time of leg $k$.
-We define the \emph{discreted path signature} of itinerary $r$ as the ordered tuple $\pathSig{r}$.
-Throughout, the notation $(o,d,\bar{t})\in\pathSig{r}$ indicates that the leg with origin $o$, destination $d$, and aggregated departure time $\bar{t}$ occurs as an entry in the tuple; if the same spatial segment appears on multiple legs of the itinerary, each occurrence is counted separately in any summation or product indexed over $\pathSig{r}$.
+其中$\bar t_k$表示第$k$段的聚合出发时间。
+我们将有序元组$\pathSig{r}$定义为行程$r$的\emph{离散化路径签名}。
+在全文中，记号$(o,d,\bar{t})\in\pathSig{r}$表示具有起点$o$、终点$d$和聚合出发时间$\bar{t}$的航段作为元组中的一个条目出现；如果同一空间航段出现在行程的多个航段上，则在任何以$\pathSig{r}$为索引的求和或乘积中分别计数每次出现。
 
-The itinerary aggregation is then performed by partitioning $\itinSet$ into equivalence classes $\eqClassByPathSig$ based on discreted path signature.
-Two itineraries $r,r' \in \itinSet$ are assigned to the same group if and only if they share the same path signature, i.e.,
+行程聚合随后通过基于离散化路径签名将$\itinSet$划分为等价类$\eqClassByPathSig$来执行。
+两条行程$r,r' \in \itinSet$被分配到同一组当且仅当它们共享相同的路径签名，即
 \[
 r \eqRelByPathSig r' \iff \pathSig{r} = \pathSig{r'}
 \]
-For each equivalence class, we construct a \emph{super-itinerary} that represents all original itineraries in this class.
-The super-itinerary inherits the common node sequence and aggregated time-arcs, and replaces all original itineraries in the relaxation model. The set of super-itineraries is denoted by $\itinSetSuper$. A super-itinerary $R$ can be represented by an aggregated path signature in the
-same way as an original itinerary. We denote this signature by $\pathSig{R}$.
+对于每个等价类，我们构造一条代表该类中所有原始行程的\emph{超级行程}。
+超级行程继承共同的节点序列和聚合时间弧，并在松弛模型中替换所有原始行程。超级行程的集合记为$\itinSetSuper$。超级行程$R$可以用与原始行程相同的方式由聚合路径签名表示。我们将此签名记为$\pathSig{R}$。
 
-Attributes associated with itineraries are aggregated conservatively.
-Specifically, for each fare class, the fare of a super-itinerary are set to the maximum value among all original itineraries in the corresponding equivalence class.
+与行程相关的属性以保守方式聚合。
+具体而言，对于每个票价等级，超级行程的票价设置为对应等价类中所有原始行程的最大值。
 \begin{equation}
 \fare_{r\ell} = \max_{r' \in \eqClassByPathSig_{(r)}} \fare_{r'\ell} \quad \forall r \in \itinSetSuper, \; \ell \in \fareClassSet
 \end{equation}
 
-The attraction values of super-itineraries are set to the maximum summation of attractions among all possible combinations of original itineraries in the corresponding equivalence class. This ensures that the super-itinerary's attraction is at least as high as any original itinerary combination it represents. Original itineraries using the same path in the original network can be operated simultaneously without conflict. Therefore, like partitioning $\itinSet$ into equivalence classes $\eqClassByPathSig$ by discreted path signature, for each super-itinerary $R$ we also partition $\eqClassByPathSig_{(R)}$ into equivalence classes $\eqClassByOrigPath^{R}$ by original path signature, two itineraries $r,r' \in \eqClassByPathSig_{(R)}$ are assigned to the same group if and only if they share the same original path signature, i.e.,
+超级行程的吸引力值设置为对应等价类中原始行程所有可能组合中吸引力的最大求和。这确保超级行程的吸引力至少与其代表的任何原始行程组合一样高。在原始网络中使用相同路径的原始行程可以同时运营而不冲突。因此，类似于通过离散化路径签名将$\itinSet$划分为等价类$\eqClassByPathSig$，对于每条超级行程$R$，我们也通过原始路径签名将$\eqClassByPathSig_{(R)}$划分为等价类$\eqClassByOrigPath^{R}$，两条行程$r,r' \in \eqClassByPathSig_{(R)}$被分配到同一组当且仅当它们共享相同的原始路径签名，即
 \[r \eqRelByOrigPath r' \iff \origPath{r} = \origPath{r'}\]
-Given passenger type $p$ and fare class $\ell$. For each equivalence class $\eqClassByOrigPath^{R}_r$, we have a summation of attractions among all original itineraries in the corresponding equivalence class $\sum_{r\in \eqClassByOrigPath^{R}_r} \attr_{rp\ell}$. And now we set the attraction values of a super-itinerary $r$ as the first $\departLimit$ maximum summation among all equivalence class in the quotient set $\eqClassByPathSig_{(R)} /\eqRelByOrigPath$ as follows:
+给定旅客类型$p$和票价等级$\ell$。对于每个等价类$\eqClassByOrigPath^{R}_r$，我们有对应等价类中所有原始行程的吸引力求和$\sum_{r\in \eqClassByOrigPath^{R}_r} \attr_{rp\ell}$。现在我们将超级行程$r$的吸引力值设置为商集$\eqClassByPathSig_{(R)} /\eqRelByOrigPath$中所有等价类中前$\departLimit$个最大求和，如下所示：
 \begin{equation*}
     \begin{aligned}
         \maxAttrCombSet_{Rp\ell}
@@ -265,31 +264,30 @@ Given passenger type $p$ and fare class $\ell$. For each equivalence class $\eqC
 % temp-command \tag{def$_{\adjAttrSuper_{Rp\ell}}$}
 \label{def:relax.shadowAttrSuper}
 \end{equation}
-where $\departLimit_{od\bar{t}}$ is defined in (\ref{def:relax.departLimit}), $\maxAttrCombSet_{Rp\ell}$ is the set of equivalence classes of original itineraries with the same original path signature that maximizes the total attraction for passenger type $p$ and fare class $\ell$, subject to the constraint that the number of selected equivalence classes does not exceed $\departLimit$. For each leg $(o,d,\bar{t})$ along the super-itinerary's path, the number of services that can physically coexist within the aggregated time window is bounded by $\min\{\departLimit_{od\bar{t}}, \freq_{o,d}\}$, reflecting both the separation-time capacity and the segment frequency. Because original itineraries with different path signatures may consolidate on certain legs, the overall limit $\departLimit$ is taken as the maximum of these per-leg bounds: as long as there exists at least one leg that can accommodate $\departLimit$ distinct services, the corresponding equivalence classes may coexist legally.
-This ensures that the relaxation model does not underestimate passenger utility and the objective value while preventing multiple fractional flows from exploiting multiple nearby departure times within the same time window.
+其中$\departLimit_{od\bar{t}}$在(\ref{def:relax.departLimit})中定义，$\maxAttrCombSet_{Rp\ell}$是具有相同原始路径签名的原始行程等价类集合，该集合在旅客类型$p$和票价等级$\ell$下最大化总吸引力，受所选等价类数量不超过$\departLimit$的约束。对于超级行程路径上的每段$(o,d,\bar{t})$，在聚合时间窗口内可以物理共存的服务数量由$\min\{\departLimit_{od\bar{t}}, \freq_{o,d}\}$限制，反映了间隔时间容量和航段频率。由于具有不同路径签名的原始行程可能在某些航段上合并，总体限制$\departLimit$取为这些每段限制的最大值：只要存在至少一段可以容纳$\departLimit$个不同服务，相应的等价类就可以合法共存。
+这确保松弛模型不会低估旅客效用和目标值，同时防止多个分数流在同一时间窗口内利用多个相邻出发时间。
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\linewidth]{figure/illustrate_valid_combinations/valid_combinations}
-    \caption{Mechanism of Lower Bound Preservation in Itinerary Aggregation}
+    \caption{行程聚合中下界保持性的机制}
     \label{fig:valid_combinations}
 \end{figure}
 
-Figure~\ref{fig:valid_combinations} illustrates why the itinerary aggregation maintains the lower bound property.
+图~\ref{fig:valid_combinations}说明了为什么行程聚合保持下界性质。
 % Consider an equivalence class of original itineraries mapping to the same super-itinerary. These original itineraries (e.g., $r_1, r_2, r_3, r_4, r_5$) may have mutual conflicts due to separation time constraints in the full model. For instance, $r_1$ and $r_3$ cannot be simultaneously operated if they are too close.
 % Conceptually (Method 1), the super-itinerary's attraction $\attrSuper$ should be calculated by preventing all conflicts and finding the subset that maximizes the total attraction.
 % In the example, the valid subset $\{(r_1, r_2), (r_5)\}$ yields a total attribute of 0.5, which is greater than $\{(r_3, r_4)\}$'s 0.4.
-Consider an equivalence class of original itineraries mapping to the same super-itinerary. These original itineraries (e.g., $r_1, r_2, r_3$) may have mutual conflicts due to separation time constraints in the full model. For instance, $r_1$ and $r_2$ cannot be simultaneously operated if they are too close.
-Conceptually (Method 1), the super-itinerary's attraction $\attrSuper$ should be calculated by preventing all conflicts and finding the subset that maximizes the total attraction.
-In the example, the valid subset $\{(r_1), (r_3)\}$ yields a total attribute of 0.3, which is greater than $\{(r_2)\}$'s 0.2.
+考虑映射到同一超级行程的原始行程等价类。这些原始行程（例如$r_1, r_2, r_3$）由于完整模型中的间隔时间约束可能存在相互冲突。例如，如果$r_1$和$r_2$过于接近则不能同时运营。
+从概念上（方法1），超级行程的吸引力$\attrSuper$应通过防止所有冲突并找到最大化总吸引力的子集来计算。
+在示例中，有效子集$\{(r_1), (r_3)\}$产生总属性0.3，大于$\{(r_2)\}$的0.2。
 
-However, finding the exact maximum weight independent set considering all the conflicts may be computationally expensive.
-Therefore, in our proposed model, we employ a simplified and efficient approximation (Method 2). For each leg $(o,d,\bar{t})$ along the path, the per-leg capacity is bounded by $\min\{\departLimit_{od\bar{t}}, \freq_{od}\}$, accounting for both the separation-time limit (Equation~\ref{def:relax.departLimit}) and the segment frequency. The overall $\departLimit$ is then derived from these per-leg bounds, reflecting the fact that itineraries with different original path signatures may consolidate on shared legs.
-We approximate the maximum feasible attraction by selecting the top $\departLimit$ equivalence classes from the quotient set.
-Since $\departLimit$ is an upper bound on the size of any valid service sequence, the attraction sum calculated by Method 2 is guaranteed to be greater than or equal to the attraction of any actual conflict-free subset (Method 1), and thus greater than or equal to any feasible integer solution.
-Selecting the super-itinerary in the relaxation model effectively grants this "optimistic" revenue.
-For any valid solution feasible in the original problem, its revenue cannot exceed this maximum possible revenue calculated for the super-itinerary. Thus, the relaxation objective (Minimize Cost - Revenue) remains less than or equal to the true optimal objective, preserving the validity of the lower bound.
-
-Constraints involving itinerary-level variables are updated to reflect the aggregation. Specifically, constraints (\ref{constr:main.choice.ratio}, \ref{constr:main.choice.limit}, \ref{constr:main.choice.capacity}, \ref{constr:main.choice.covering}) are modified as follows:
+然而，考虑所有冲突找到精确的最大权重独立集可能计算代价高昂。
+因此，在我们提出的模型中，我们采用简化且高效的近似（方法2）。对于路径上的每段$(o,d,\bar{t})$，每段容量由$\min\{\departLimit_{od\bar{t}}, \freq_{od}\}$限制，同时考虑间隔时间限制（公式~\ref{def:relax.departLimit}）和航段频率。总体$\departLimit$随后从这些每段限制导出，反映了具有不同原始路径签名的行程可能在共享航段上合并的事实。
+我们通过从商集中选择前$\departLimit$个等价类来近似最大可行吸引力。
+由于$\departLimit$是任何有效服务序列大小的上界，方法2计算的吸引力和保证大于或等于任何实际无冲突子集（方法1）的吸引力，因此大于或等于任何可行整数解。
+在松弛模型中选择超级行程有效地授予了这种"乐观"收入。
+对于原始问题中可行的任何有效解，其收入不能超过为超级行程计算的最大可能收入。因此，松弛目标（最小化成本 - 收入）保持小于或等于真实最优目标，保持了下界的有效性。
+涉及行程级变量的约束被更新以反映聚合。具体而言，约束(\ref{constr:main.choice.ratio}, \ref{constr:main.choice.limit}, \ref{constr:main.choice.capacity}, \ref{constr:main.choice.covering})修改如下：
 \begin{equation}
     \outAttr_{mp}\, \shareVar_{rp\ell} \;\le\; \attrSuper_{rp\ell}\, \outsideShareVar_{mp}
     \quad \forall m\in \marketSet,\, \forall p\in \psgTypeSet,\, \forall r\in \itinSuperInMarket_{m},\, \forall \ell\in \fareClassSet
@@ -320,13 +318,13 @@ Constraints involving itinerary-level variables are updated to reflect the aggre
     \label{constr:relax.choice.covering}
 \end{equation}
 
-Through this itinerary aggregation, all fractional resource flows using different original time-arcs within one aggregated time window are forced to compete for the same super-itinerary.
-As a consequence, revenue collected on an aggregated time-arc corresponds to at most $\departLimit_{ijt}$ complete resource flows in the original network, effectively eliminating the artificial revenue inflation caused by fractional resource reuse across adjacent departure times.
+通过这种行程聚合，在一个聚合时间窗口内使用不同原始时间弧的所有分数资源流被迫竞争同一超级行程。
+因此，在聚合时间弧上收集的收入对应于原始网络中最多$\departLimit_{ijt}$个完整资源流，有效消除了由相邻出发时间间分数资源重用引起的人为收入膨胀。
 
-% \model{\discretization, \itinSetSuper}, the final relaxation model
-We denote the final relaxation model incorporating both time-arc aggregation and itinerary aggregation as $\model{\discretization, \itinSetSuper}$. Denote $\model{\discretization} = \model{\discretization, \itinSet}$ when the itinerary set is same as in the full model.
+% \model{\discretization, \itinSetSuper}，最终松弛模型
+我们将同时包含时间弧聚合和行程聚合的最终松弛模型记为$\model{\discretization, \itinSetSuper}$。当行程集合与完整模型相同时，记$\model{\discretization} = \model{\discretization, \itinSet}$。
 
-The model $\model{\discretization, \itinSetSuper}$ is written as follows:
+模型$\model{\discretization, \itinSetSuper}$写作如下：
 \begin{align}
     \min \;\; &
     \sum_{a\in \flightArc}\sum_{f\in \fleetSet} \cost_{af}\, \fleetAssignVar_{af}
@@ -369,7 +367,7 @@ The model $\model{\discretization, \itinSetSuper}$ is written as follows:
     \label{constr:relax.domain.w}
 \end{align}
 
-The following theorem guarantees the validity of the relaxation model $\model{\discretization, \itinSetSuper}$ as a lower bound for the original model $\model{\discretizationFull}$.
+以下定理保证松弛模型$\model{\discretization, \itinSetSuper}$作为原始模型$\model{\discretizationFull}$下界的有效性。
 \input{thm/valid_relaxation/_main.tex}
 
 % % ---------------------------------------- Re model ----------------------------------------

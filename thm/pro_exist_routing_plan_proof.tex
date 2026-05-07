@@ -4,11 +4,10 @@
     \newcommand{\vectorAdd}{\oplus }
     \newcommand{\vectorMinus}{\ominus}
     \newcommand{\vectorLe}{\preceq}
-We fix a resource type $f\in\fleetSet$ and prove the statement for its assignment vector 
-$\assignmentVector^f=\{\fleetAssignVar_{af}\}_{a\in\arcSet}$. $\assignmentVector^f_{a}$ denotes the number of resource type $f$ assigned to arc $a$, which is a non-negative real number.
+我们固定资源类型 $f\in\fleetSet$，对其分配向量 $\assignmentVector^f=\{\fleetAssignVar_{af}\}_{a\in\arcSet}$ 证明该命题。$\assignmentVector^f_{a}$ 表示分配到弧 $a$ 的资源类型 $f$ 的数量，是一个非负实数。
 
-\paragraph{Step 0. Algebraic structure.}
-Define the flow feasible set denoting all assignment vectors satisfying the flow-balance constraint~\eqref{constr:main.flow}:
+\paragraph{步骤 0. 代数结构。}
+定义流量可行集，表示所有满足流量平衡约束~\eqref{constr:main.flow} 的分配向量：
 \[
 \feasibleSet_f=\Bigl\{
 \assignmentVector^f\in\mathbb{R}_{\ge0}^{\lvert\arcSet\rvert}\;\Bigm|\;
@@ -24,73 +23,70 @@ Define the flow feasible set denoting all assignment vectors satisfying the flow
 \[
     \vectorLe: x \vectorLe x' \iff x_a \le x'_a,\ \forall a\in\arcSet
 \]
-$(\feasibleSet_f,\vectorAdd)$ forms a commutative monoid:
-it is closed under addition $\vectorAdd$, associative, and admits the zero vector $\mathbf{0}$ as identity.
-We equip it with the partial order $\vectorLe$ defined componentwise; for $x',x\in\feasibleSet_f$,
-the difference $x\vectorMinus x'$ is defined if $x'\vectorLe x$ and remains in $\feasibleSet_f$.
+$(\feasibleSet_f,\vectorAdd)$ 构成交换幺半群：
+它在加法 $\vectorAdd$ 下封闭、满足结合律，且以零向量 $\mathbf{0}$ 为单位元。
+我们赋予它按分量定义的偏序 $\vectorLe$；对 $x',x\in\feasibleSet_f$，
+差 $x\vectorMinus x'$ 在 $x'\vectorLe x$ 时有定义且仍属于 $\feasibleSet_f$。
 
-\paragraph{Step 1. Cycle vectors.}
-A \emph{directed cycle} $C=(a_1,\ldots,a_L)$ is a finite sequence of arcs 
-forming a closed walk on $\net$; the same arc may appear multiple times along $C$.
-For any arc $a\in\arcSet$, denote by
+\paragraph{步骤 1. 环向量。}
+有向环 $C=(a_1,\ldots,a_L)$ 是在 $\net$ 上构成闭合游走的有限弧序列；同一条弧可沿 $C$ 多次出现。
+对任意弧 $a\in\arcSet$，记
 \[
     \nu_{C}(a) := \#\{r\in\{1,\ldots,L\}\mid a_r = a\}
 \]
-its multiplicity within $C$.
-For any scalar $z\ge 0$, define its \emph{cycle vector}
+为其在 $C$ 中的重数。
+对任意标量 $z\ge 0$，定义其环向量
 \[
 v(C;z)_a=
 \begin{cases}
 z\,\nu_{C}(a),& a\in C,\\[2pt]
-0,&\text{otherwise}.
+0,&\text{其他}.
 \end{cases}
 \]
-Then $v(C;z)\in\feasibleSet_f$ because every node on the cycle has one incoming and one outgoing arc,
-and scaling by $z$ preserves the flow-balance constraint~\eqref{constr:main.flow}.
+则 $v(C;z)\in\feasibleSet_f$，因为环上每个节点有一条入弧和一条出弧，
+且乘以 $z$ 保持流量平衡约束~\eqref{constr:main.flow}。
 
-\paragraph{Step 2. Existence of a directed cycle.}
-For a nonzero $\assignmentVector\in\feasibleSet_f$, define the positive-support subgraph 
-${\net}^+(\assignmentVector)$ induced by $\arcSet^+(\assignmentVector)=\{a\in\arcSet\mid \assignmentVector_a>0\}$.
-At every node of ${\net}^+(\assignmentVector)$, the flow-balance constraint ensures
-$\text{outdegree}\ge1$ and $\text{indegree}\ge1$.
-Starting from any node with positive outflow and following positive arcs,
-finiteness of the network implies that a node must repeat, 
-thus forming a directed cycle $C\subseteq \arcSet^+(\assignmentVector)$.
+\paragraph{步骤 2. 有向环的存在性。}
+对非零 $\assignmentVector\in\feasibleSet_f$，定义由 $\arcSet^+(\assignmentVector)=\{a\in\arcSet\mid \assignmentVector_a>0\}$ 导出的正支撑子图 ${\net}^+(\assignmentVector)$。
+在 ${\net}^+(\assignmentVector)$ 的每个节点处，流量平衡约束确保
+$\text{出度}\ge1$ 且 $\text{入度}\ge1$。
+从任意具有正出流的节点出发沿正弧前进，
+网络的有限性意味着某个节点必然重复，
+从而形成有向环 $C\subseteq \arcSet^+(\assignmentVector)$。
 
-\paragraph{Step 3. Greedy peeling procedure.}
-Let $z=\min_{a\in C}\assignmentVector_a/\nu_{C}(a)>0$ (so that $v(C;z)\vectorLe \assignmentVector$) and define $\assignmentVector':=\assignmentVector-v(C;z)$.
-Then:
+\paragraph{步骤 3. 贪心剥离过程。}
+令 $z=\min_{a\in C}\assignmentVector_a/\nu_{C}(a)>0$（使得 $v(C;z)\vectorLe \assignmentVector$），定义 $\assignmentVector':=\assignmentVector-v(C;z)$。
+则：
 \begin{itemize}
-\item $\assignmentVector'\ge0$ componentwise, because $z$ is the minimum scaled value $\assignmentVector_a/\nu_C(a)$;
-\item $\assignmentVector'\in\feasibleSet_f$, since both $\assignmentVector$ and $v(C;z)$ satisfy~\eqref{constr:main.flow};
-\item the support strictly shrinks: $\arcSet^+(\assignmentVector')\subsetneq \arcSet^+(\assignmentVector)$.
+\item $\assignmentVector'\ge0$ 按分量成立，因为 $z$ 是缩放值 $\assignmentVector_a/\nu_C(a)$ 的最小值；
+\item $\assignmentVector'\in\feasibleSet_f$，因为 $\assignmentVector$ 和 $v(C;z)$ 都满足~\eqref{constr:main.flow}；
+\item 支撑严格缩小：$\arcSet^+(\assignmentVector')\subsetneq \arcSet^+(\assignmentVector)$。
 \end{itemize}
-Therefore, for $\assignmentVector^f$ iterating this procedure finitely many times (at most $|A^+(\assignmentVector^f)|$)
-yields a decomposition
+因此，对 $\assignmentVector^f$ 有限次迭代此过程（至多 $|A^+(\assignmentVector^f)|$ 次）
+得到分解
 \[
 \assignmentVector^f=\sum_{k=1}^{K}v(C_k;z_k),\qquad K\le|A^+(\assignmentVector^f)|.
 \]
 
-\paragraph{Step 4. Constructing the routing plan.}
-For each cycle $C_k$, let $\pathInRoute{f}{k}$ be its projection onto the set of service arcs
-$\flightArc$.
-Let $\routeAmount{\pathInRoute{f}{k}}:=z_k$, and denote
+\paragraph{步骤 4. 构造路由方案。}
+对每个环 $C_k$，令 $\pathInRoute{f}{k}$ 为其在服务弧集 $\flightArc$ 上的投影。
+令 $\routeAmount{\pathInRoute{f}{k}}:=z_k$，并记
 \[
     \nu_{fk}(a)
         := \#\{r\mid a_{k,r}=a\}
         = \nu_{C_k}(a),
 \]
-the number of times arc $a$ appears in the projected cycle (if $a\notin C_k$, the count is zero).
-Then, for any $a\in\flightArc$,
+为弧 $a$ 在投影环中出现的次数（若 $a\notin C_k$，计数为零）。
+则，对任意 $a\in\flightArc$，
 \[
 \sum_{k=1}^{K}\routeAmount{\pathInRoute{f}{k}}\nu_{fk}(a)
 =\sum_{k=1}^{K}v(C_k;z_k)_a
 =\assignmentVector^f_a
 =\fleetAssignVar_{af},
 \]
-Define 
+定义
 $\route{f}=\{(\pathInRoute{f}{k},\routeAmount{\pathInRoute{f}{k}})\}_{k=1}^{K}$
-and 
-$\routingPlan(\solution)=\{\route{f}\mid f\in\fleetSet\}$.
-Hence, for every resource type $f$, we can derive a routing plan consistent with its assignment vector.
+和
+$\routingPlan(\solution)=\{\route{f}\mid f\in\fleetSet\}$。
+因此，对每种资源类型 $f$，我们可以导出与其分配向量一致的路由方案。
 \end{proof}
