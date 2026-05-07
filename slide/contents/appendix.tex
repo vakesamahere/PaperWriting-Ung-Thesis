@@ -1,93 +1,210 @@
 \appendix
-
 \section{附录}
 
-\begin{frame}{附录 A：基准模型（只列核心结构）}
-\small
-\begin{block}{SN-PC$(\hat{\discretization})$}
-\vspace{-0.25cm}
+
+% ===== 附录 A：原始模型 =====
+\begin{frame}{附录 A：原始模型 SN-PC$(\hat{\discretization})$}
+\scriptsize
+\textbf{目标函数}（最小化 运营成本 $-$ 票务收入 $=$ 最大化利润）
+\vspace{-0.2cm}
+\begin{equation*}
+\min \sum_{a\in \full{\flightArc}}\sum_{f\in\fleetSet} \cost_{af}\fleetAssignVar_{af}
+- \sum_{m\in\marketSet}\sum_{p\in\psgTypeSet}\sum_{r\in\itinInMarket_m}\sum_{\ell\in\fareClassSet} \demand_{mp}\fare_{r\ell}\shareVar_{rp\ell}
+\end{equation*}
+\vspace{-0.4cm}
+\begin{columns}[T,totalwidth=\textwidth]
+\column{0.48\textwidth}
+\textbf{资源约束}
+\vspace{-0.15cm}
 \begin{align*}
-\min\;& \sum_{a\in \full{\flightArc}}\sum_{f\in\fleetSet} \cost_{af}\,\fleetAssignVar_{af}
-- \sum_{m\in\marketSet}\sum_{p\in\psgTypeSet}\sum_{r\in\itinInMarket}\sum_{\ell\in\fareClassSet} \demand_{mp}\fare_{r\ell}\shareVar_{rp\ell}\\[0.15cm]
-\text{s.t. } & \sum_{a\in \outArcSet{i,t}} \fleetAssignVar_{af} - \sum_{a\in \inArcSet{i,t}} \fleetAssignVar_{af} = 0, \quad \forall (i,t),f \\
-& \sum_{a\in \holdingArcTc{\checkTime}} \fleetAssignVar_{af} + \sum_{a\in \flightArcTc{\checkTime}} \fleetAssignVar_{af} \le \fleetAvail_f, \quad \forall f \\
-& \sum_{f\in\fleetSet}\sum_{a\in \arcDuringSepTime_{ijt}} \fleetAssignVar_{af} \le 1, \quad \forall (i,j),t \\
-& \outAttr_{mp}\shareVar_{rp\ell} \le \attr_{rp\ell}\outsideShareVar_{mp}, \quad \forall m,p,r,\ell \\
-& \left(\frac{\adjOutAttr_{mp}}{\outAttr_{mp}}\right) \outsideShareVar_{mp} +
-\sum_{r,\ell} \left(\frac{\adjAttr_{rp\ell}}{\attr_{rp\ell}}\right)\shareVar_{rp\ell} = 1, \quad \forall m,p \\
-& \sum_{m,p,\ell}\sum_{r\in \itinUsingArc{m}{a}} \demand_{mp}\shareVar_{rp\ell} \le \sum_{f\in\fleetSet}\fleetCap_f\fleetAssignVar_{af}, \quad \forall a\in\full{\flightArc}
+& \sum_{a\in \outArcSet{i,t}} \fleetAssignVar_{af} - \sum_{a\in \inArcSet{i,t}} \fleetAssignVar_{af} = 0 & \forall (i,t),f \\
+& \sum_{a\in \holdingArcTc{\checkTime}} \fleetAssignVar_{af} + \sum_{a\in \flightArcTc{\checkTime}} \fleetAssignVar_{af} \le \fleetAvail_f & \forall f \\
+& \sum_{f}\sum_{a\in \arcDuringSepTime_{ijt}} \fleetAssignVar_{af} \le 1 & \forall (i,j),t \\
+& \sum_{f}\sum_{a\in \segArcSet{s}} \fleetAssignVar_{af} = \freq_s & \forall s
 \end{align*}
-\end{block}
+
+\column{0.48\textwidth}
+\textbf{旅客选择约束（SBLP/GAM）}
+\vspace{-0.15cm}
+\begin{align*}
+& \outAttr_{mp}\shareVar_{rp\ell} \le \attr_{rp\ell}\outsideShareVar_{mp} & \forall m,p,r,\ell \\
+& \tfrac{\adjOutAttr_{mp}}{\outAttr_{mp}} \outsideShareVar_{mp} + \sum_{r,\ell} \tfrac{\adjAttr_{rp\ell}}{\attr_{rp\ell}}\shareVar_{rp\ell} = 1 & \forall m,p \\
+& \sum_{m,p,\ell}\sum_{r\in \itinUsingArc{m}{a}} \demand_{mp}\shareVar_{rp\ell} \le \sum_f\fleetCap_f\fleetAssignVar_{af} & \forall a \\
+& \sum_f \fleetAssignVar_{af} \ge \shareVar_{rp\ell} & \forall a,r,p,\ell
+\end{align*}
+\end{columns}
+\vspace{0.1cm}
+\textbf{变量域：} $\fleetAssignVar_{af}\in\{0,1\}$ (service arcs), $\fleetAssignVar_{af}\ge0$ (holding arcs), $\shareVar_{rp\ell}\ge0$, $\outsideShareVar_{mp}\ge0$
 \end{frame}
 
-\begin{frame}{附录 B：算法细节（按模块拆开）}
-\small
+
+% ===== 附录 B：下界模型构建 =====
+\begin{frame}{附录 B：下界模型 LBM 的构建}
+\scriptsize
 \begin{columns}[T,totalwidth=\textwidth]
-\column{0.33\textwidth}
-\begin{block}{LBM}
+\column{0.48\textwidth}
+\textbf{Step 1: 时间弧聚合}
+\begin{itemize}\setlength\itemsep{0.05cm}
+    \item 将完整离散化 $\discretizationFull$ 压缩为粗离散化 $\discretization$
+    \item 弧映射 $\Phi_{\arcSet}: \full{\arcSet}\to\arcSet\cup\{\bot\}$
+    \item 服务弧到达时间取 floor：$t'=\max\{\bar{t}\in\discretization_j\mid\bar{t}\le t+\travelTime_{ij}\}$
+    \item 资源变量变为整数：$\fleetAssignVar_{af}\in\mathbb{Z}_{\ge0}$（允许多个原始弧映射到同一聚合弧）
+\end{itemize}
+
+\vspace{0.15cm}
+\textbf{约束修正}
+\begin{itemize}\setlength\itemsep{0.05cm}
+    \item 资源可用性：减去逆弧修正项 $-\sum_{a\in\invertArcTc{\checkTime}}\fleetAssignVar_{af}$
+    \item 最小间隔：RHS 放松为 $\departLimit_{ijt}=\lceil\frac{\Delta t}{\minInterdepTime_{ij}}\rceil$
+\end{itemize}
+
+\column{0.48\textwidth}
+\textbf{Step 2: 行程聚合}
+\begin{itemize}\setlength\itemsep{0.05cm}
+    \item 按聚合路径签名 $\pathSig{r}=(o_k,d_k,\bar{t}_k)$ 分组
+    \item 同签名的原始 itineraries $\to$ 一个 super-itinerary $R$
+    \item Attraction 取合法组合的 optimistic 上界（见附录 E）
+\end{itemize}
+
+\vspace{0.15cm}
+\textbf{Step 3: 初始离散化策略}
+\begin{itemize}\setlength\itemsep{0.05cm}
+    \item 拓扑自适应：$\initStep_i = \min_{j:(j,i)\in\segSet}\travelTime_{ji}$
+    \item Hub 节点自动获得细网格，spoke 节点获得粗网格
+    \item 消除逆弧，初始松弛即物理可行
+\end{itemize}
+
+\vspace{0.15cm}
+\textbf{结果}
 \begin{itemize}
-    \item 在粗时间离散化上建模；
-    \item 允许时间弧聚合；
-    \item 再对 itinerary 做 path-signature aggregation；
-    \item 得到 valid lower bound。
+    \item 模型 $\model{\discretization,\itinSetSuper}$ 是原始模型的 valid relaxation
+    \item 最优值 $\le$ 原始模型最优值（下界）
+\end{itemize}
+\end{columns}
+\end{frame}
+
+
+% ===== 附录 C：上界模型的 Cuts =====
+\begin{frame}{附录 C：上界模型 UBM 的 Cuts}
+\scriptsize
+\begin{block}{核心思想}
+在原始完整网络 $\full{\net}$ 上求解，锁定 LBM 的资源分配频率，注入 cuts 加速收敛。
+\end{block}
+\vspace{0.1cm}
+\begin{columns}[T,totalwidth=\textwidth]
+\column{0.48\textwidth}
+\textbf{1. Frequency Fixing}
+\vspace{-0.1cm}
+\begin{equation*}
+\sum_{a\in\full{\segArcSet{s}}}\fleetAssignVar_{af} = \freq_{s,f}^{*} \quad \forall s,f
+\end{equation*}
+锁定每条航段每种机型的服务次数，将问题简化为纯调度问题。
+
+\vspace{0.2cm}
+\textbf{2. Revenue Upper Bound Cut}
+\vspace{-0.1cm}
+\begin{equation*}
+\sum_{m,p,\ell}\sum_{r\in\itinInMarket_m}\demand_{mp}\fare_{r\ell}\shareVar_{rp\ell} \le \mathbf{r}^{\mathrm{LB}}
+\end{equation*}
+总收入不超过 LBM 的收入上界，排除不可能的高收入区域。
+
+\column{0.48\textwidth}
+\textbf{3. Itinerary Cuts}
+
+引入 super-itinerary 份额变量 $\shareSVar_{Rp\ell}$：
+\vspace{-0.1cm}
+\begin{align*}
+& \outAttr_{mp}\shareSVar_{Rp\ell} \le \attrSuper_{Rp\ell}\outsideShareVar_{mp} \\
+& \tfrac{\adjOutAttr_{mp}}{\outAttr_{mp}}\outsideShareVar_{mp} + \sum_{R,\ell}\tfrac{\adjAttrSuper_{Rp\ell}}{\attrSuper_{Rp\ell}}\shareSVar_{Rp\ell} \le 1 \\
+& \sum_{m,p,\ell}\sum_{R\in\itinSuperUsingArc{m}{a}}\demand_{mp}\shareSVar_{Rp\ell} \le \sum_{a'\in\Phi^{-1}(a)}\sum_f\fleetCap_f\fleetAssignVar_{a'f}
+\end{align*}
+\vspace{-0.1cm}
+\textbf{4. Linking Cut}
+\vspace{-0.1cm}
+\begin{equation*}
+\shareSVar_{Rp\ell}\cdot\fare_{R\ell} \le \sum_{r\in R}\shareVar_{rp\ell}\cdot\fare_{r\ell}
+\end{equation*}
+Super-itinerary 收入必须被其细粒度 itineraries 支撑。
+\end{columns}
+\end{frame}
+
+
+% ===== 附录 D：Refinement 三类 Artifact =====
+\begin{frame}{附录 D：Refinement 检测的三类 Artifact}
+\scriptsize
+\begin{columns}[T,totalwidth=\textwidth]
+\column{0.32\textwidth}
+\begin{block}{\centering 1. Impossible Departures\\（时序违规）}
+\begin{itemize}\setlength\itemsep{0.05cm}
+    \item 聚合后某弧的到达时间 $\le$ 出发时间（逆弧效应）
+    \item 资源"穿越时间"到达，虚假满足出发需求
+    \item \textbf{修复}：插入真实到达时间 $t_{\mathrm{dep}}+\travelTime$ 到 $\discretization_i$
 \end{itemize}
 \end{block}
 
-\column{0.33\textwidth}
-\begin{block}{UBM}
-\begin{itemize}
-    \item 在 full network 上修复；
-    \item 锁定 segment--fleet frequency；
-    \item 用 itinerary cuts 抑制收入高估；
-    \item 给出 feasible incumbent。
+\column{0.32\textwidth}
+\begin{block}{\centering 2. Inter Departures\\（间隔违规）}
+\begin{itemize}\setlength\itemsep{0.05cm}
+    \item 多个物理服务被聚合到同一时间窗
+    \item 实际出发间隔 $<$ 最小间隔 $\minInterdepTime_{ij}$
+    \item \textbf{修复}：插入冲突服务的真实出发时间到 $\discretization_i$
 \end{itemize}
 \end{block}
 
-\column{0.33\textwidth}
-\begin{block}{Refinement}
-\begin{itemize}
-    \item 检查 chronological violations；
-    \item 检查 separation infeasibility；
-    \item 检查 phantom revenue；
-    \item 针对性加入时间点，继续迭代。
+\column{0.32\textwidth}
+\begin{block}{\centering 3. Phantom Revenue\\（虚假收入）}
+\begin{itemize}\setlength\itemsep{0.05cm}
+    \item Super-itinerary 的聚合 attraction 无法被任何原始组合实现
+    \item 离散化太粗，无法区分冲突的原始 itineraries
+    \item \textbf{修复}：插入相关 itinerary 的物理时间点，打破等价类
 \end{itemize}
 \end{block}
 \end{columns}
 
 \vspace{0.2cm}
-\begin{alertblock}{一句话总结}
-\centering
-\textbf{用 tighter LB 缩小搜索空间，用 targeted refinement 保证 exactness。}
+\begin{alertblock}{}
+\centering\small
+\textbf{定理}：松弛解非法 $\Leftrightarrow$ 存在至少一类 artifact。持续消除 $\Rightarrow$ 有限步收敛到全局最优。
 \end{alertblock}
 \end{frame}
 
-\begin{frame}{附录 C：行程聚合为什么能保持下界？}
-\begin{columns}[T,totalwidth=\textwidth]
-\column{0.42\textwidth}
-\begin{block}{直观理解}
-\small
-\begin{itemize}
-    \item 一个 super-itinerary 对应多个原始 itinerary；
-    \item 原始 itinerary 之间可能因最小间隔约束而冲突；
-    \item 我们不是把 attraction 全部直接相加；
-    \item 而是在合法组合上取 \hl{optimistic but valid} 的上界。
-\end{itemize}
-\end{block}
 
-\vspace{0.12cm}
-\begin{equation*}
-\attrSuper_{R p\ell} =
-\max_{\itinCombSet:\, |\itinCombSet|\le \combLimit_R}
-\sum_{\mathscr{O}\in\itinCombSet}\sum_{r\in\mathscr{O}} \attr_{r p\ell}
-\end{equation*}
-
-\vspace{0.05cm}
-\small
-其中 $\combLimit_R$ 由聚合时间窗内可物理共存的服务数量控制。
-
-\column{0.56\textwidth}
+% ===== 附录 E-1：行程聚合图示 =====
+\begin{frame}{附录 E：行程聚合消除不可行组合}
 \begin{center}
-    \includegraphics[width=\linewidth]{../figure/illustrate_valid_combinations/valid_combinations.pdf}
+    \includegraphics[width=0.5\linewidth]{../figure/illustrate_valid_combinations/valid_combinations.pdf}
 \end{center}
-\end{columns}
+\vspace{-0.1cm}
+\centering\scriptsize
+同一 super-itinerary 内的原始 itineraries 可能因最小间隔约束互斥。\\
+聚合 attraction 仅在\textbf{物理可共存}的组合上求和，排除不可行组合。
+\end{frame}
+
+% ===== 附录 E-2：行程聚合公式 =====
+\begin{frame}{附录 E（续）：Attraction 聚合公式}
+\tiny
+\begin{block}{路径签名分组}
+原始 itinerary $r$ 的聚合路径签名：$\pathSig{r}=(o_1,d_1,\bar{t}_1),\ldots,(o_k,d_k,\bar{t}_k)$。
+按 $\pathSig{r}$ 分组得到等价类 $\eqClassByPathSig$，每个等价类构造一个 super-itinerary $R$。
+\end{block}
+\vspace{0.05cm}
+\begin{block}{组内再按原始路径签名分组}
+$\eqClassByPathSig_{(R)}$ 内按原始路径 $\origPath{r}$ 再分组得 $\eqClassByOrigPath^R$。
+同一 $\eqClassByOrigPath^R_r$ 内的 itineraries 使用完全相同的物理路径，可同时运营。
+\end{block}
+\vspace{0.05cm}
+\begin{block}{Attraction 计算}
+\vspace{-0.15cm}
+\begin{equation*}
+\attrSuper_{Rp\ell} = \max_{\itinCombSet \subseteq \eqClassByPathSig_{(R)}/\eqRelByOrigPath,\;|\itinCombSet|\le\combLimit_R}
+\sum_{\mathscr{O}\in\itinCombSet}\sum_{r\in\mathscr{O}}\attr_{rp\ell}
+\qquad
+\combLimit_R = \prod_{(o,d,\bar{t})\in\pathSig{R}} \min\{\departLimit_{od\bar{t}},\;\freq_{od}\}
+\end{equation*}
+\end{block}
+\vspace{0.05cm}
+\begin{alertblock}{}
+\centering\scriptsize
+$\combLimit_R$ 是合法共存服务数的上界 $\Rightarrow$ $\attrSuper_{Rp\ell} \ge$ 任何可行整数解的 attraction $\Rightarrow$ \textbf{下界有效}
+\end{alertblock}
 \end{frame}

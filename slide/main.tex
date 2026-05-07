@@ -10,6 +10,9 @@
 \usetikzlibrary{arrows.meta,positioning,fit,shapes.misc,backgrounds}
 \usepackage{xcolor}
 \usepackage{ragged2e}
+\usepackage[style=gb7714-2015,backend=biber]{biblatex}
+\addbibresource{../bib/references.bib}
+\setbeamertemplate{bibliography item}[text]
 
 \usetheme{tongji}
 
@@ -24,18 +27,16 @@
 \newcommand{\gap}{\textit{gap}}
 
 %Information to be included in the title page:
-\title[考虑乘客选择的服务网络设计]{考虑乘客选择的服务网络设计}
+\title[考虑顾客选择的服务网络设计]{考虑顾客选择的服务网络设计}
 \subtitle{基于行程聚合与动态细化的精确优化方法}
-\author[张子越]{张子越}
+\author[张子越]{张子越 \\ {\small 指导老师：魏可佶}}
 \institute[同济大学]{同济大学经济与管理学院}
 \date{}
 
 \begin{document}
 
-\begin{frame}[plain]
-    \begin{tikzpicture}[remember picture,overlay]
-        \node[anchor=center] at (current page.center) {\includegraphics[width=\paperwidth,height=\paperheight]{my_content/asset/cover.png}};
-    \end{tikzpicture}
+\begin{frame}
+    \titlepage
 \end{frame}
 
 \input{contents/problem}
@@ -43,5 +44,9 @@
 \input{contents/results}
 \input{contents/conclusion}
 \input{contents/appendix}
+
+\begin{frame}{参考文献}
+    \printbibliography
+\end{frame}
 
 \end{document}

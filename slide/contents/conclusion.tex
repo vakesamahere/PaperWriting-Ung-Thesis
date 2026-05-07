@@ -1,30 +1,70 @@
 \section{结论与展望}
 
-\begin{frame}{结论与未来方向}
-\begin{columns}[T,totalwidth=\textwidth]
-\column{0.53\textwidth}
-\begin{block}{结论}
-\begin{itemize}
-    \item 本文研究的是 \hl{考虑乘客选择的服务网络设计}；
-    \item 我提出了 \hl{IA-DR}：行程聚合 + 上界修复 + 动态细化；
-    \item 关键价值在于：\hl{既压缩 itinerary 空间，又保留 exactness}；
-    \item 在真实大规模实例上，证明了比直接求解更有效且可达到 \hl{0\% gap}。
-\end{itemize}
+% Page 1: 结论
+\begin{frame}{结论}
+\begin{block}{研究问题}
+考虑顾客选择的服务网络设计——供给决策与需求分配的联合优化。
 \end{block}
 
-\column{0.43\textwidth}
-\begin{block}{未来方向}
+\vspace{0.2cm}
+\begin{block}{方法贡献：IA-DR 框架}
 \begin{itemize}
-    \item 扩展到城际铁路、公交等其他客运网络；
-    \item 做更大网络、更多资源类型、multi-day planning；
-    \item 融入 crew scheduling、maintenance 等下游约束；
-    \item 探索更丰富的 choice model 与 warm start。
+    \item \hl{行程聚合}：基于路径签名的 super-itinerary，抑制虚假收入，产生紧下界
+    \item \hl{上界修复}：频率锁定 + itinerary cuts，从松弛解恢复到可行解，提供高质量上界
+    \item \hl{动态细化}：检测并消除三类松弛产生的假象，保证有限步收敛到全局最优
 \end{itemize}
 \end{block}
 
 \vspace{0.2cm}
-\begin{center}
-\Large \textcolor{structure}{\textbf{谢谢！}}
-\end{center}
+\begin{block}{实验验证}
+\begin{itemize}
+    \item 在大规模实例上，IA-DR 显著优于直接求解原始模型。
+\end{itemize}
+\end{block}
+\end{frame}
+
+
+% Page 2: 展望
+\begin{frame}{未来方向}
+\begin{columns}[T,totalwidth=\textwidth]
+\column{0.618\textwidth}
+
+\begin{block}{模型扩展}
+\begin{itemize}
+    \item 将频率作为决策变量，考虑更灵活的服务供给
+\end{itemize}
+\end{block}
+
+\vspace{0.2cm}
+
+% \column{0.48\textwidth}
+\begin{block}{理论分析}
+\begin{itemize}
+    \item 探究不同网络图结构下的问题复杂性
+\end{itemize}
+\end{block}
+
+\vspace{0.2cm}
+
+\begin{block}{性能测试}
+\begin{itemize}
+    \item 与同类算法进行横向对比
+    \item 在广泛的实例上测试算法性能
+\end{itemize}
+\end{block}
+
 \end{columns}
+\end{frame}
+
+
+% Page 3: 谢谢
+\begin{frame}{}
+\vfill
+\begin{center}
+{\Huge \textcolor{structure}{\textbf{谢谢}}}
+
+\vspace{0.5cm}
+{\large 欢迎提问与讨论}
+\end{center}
+\vfill
 \end{frame}

@@ -1,94 +1,182 @@
 \section{问题背景}
 
-\begin{frame}{问题是什么？}
-\begin{columns}[T,totalwidth=\textwidth]
-\column{0.56\textwidth}
-\begin{block}{研究对象}
+% Page 1: 什么是服务网络设计
+\begin{frame}{服务网络设计（Service Network Design）}
+\begin{block}{定义}
 \justifying
-在 \hl{service network design} 中，需要同时决定：
+服务网络设计是指在给定物理网络上，决定\hl{开设哪些服务}（路线、频率、时刻、资源分配），以最优化运营目标（利润、成本、服务水平）的规划问题。
+\end{block}
+
+\vspace{0.3cm}
+\begin{block}{现实应用}
 \begin{itemize}
-    \item 开哪些服务、何时出发、分配哪类资源；
-    \item 旅客在不同 itinerary 与 outside option 之间如何选择；
-    \item 因而 \hl{供给决策} 与 \hl{需求分配} 是相互反馈的。
+    \item \hl{航空}：航班时刻表与机队分配
+    \item \hl{城际铁路}：列车开行方案
+    \item \hl{城市公交}：线路频率与车辆调度
+    \item \hl{货运物流}：干线运输网络规划
 \end{itemize}
 \end{block}
+% \begin{columns}[T,totalwidth=\textwidth]
+% \column{0.48\textwidth}
 
-\vspace{0.2cm}
-\begin{block}{为什么难？}
+% % \column{0.48\textwidth}
+% % \begin{block}{共同特征}
+% % \begin{itemize}
+% %     \item 服务供给决定了顾客可选的出行方案
+% %     \item 顾客选择反过来影响服务的盈利性
+% %     \item 供给与需求之间存在\hl{反馈耦合}
+% % \end{itemize}
+% \end{block}
+% \end{columns}
+\end{frame}
+
+
+% Page 2: 在SND中引入顾客选择
+\begin{frame}{考虑顾客选择的服务网络设计}
+\begin{columns}[T,totalwidth=\textwidth]
+\column{0.45\textwidth}
+在传统的服务网络设计中，顾客需求通常被视为\hl{外生输入}。
+\begin{block}{考虑顾客选择的服务网络设计}
+\justifying
+需要同时考虑：
 \begin{itemize}
-    \item 旅客选择是 \hl{内生需求}，不是固定流量；
-    \item 决策变量同时包含二元服务变量 $\fleetAssignVar_{af}$ 和选择变量 $\shareVar_{rp\ell}$；
-    \item 可行 itinerary 数量随网络规模与时间分辨率 \hl{组合爆炸}。
+    \item 开哪些服务、分配哪类资源
+    \item 顾客如何选择
 \end{itemize}
+\hl{供给决策} 与 \hl{需求分配} 相互反馈。
 \end{block}
 
-\column{0.42\textwidth}
-\begin{block}{F9 基准实例}
-\centering
-\vspace{0.1cm}
-\begin{tabular}{>{\bfseries}p{2.3cm}p{2.1cm}}
-机场数 & 60 \\
-航段数 & 259 \\
-OD 市场 & 382 \\
-最大中转数 & 2 \\
-可行 itineraries & 475,776 \\
-\end{tabular}
-\vspace{0.15cm}
-\end{block}
+% \vspace{0.3cm}
+% \begin{block}{核心矛盾}
+% \centering
+% \Large
+% \textbf{模型更真实}\par
+% \vspace{0.15cm}
+% $\Downarrow$\par
+% \vspace{0.15cm}
+% \Large
+% \textcolor{BadRed}{\textbf{直接求解更困难}}
+% \end{block}
 
-\vspace{0.25cm}
-\begin{block}{核心矛盾}
-\centering
-\Large
-\textbf{模型更真实}\par
-\vspace{0.15cm}
-$\Downarrow$\par
-\vspace{0.15cm}
-\Large
-\textcolor{BadRed}{\textbf{直接求解更困难}}
-\end{block}
+\column{0.53\textwidth}
+\begin{center}
+\begin{tikzpicture}[node distance=0.5cm, every node/.style={font=\small}]
+    \node[draw=structure,rounded corners,thick,fill=structure!8,minimum width=4.2cm,minimum height=1cm,align=center] (supply) {供给决策\\开哪些服务？分配什么资源？};
+    \node[draw=structure,rounded corners,thick,fill=structure!8,below=1.2cm of supply,minimum width=4.2cm,minimum height=1cm,align=center] (demand) {需求分配\\顾客如何选择 itinerary？};
+    \draw[-{Latex[length=2.5mm]},thick] (supply.east) to[bend left=40] node[right,font=\scriptsize]{服务方案} (demand.east);
+    \draw[-{Latex[length=2.5mm]},thick] (demand.west) to[bend left=40] node[left,font=\scriptsize]{盈利结果} (supply.west);
+\end{tikzpicture}
+\end{center}
 \end{columns}
 \end{frame}
 
 
-\begin{frame}{为什么现有方法不够？}
+% Page 3: 为什么难
+\begin{frame}{难点分析}
 \begin{columns}[T,totalwidth=\textwidth]
-\column{0.52\textwidth}
+\column{0.85\textwidth}
+\begin{block}{建模方式}
+\begin{itemize}
+    \item 基于\hl{混合整数规划}（MIP）
+    \item 网络层：多商品流（MCF）建模服务与资源
+    \item 需求层：离散选择模型建模顾客行为
+\end{itemize}
+\end{block}
+
+\vspace{0.2cm}
+\begin{block}{计算困难的来源}
+\begin{itemize}
+    \item 问题本身是 \hl{NP-hard}
+    \item 顾客选择是\hl{内生需求}，不是固定流量——供给变则需求变
+    \item 决策变量同时包含二元服务变量 $\fleetAssignVar$ 和连续选择变量 $\shareVar$，两者耦合
+    \item 可选的行程（itinerary）数量随网络规模呈现极快的增长
+\end{itemize}
+\end{block}
+
+% \column{0.44\textwidth}
+% \begin{center}
+% \begin{tikzpicture}[node distance=0.6cm, every node/.style={font=\small}]
+%     \node[draw=structure,rounded corners,thick,fill=structure!8,minimum width=4.5cm,minimum height=0.9cm,align=center] (a) {网络层：MCF + 整数变量};
+%     \node[draw=structure,rounded corners,thick,fill=structure!8,below=of a,minimum width=4.5cm,minimum height=0.9cm,align=center] (b) {需求层：离散选择模型};
+%     \node[draw=BadRed,rounded corners,thick,fill=BadRed!8,below=of b,minimum width=4.5cm,minimum height=1cm,align=center] (c) {耦合 $\Rightarrow$ 变量爆炸\newline LP 松弛极弱};
+%     \draw[-{Latex[length=2.5mm]},thick] (a) -- (b);
+%     \draw[-{Latex[length=2.5mm]},thick] (b) -- (c);
+%     \draw[-{Latex[length=2.5mm]},thick,dashed,bend right=40] (c.west) to node[left,font=\scriptsize]{反馈} (a.west);
+% \end{tikzpicture}
+% \end{center}
+\end{columns}
+\end{frame}
+
+
+% Page 4: 现有方法的不足
+\begin{frame}{现有方法的不足}
+\begin{columns}[T,totalwidth=\textwidth]
+\column{0.65\textwidth}
 \begin{block}{直接 MIP}
 \begin{itemize}
-    \item itinerary 变量太多；
-    \item LP 松弛很弱，存在严重 fractional degeneracy；
-    \item branch-and-bound 长时间卡住。
+    \item 变量太多，求解器难以直接处理
+    \item 退化严重，分支定界树膨胀
 \end{itemize}
 \end{block}
 
 \vspace{0.18cm}
-\begin{block}{DDD}
+\begin{block}{Dynamic Discretization Discovery (DDD) \cite{boland2017continuous}}
 \begin{itemize}
-    \item 能压缩 \hl{物理时空网络}；
-    \item 但 \hl{不能处理 itinerary 层面的爆炸}；
-    \item 无法直接应对 passenger choice 的耦合。
+    \item 核心思想：对\hl{时空网络做聚合}，逐步细化时间点
+    \item 能有效压缩物理时空网络
+    \item 但\hl{无法处理行程维度的数量爆炸}
 \end{itemize}
 \end{block}
 
-\column{0.46\textwidth}
-\begin{block}{我想解决的点}
-\begin{enumerate}
-    \item 既保留 passenger choice，模型要真实；
-    \item 又不能直接把所有 itinerary 全塞给求解器；
-    \item 最好还能给出 \hl{理论可证的全局最优性}。
-\end{enumerate}
+% \column{0.48\textwidth}
+% \begin{center}
+% \begin{tikzpicture}[node distance=0.7cm]
+%     \node[draw=BadRed,rounded corners,thick,fill=BadRed!8,minimum width=4.7cm,minimum height=0.9cm,align=center] (a) {Raw model 太大};
+%     \node[draw=WarnOrange,rounded corners,thick,fill=WarnOrange!12,below=of a,minimum width=4.7cm,minimum height=0.9cm,align=center] (b) {DDD 只压缩时间层};
+%     \node[draw=GoodGreen,rounded corners,thick,fill=GoodGreen!10,below=of b,minimum width=4.7cm,minimum height=1cm,align=center] (c) {需要同时压缩\newline 物理网络 + 顾客行程层};
+%     \draw[-{Latex[length=2.5mm]},thick] (a) -- (b);
+%     \draw[-{Latex[length=2.5mm]},thick] (b) -- (c);
+% \end{tikzpicture}
+% \end{center}
+\end{columns}
+\end{frame}
+
+
+% Page 5: 研究目标
+\begin{frame}{研究目标}
+\begin{block}{本文要解决的核心问题}
+\centering
+\large
+设计一种精确优化方法，使得：
 \end{block}
 
-\vspace{0.18cm}
-\begin{center}
-\begin{tikzpicture}[node distance=0.7cm]
-    \node[draw=BadRed,rounded corners,thick,fill=BadRed!8,minimum width=4.7cm,minimum height=0.9cm,align=center] (a) {Raw model 太大};
-    \node[draw=WarnOrange,rounded corners,thick,fill=WarnOrange!12,below=of a,minimum width=4.7cm,minimum height=0.9cm,align=center] (b) {DDD 只压缩时间层};
-    \node[draw=GoodGreen,rounded corners,thick,fill=GoodGreen!10,below=of b,minimum width=4.7cm,minimum height=1cm,align=center] (c) {需要同时压缩\newline 物理网络 + 旅客行程层};
-    \draw[-{Latex[length=2.5mm]},thick] (a) -- (b);
-    \draw[-{Latex[length=2.5mm]},thick] (b) -- (c);
-\end{tikzpicture}
-\end{center}
+\vspace{0.3cm}
+\begin{columns}[T,totalwidth=\textwidth]
+\column{0.32\textwidth}
+\begin{block}{\centering 模型真实性}
+\centering
+\vspace{0.1cm}
+考虑选择模型 \\[0.2cm]
+供给—需求反馈耦合\\[0.2cm]
+\vspace{0.1cm}
+\end{block}
+
+\column{0.32\textwidth}
+\begin{block}{\centering 计算可行性}
+\centering
+\vspace{0.1cm}
+模型规模可控\\[0.2cm]
+实际可求解\\[0.2cm]
+\vspace{0.1cm}
+\end{block}
+
+\column{0.32\textwidth}
+\begin{block}{\centering 理论保证}
+\centering
+\vspace{0.1cm}
+全局最优性保证\\[0.2cm]
+精确方法\\[0.2cm]
+\vspace{0.1cm}
+\end{block}
 \end{columns}
 \end{frame}
