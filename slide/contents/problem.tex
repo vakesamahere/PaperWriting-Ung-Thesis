@@ -4,14 +4,13 @@
 \begin{frame}{服务网络设计（Service Network Design）}
 \begin{block}{定义}
 \justifying
-服务网络设计是指在给定物理网络上，决定\hl{开设哪些服务}（路线、频率、时刻、资源分配），以最优化运营目标（利润、成本、服务水平）的规划问题。
+服务网络设计是指在给定物理网络上，决定\hl{开设哪些服务}（路线、频率、时刻、资源分配），以最优化运营目标的规划问题。
+$$\min_{\tiny\text{提供的服务}} \{\text{成本}-\text{收益}\}$$
 \end{block}
 
-\vspace{0.3cm}
 \begin{block}{现实应用}
 \begin{itemize}
     \item \hl{航空}：航班时刻表与机队分配
-    \item \hl{城际铁路}：列车开行方案
     \item \hl{城市公交}：线路频率与车辆调度
     \item \hl{货运物流}：干线运输网络规划
 \end{itemize}
@@ -62,7 +61,7 @@
 \begin{center}
 \begin{tikzpicture}[node distance=0.5cm, every node/.style={font=\small}]
     \node[draw=structure,rounded corners,thick,fill=structure!8,minimum width=4.2cm,minimum height=1cm,align=center] (supply) {供给决策\\开哪些服务？分配什么资源？};
-    \node[draw=structure,rounded corners,thick,fill=structure!8,below=1.2cm of supply,minimum width=4.2cm,minimum height=1cm,align=center] (demand) {需求分配\\顾客如何选择 itinerary？};
+    \node[draw=structure,rounded corners,thick,fill=structure!8,below=1.2cm of supply,minimum width=4.2cm,minimum height=1cm,align=center] (demand) {需求分配\\顾客如何选择？};
     \draw[-{Latex[length=2.5mm]},thick] (supply.east) to[bend left=40] node[right,font=\scriptsize]{服务方案} (demand.east);
     \draw[-{Latex[length=2.5mm]},thick] (demand.west) to[bend left=40] node[left,font=\scriptsize]{盈利结果} (supply.west);
 \end{tikzpicture}
@@ -86,7 +85,6 @@
 \vspace{0.2cm}
 \begin{block}{计算困难的来源}
 \begin{itemize}
-    \item 问题本身是 \hl{NP-hard}
     \item 顾客选择是\hl{内生需求}，不是固定流量——供给变则需求变
     \item 决策变量同时包含二元服务变量 $\fleetAssignVar$ 和连续选择变量 $\shareVar$，两者耦合
     \item 可选的行程（itinerary）数量随网络规模呈现极快的增长
@@ -112,7 +110,7 @@
 \begin{frame}{现有方法的不足}
 \begin{columns}[T,totalwidth=\textwidth]
 \column{0.65\textwidth}
-\begin{block}{直接 MIP}
+\begin{block}{分支定界}
 \begin{itemize}
     \item 变量太多，求解器难以直接处理
     \item 退化严重，分支定界树膨胀
@@ -120,7 +118,7 @@
 \end{block}
 
 \vspace{0.18cm}
-\begin{block}{Dynamic Discretization Discovery (DDD) \cite{boland2017continuous}}
+\begin{block}{Dynamic Discretization Discovery (DDD) \cite{boland2017continuous}框架}
 \begin{itemize}
     \item 核心思想：对\hl{时空网络做聚合}，逐步细化时间点
     \item 能有效压缩物理时空网络
