@@ -20,6 +20,8 @@ _out
 *.synctex(busy)
 *SAVE-ERROR
 *.toc
+*.nav
+*.snm
 
 template/
 
