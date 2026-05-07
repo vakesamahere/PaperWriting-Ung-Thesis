@@ -1,0 +1,47 @@
+%% main.tex
+%% Based on Tongji-Beamer template (TJ-CSCCG)
+\documentclass[aspectratio=169]{ctexbeamer}
+
+\usepackage{amsthm}
+\usepackage{amsmath,amssymb,mathrsfs}
+\usepackage{booktabs,array,multirow}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,shapes.misc,backgrounds}
+\usepackage{xcolor}
+\usepackage{ragged2e}
+
+\usetheme{tongji}
+
+\let\solution\relax
+\input{../command/notations.tex}
+
+\definecolor{GoodGreen}{RGB}{26,160,83}
+\definecolor{WarnOrange}{RGB}{245,166,35}
+\definecolor{BadRed}{RGB}{196,44,44}
+
+\newcommand{\hl}[1]{\textcolor{structure}{\textbf{#1}}}
+\newcommand{\gap}{\textit{gap}}
+
+%Information to be included in the title page:
+\title[考虑乘客选择的服务网络设计]{考虑乘客选择的服务网络设计}
+\subtitle{基于行程聚合与动态细化的精确优化方法}
+\author[张子越]{张子越}
+\institute[同济大学]{同济大学经济与管理学院}
+\date{}
+
+\begin{document}
+
+\begin{frame}[plain]
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=center] at (current page.center) {\includegraphics[width=\paperwidth,height=\paperheight]{my_content/asset/cover.png}};
+    \end{tikzpicture}
+\end{frame}
+
+\input{contents/problem}
+\input{contents/method}
+\input{contents/results}
+\input{contents/conclusion}
+\input{contents/appendix}
+
+\end{document}

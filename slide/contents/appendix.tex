@@ -1,0 +1,93 @@
+\appendix
+
+\section{附录}
+
+\begin{frame}{附录 A：基准模型（只列核心结构）}
+\small
+\begin{block}{SN-PC$(\hat{\discretization})$}
+\vspace{-0.25cm}
+\begin{align*}
+\min\;& \sum_{a\in \full{\flightArc}}\sum_{f\in\fleetSet} \cost_{af}\,\fleetAssignVar_{af}
+- \sum_{m\in\marketSet}\sum_{p\in\psgTypeSet}\sum_{r\in\itinInMarket}\sum_{\ell\in\fareClassSet} \demand_{mp}\fare_{r\ell}\shareVar_{rp\ell}\\[0.15cm]
+\text{s.t. } & \sum_{a\in \outArcSet{i,t}} \fleetAssignVar_{af} - \sum_{a\in \inArcSet{i,t}} \fleetAssignVar_{af} = 0, \quad \forall (i,t),f \\
+& \sum_{a\in \holdingArcTc{\checkTime}} \fleetAssignVar_{af} + \sum_{a\in \flightArcTc{\checkTime}} \fleetAssignVar_{af} \le \fleetAvail_f, \quad \forall f \\
+& \sum_{f\in\fleetSet}\sum_{a\in \arcDuringSepTime_{ijt}} \fleetAssignVar_{af} \le 1, \quad \forall (i,j),t \\
+& \outAttr_{mp}\shareVar_{rp\ell} \le \attr_{rp\ell}\outsideShareVar_{mp}, \quad \forall m,p,r,\ell \\
+& \left(\frac{\adjOutAttr_{mp}}{\outAttr_{mp}}\right) \outsideShareVar_{mp} +
+\sum_{r,\ell} \left(\frac{\adjAttr_{rp\ell}}{\attr_{rp\ell}}\right)\shareVar_{rp\ell} = 1, \quad \forall m,p \\
+& \sum_{m,p,\ell}\sum_{r\in \itinUsingArc{m}{a}} \demand_{mp}\shareVar_{rp\ell} \le \sum_{f\in\fleetSet}\fleetCap_f\fleetAssignVar_{af}, \quad \forall a\in\full{\flightArc}
+\end{align*}
+\end{block}
+\end{frame}
+
+\begin{frame}{附录 B：算法细节（按模块拆开）}
+\small
+\begin{columns}[T,totalwidth=\textwidth]
+\column{0.33\textwidth}
+\begin{block}{LBM}
+\begin{itemize}
+    \item 在粗时间离散化上建模；
+    \item 允许时间弧聚合；
+    \item 再对 itinerary 做 path-signature aggregation；
+    \item 得到 valid lower bound。
+\end{itemize}
+\end{block}
+
+\column{0.33\textwidth}
+\begin{block}{UBM}
+\begin{itemize}
+    \item 在 full network 上修复；
+    \item 锁定 segment--fleet frequency；
+    \item 用 itinerary cuts 抑制收入高估；
+    \item 给出 feasible incumbent。
+\end{itemize}
+\end{block}
+
+\column{0.33\textwidth}
+\begin{block}{Refinement}
+\begin{itemize}
+    \item 检查 chronological violations；
+    \item 检查 separation infeasibility；
+    \item 检查 phantom revenue；
+    \item 针对性加入时间点，继续迭代。
+\end{itemize}
+\end{block}
+\end{columns}
+
+\vspace{0.2cm}
+\begin{alertblock}{一句话总结}
+\centering
+\textbf{用 tighter LB 缩小搜索空间，用 targeted refinement 保证 exactness。}
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{附录 C：行程聚合为什么能保持下界？}
+\begin{columns}[T,totalwidth=\textwidth]
+\column{0.42\textwidth}
+\begin{block}{直观理解}
+\small
+\begin{itemize}
+    \item 一个 super-itinerary 对应多个原始 itinerary；
+    \item 原始 itinerary 之间可能因最小间隔约束而冲突；
+    \item 我们不是把 attraction 全部直接相加；
+    \item 而是在合法组合上取 \hl{optimistic but valid} 的上界。
+\end{itemize}
+\end{block}
+
+\vspace{0.12cm}
+\begin{equation*}
+\attrSuper_{R p\ell} =
+\max_{\itinCombSet:\, |\itinCombSet|\le \combLimit_R}
+\sum_{\mathscr{O}\in\itinCombSet}\sum_{r\in\mathscr{O}} \attr_{r p\ell}
+\end{equation*}
+
+\vspace{0.05cm}
+\small
+其中 $\combLimit_R$ 由聚合时间窗内可物理共存的服务数量控制。
+
+\column{0.56\textwidth}
+\begin{center}
+    \includegraphics[width=\linewidth]{../figure/illustrate_valid_combinations/valid_combinations.pdf}
+\end{center}
+\end{columns}
+\end{frame}

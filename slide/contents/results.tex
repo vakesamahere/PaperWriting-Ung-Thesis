@@ -1,0 +1,40 @@
+\section{实验结果}
+
+\begin{frame}{在真实航空实例上显著优于直接求解}
+\begin{columns}[T,totalwidth=\textwidth]
+\column{0.44\textwidth}
+\begin{block}{Base case: Frontier F9}
+\centering
+\small
+\begin{tabular}{lcc}
+\toprule
+方法 & Raw Model & IA-DR \\
+\midrule
+UB & -176{,}824.17 & -176{,}843.71 \\
+LB & -185{,}214.71 & -176{,}843.71 \\
+Gap & 4.75\% & \textbf{0.00\%} \\
+时间(h) & 12.00$^*$ & \textbf{10.92} \\
+\bottomrule
+\end{tabular}
+\vspace{0.08cm}
+
+\footnotesize $^*$ 到 12 小时上限仍未收敛。
+\end{block}
+
+\vspace{0.1cm}
+\small
+\begin{itemize}
+    \item 最优解激活 \hl{348} 个航班；
+    \item 382 个市场中只服务最有利可图的 \hl{120} 个；
+    \item \hl{112} 条中转 itinerary vs. 64 条直接 itinerary。
+\end{itemize}
+
+\column{0.54\textwidth}
+\begin{center}
+    \includegraphics[width=0.96\linewidth]{../figure/img/unexpl_raw_end_both.pdf}
+\end{center}
+\vspace{-0.1cm}
+\centering\scriptsize
+branch-and-bound 树对比：直接模型不断膨胀，而 IA-DR 很早收敛。
+\end{columns}
+\end{frame}

@@ -1,0 +1,115 @@
+\section{方法框架}
+
+\begin{frame}{IA-DR 框架}
+\begin{block}{一句话概括}
+\centering
+\large 不是一次性求完整大模型，而是 \hl{先做紧下界，再做上界修复，再做定向细化}。
+\end{block}
+
+\vspace{0.15cm}
+\begin{columns}[T,totalwidth=\textwidth]
+\column{0.45\textwidth}
+\begin{block}{三个模块}
+\small
+\begin{itemize}
+    \item \hl{行程聚合}：构造 super-itinerary，压缩 passenger 维度；
+    \item \hl{上界修复}：从松弛解恢复可行整数时刻表；
+    \item \hl{动态细化}：只在必要位置加时间点，而不是全局细化。
+\end{itemize}
+\end{block}
+
+\vspace{0.08cm}
+\small\textcolor{structure}{\textbf{精髓：用 tighter LB 缩小搜索空间，用 targeted refinement 保证 exactness。}}
+
+\column{0.5\textwidth}
+\begin{center}
+\begin{tikzpicture}[node distance=0.35cm, every node/.style={font=\small}]
+    \node[draw=structure,rounded corners,thick,fill=structure!8,minimum width=4.3cm,minimum height=0.9cm,align=center] (t0) {粗时间离散化 $\discretization$};
+    \node[draw=structure,rounded corners,thick,fill=structure!8,below=of t0,minimum width=4.3cm,minimum height=0.9cm,align=center] (lb) {LBM：时间弧聚合 + itinerary aggregation};
+    \node[draw=structure,rounded corners,thick,fill=structure!8,below=of lb,minimum width=4.3cm,minimum height=0.9cm,align=center] (ub) {UBM：frequency fixing + itinerary cuts};
+    \node[draw=structure,rounded corners,thick,fill=structure!8,below=of ub,minimum width=4.3cm,minimum height=0.9cm,align=center] (ref) {Refinement：补加关键时间点};
+    \draw[-{Latex[length=3mm]},thick] (t0) -- (lb);
+    \draw[-{Latex[length=3mm]},thick] (lb) -- node[right]{LB} (ub);
+    \draw[-{Latex[length=3mm]},thick] (ub) -- node[right]{UB} (ref);
+\end{tikzpicture}
+\end{center}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}{核心 insight：为什么要做 itinerary aggregation？}
+\small
+\begin{columns}[T,totalwidth=\textwidth]
+\column{0.44\textwidth}
+\small
+\begin{block}{标准时间聚合会出错}
+\begin{itemize}
+    \item 相邻出发时间被合并后，\hl{同一份分数资源} 可能"同时"吃到多份收入；
+    \item 于是出现 \textcolor{BadRed}{phantom revenue}；
+    \item 结果是 lower bound 太松，甚至会误导后续求解。
+\end{itemize}
+\end{block}
+
+\vspace{0.12cm}
+\begin{block}{itinerary aggregation 的修正}
+\begin{itemize}
+    \item 按聚合路径签名分组；
+    \item 用 \hl{super-itinerary} 替代原始 itineraries；
+    \item attraction 只在 \hl{物理可共存} 的组合上做 optimistic upper bound。
+\end{itemize}
+\end{block}
+
+\vspace{0.05cm}
+\column{0.54\textwidth}
+\begin{center}
+    \includegraphics[width=\linewidth]{../figure/illustrate_rev_overestimation/rev_distribution.pdf}
+\end{center}
+\vspace{-0.15cm}
+\centering\scriptsize 单纯时间聚合会继承收入高估；必须引入 itinerary-level aggregation 才能修正。
+\end{columns}
+\end{frame}
+
+
+\begin{frame}{动态细化如何保证精确性？}
+\begin{columns}[T,totalwidth=\textwidth]
+\column{0.52\textwidth}
+\begin{block}{每次迭代做什么？}
+\begin{enumerate}
+    \item 在当前粗网络上求一个 \hl{tight lower bound}；
+    \item 生成一个 \hl{feasible upper bound}；
+    \item 如果两者还没合上，就只对\hl{出问题的位置}加时间点。
+\end{enumerate}
+\end{block}
+
+\vspace{0.18cm}
+\begin{block}{检测的三类 relaxation artifacts}
+\begin{itemize}
+    \item \hl{Chronological violations}: 时间先后顺序不合法；
+    \item \hl{Separation infeasibilities}: 最小间隔不满足；
+    \item \hl{Phantom revenue}: 聚合后出现虚假收入。
+\end{itemize}
+\end{block}
+
+\vspace{0.18cm}
+\begin{alertblock}{理论结论}
+\centering
+只要持续消除这些伪影，算法就会在有限步内\textbf{收敛到全局最优解}。
+\end{alertblock}
+
+\column{0.44\textwidth}
+\begin{center}
+\begin{tikzpicture}[node distance=0.45cm]
+    \node[draw=structure,rounded corners,thick,fill=structure!6,minimum width=3.9cm,minimum height=0.9cm,align=center] (a1) {Solve LB on coarse network};
+    \node[draw=structure,rounded corners,thick,fill=structure!6,below=of a1,minimum width=3.9cm,minimum height=0.9cm,align=center] (a2) {Repair UB on full network};
+    \node[draw=structure,rounded corners,thick,fill=structure!6,below=of a2,minimum width=3.9cm,minimum height=0.9cm,align=center] (a3) {Detect artifacts};
+    \node[draw=structure,rounded corners,thick,fill=structure!6,below=of a3,minimum width=3.9cm,minimum height=0.9cm,align=center] (a4) {Add targeted time points};
+    \node[draw=GoodGreen,rounded corners,thick,fill=GoodGreen!10,below=0.6cm of a4,minimum width=3.9cm,minimum height=1cm,align=center] (a5) {Stop when $UB-LB\leq \smallValue$};
+    \draw[-{Latex[length=3mm]},thick] (a1) -- (a2);
+    \draw[-{Latex[length=3mm]},thick] (a2) -- (a3);
+    \draw[-{Latex[length=3mm]},thick] (a3) -- (a4);
+    \draw[-{Latex[length=3mm]},thick,bend left=28] (a4.east) to ++(1.0,0) |- (a1.east);
+    \draw[-{Latex[length=3mm]},thick] (a4) -- (a5);
+\end{tikzpicture}
+\end{center}
+\end{columns}
+\end{frame}

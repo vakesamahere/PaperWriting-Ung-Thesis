@@ -1,0 +1,94 @@
+\section{问题背景}
+
+\begin{frame}{问题是什么？}
+\begin{columns}[T,totalwidth=\textwidth]
+\column{0.56\textwidth}
+\begin{block}{研究对象}
+\justifying
+在 \hl{service network design} 中，需要同时决定：
+\begin{itemize}
+    \item 开哪些服务、何时出发、分配哪类资源；
+    \item 旅客在不同 itinerary 与 outside option 之间如何选择；
+    \item 因而 \hl{供给决策} 与 \hl{需求分配} 是相互反馈的。
+\end{itemize}
+\end{block}
+
+\vspace{0.2cm}
+\begin{block}{为什么难？}
+\begin{itemize}
+    \item 旅客选择是 \hl{内生需求}，不是固定流量；
+    \item 决策变量同时包含二元服务变量 $\fleetAssignVar_{af}$ 和选择变量 $\shareVar_{rp\ell}$；
+    \item 可行 itinerary 数量随网络规模与时间分辨率 \hl{组合爆炸}。
+\end{itemize}
+\end{block}
+
+\column{0.42\textwidth}
+\begin{block}{F9 基准实例}
+\centering
+\vspace{0.1cm}
+\begin{tabular}{>{\bfseries}p{2.3cm}p{2.1cm}}
+机场数 & 60 \\
+航段数 & 259 \\
+OD 市场 & 382 \\
+最大中转数 & 2 \\
+可行 itineraries & 475,776 \\
+\end{tabular}
+\vspace{0.15cm}
+\end{block}
+
+\vspace{0.25cm}
+\begin{block}{核心矛盾}
+\centering
+\Large
+\textbf{模型更真实}\par
+\vspace{0.15cm}
+$\Downarrow$\par
+\vspace{0.15cm}
+\Large
+\textcolor{BadRed}{\textbf{直接求解更困难}}
+\end{block}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}{为什么现有方法不够？}
+\begin{columns}[T,totalwidth=\textwidth]
+\column{0.52\textwidth}
+\begin{block}{直接 MIP}
+\begin{itemize}
+    \item itinerary 变量太多；
+    \item LP 松弛很弱，存在严重 fractional degeneracy；
+    \item branch-and-bound 长时间卡住。
+\end{itemize}
+\end{block}
+
+\vspace{0.18cm}
+\begin{block}{DDD}
+\begin{itemize}
+    \item 能压缩 \hl{物理时空网络}；
+    \item 但 \hl{不能处理 itinerary 层面的爆炸}；
+    \item 无法直接应对 passenger choice 的耦合。
+\end{itemize}
+\end{block}
+
+\column{0.46\textwidth}
+\begin{block}{我想解决的点}
+\begin{enumerate}
+    \item 既保留 passenger choice，模型要真实；
+    \item 又不能直接把所有 itinerary 全塞给求解器；
+    \item 最好还能给出 \hl{理论可证的全局最优性}。
+\end{enumerate}
+\end{block}
+
+\vspace{0.18cm}
+\begin{center}
+\begin{tikzpicture}[node distance=0.7cm]
+    \node[draw=BadRed,rounded corners,thick,fill=BadRed!8,minimum width=4.7cm,minimum height=0.9cm,align=center] (a) {Raw model 太大};
+    \node[draw=WarnOrange,rounded corners,thick,fill=WarnOrange!12,below=of a,minimum width=4.7cm,minimum height=0.9cm,align=center] (b) {DDD 只压缩时间层};
+    \node[draw=GoodGreen,rounded corners,thick,fill=GoodGreen!10,below=of b,minimum width=4.7cm,minimum height=1cm,align=center] (c) {需要同时压缩\newline 物理网络 + 旅客行程层};
+    \draw[-{Latex[length=2.5mm]},thick] (a) -- (b);
+    \draw[-{Latex[length=2.5mm]},thick] (b) -- (c);
+\end{tikzpicture}
+\end{center}
+\end{columns}
+\end{frame}
