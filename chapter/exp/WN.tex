@@ -26,7 +26,7 @@ Raw Model (Baseline) & $-1.397 \times 10^7$ & $0.2\%$ & 7,147 \\
 \end{tabular}
 \end{table}
 
-When the complete ATFP model with over 2.15 million itinerary variables is formulated directly and passed to the Gurobi solver, the memory footprint strictly exceeds the available hardware capacity. Consequently, the Raw Model inevitably fails due to an Out of Memory (OOM) error in the early stages of the branch-and-bound process.
+When the complete \problemName model with over 2.15 million itinerary variables is formulated directly and passed to the Gurobi solver, the memory footprint strictly exceeds the available hardware capacity. Consequently, the Raw Model inevitably fails due to an Out of Memory (OOM) error in the early stages of the branch-and-bound process.
 
 In contrast, the \algoNotation algorithm circumvents the memory bottleneck by leveraging the Lower Bound Model (LBM) to solve a dynamically aggregated relaxation. The algorithm then meticulously refines the time-space network and itinerary mappings. 
 
