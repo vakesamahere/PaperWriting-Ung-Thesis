@@ -7,13 +7,13 @@
     =
     \sum_{k\in K_f}\routeAmount{\pathInRoute{f}{k}}\wrapnum_{fk}.
 \]
-对精细离散化路由 $(a'_{k,1},\ldots,a'_{k,q_k})$ 直接应用相同的计数论证表明
+对完全离散化内的路径 $(a'_{k,1},\ldots,a'_{k,q_k})$ 直接应用相同的论证，得到
 \[
     \sum_{a'\in\holdingArcTc{\checkTime}}\bar{\fleetAssignVar}_{a'f}
     + \sum_{a'\in\flightArcTc{\checkTime}}\bar{\fleetAssignVar}_{a'f}
     = \sum_{k\in K_f}\routeAmount{\pathInRoute{f}{k}}\wrapnum_{fk},
 \]
-为计算 \eqref{constr:main.fleet_available} 的右端，展开
+这里计算 \eqref{constr:main.fleet_available} 的右端，展开
 \[
     \sum_{a'\in\holdingArcTc{\checkTime}}\bar{\fleetAssignVar}_{a'f}
     + \sum_{a'\in\flightArcTc{\checkTime}}\bar{\fleetAssignVar}_{a'f}
@@ -24,8 +24,8 @@
             + \#\{r \mid a'_{k,r}\in\flightArcTc{\checkTime}\}
         \right),
 \]
-其中 $a'_{k,r}$ 表示精细路由的第 $r$ 条弧。
-如前所述，为精细离散化引入提升时间：
+其中 $a'_{k,r}$ 表示完全离散化中路径的第 $r$ 条弧。
+如前所述，为完全离散化引入提升时间：
 \[
     \widetilde{t}_o(a') := t_o(a'),\qquad
     \widetilde{t}_d(a') :=
@@ -44,7 +44,7 @@
     \arcPosi^{\mathrm{full}}
         := \{a'_{k,r}\mid \widetilde{t}_o(a'_{k,r}) \le \checkTime < \widetilde{t}_d(a'_{k,r})\}.
 \]
-因为精细路由中的反向弧都是环绕的，即 $\arcNega^{\mathrm{full}}$ 为空，由引理~\ref{lem:fleet_avail.wrap} 可得 $|\arcPosi^{\mathrm{full}}|=\wrapnum_{fk}$。
+因为原始网络中路径的反向弧都是隔夜航班产生的，即 $\arcNega^{\mathrm{full}}$ 为空，由引理~\ref{lem:fleet_avail.wrap} 可得 $|\arcPosi^{\mathrm{full}}|=\wrapnum_{fk}$。
 由于 $\bar{\fleetAssignVar}_{\cdot f}$ 满足 \eqref{constr:main.fleet_available}，我们有
 \[
     \sum_{k\in K_f}\routeAmount{\pathInRoute{f}{k}}\wrapnum_{fk}

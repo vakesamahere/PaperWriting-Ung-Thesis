@@ -1,6 +1,6 @@
 
 \begin{lemma}\label{lem:fleet_avail.wrap}
-对每种资源类型 $f$ 和路由 $\pathInRoute{f}{k}$，
+对每种资源类型 $f$ 和路径 $\pathInRoute{f}{k}$，
 $|\arcPosi|-|\arcNega|=\wrapnum_{fk}$。
 \end{lemma}
 \begin{proof}
@@ -23,7 +23,7 @@ $|\arcPosi|-|\arcNega|=\wrapnum_{fk}$。
     \qquad r=1,\ldots,Q.
 \]
 
-因为路由是连续的，$t_o(a_{r})$ 和 $t_d(a_{r\ominus1})$ 在截断处必须相等。考虑两个连续符号的组合，由上述定义，定义：
+因为路径是连续的，$t_o(a_{r})$ 和 $t_d(a_{r\ominus1})$ 在截断处必须相等。考虑两个连续符号的组合，由上述定义，定义：
 \[
     \slr{r} := (\sign_{r\ominus1},\sign_{r}) = (0,1)\qquad( \iff t_o(a_r)\le\checkTime < t_d(a_r))
 \]
@@ -137,7 +137,7 @@ $|\arcPosi|-|\arcNega|=\wrapnum_{fk}$。
     a_r\in(\wrapSet\setminus\wrapTc)\cup\arcNega \iff \srl{r}
 \]
 
-因为路由是循环且连续的，遍历序列时 $\slr{r}$ 的个数等于 $\srl{r}$ 的个数：
+因为路径是循环且连续的，遍历序列时 $\slr{r}$ 的个数等于 $\srl{r}$ 的个数：
 \[
     \#\{r\mid \slr{r}\} = \#\{r\mid \srl{r}\}
 \]

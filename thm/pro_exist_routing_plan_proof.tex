@@ -68,7 +68,7 @@ $\text{出度}\ge1$ 且 $\text{入度}\ge1$。
 \assignmentVector^f=\sum_{k=1}^{K}v(C_k;z_k),\qquad K\le|A^+(\assignmentVector^f)|.
 \]
 
-\paragraph{步骤 4. 构造路由方案。}
+\paragraph{步骤 4. 构造路径方案。}
 对每个环 $C_k$，令 $\pathInRoute{f}{k}$ 为其在服务弧集 $\flightArc$ 上的投影。
 令 $\routeAmount{\pathInRoute{f}{k}}:=z_k$，并记
 \[
@@ -88,5 +88,5 @@ $\text{出度}\ge1$ 且 $\text{入度}\ge1$。
 $\route{f}=\{(\pathInRoute{f}{k},\routeAmount{\pathInRoute{f}{k}})\}_{k=1}^{K}$
 和
 $\routingPlan(\solution)=\{\route{f}\mid f\in\fleetSet\}$。
-因此，对每种资源类型 $f$，我们可以导出与其分配向量一致的路由方案。
+因此，对每种资源类型 $f$，我们可以导出与其分配向量一致的路径方案。
 \end{proof}

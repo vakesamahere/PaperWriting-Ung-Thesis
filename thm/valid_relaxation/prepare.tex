@@ -1,10 +1,10 @@
-我们首先将一般 \problemName 解的结构分解为循环路由的平坦结构，以此开始预备分析。
+我们首先将一般 \problemName 解的结构分解为循环路径的平坦结构，以此开始预备分析。
 
-对于 \problemName 解 $\solution = (\fleetAssignVar, \shareVar, \outsideShareVar)$，我们可以定义其对应的路由方案 $\routingPlan(\solution)$ 或 $\routingPlan(\fleetAssignVar)$ 如下：
+对于 \problemName 解 $\solution = (\fleetAssignVar, \shareVar, \outsideShareVar)$，我们可以定义其对应的路径方案 $\routingPlan(\solution)$ 或 $\routingPlan(\fleetAssignVar)$ 如下：
 \[
     \routingPlan(\solution) = \{\route{f}\mid\forall f\in\fleetSet\}
 \]
-表示每种资源类型的路由方案，其中 $\route{f}$ 对任意资源类型 $f\in\fleetSet$ 定义如下，表示其路由：
+表示每种资源类型的路径方案，其中 $\route{f}$ 对任意资源类型 $f\in\fleetSet$ 定义如下，表示其路径：
 \[
     \route{f} = \{\pathInRoute{f}{k}, \routeAmount{\pathInRoute{f}{k}}\mid k=1,2,\ldots,K\}
 \]
@@ -20,18 +20,18 @@
     ,\qquad
     \pathInRoute{f}{k}(\positionArc) = \{a\in\positionArc\mid a\in\pathInRoute{f}{k}\}
 \]
-$\pathInRoute{f}{k}$ 表示资源类型 $f$ 的第 $k$ 条路由。$\routeAmount{\pathInRoute{f}{k}}$ 表示 $\pathInRoute{f}{k}$ 在解中出现的次数。注意 $\routeAmount{\pathInRoute{f}{k}}$ 不是指分配到该路由的资源单位数，而是该路由在解中被使用的次数。我们定义 $\wrapnum_{fk}$ 为路由 $\pathInRoute{f}{k}$ 的环绕次数，即该路由跨越规划时域的次数。因此，分配到路由 $\pathInRoute{f}{k}$ 的资源单位数为 $\routeAmount{\pathInRoute{f}{k}} \cdot \wrapnum_{fk}$。
+$\pathInRoute{f}{k}$ 表示资源类型 $f$ 的第 $k$ 条路径。$\routeAmount{\pathInRoute{f}{k}}$ 表示 $\pathInRoute{f}{k}$ 在解中出现的次数。注意 $\routeAmount{\pathInRoute{f}{k}}$ 不是指分配到该路径的资源单位数，而是该路径在解中被使用的次数。我们定义 $\wrapnum_{fk}$ 为路径 $\pathInRoute{f}{k}$ 的环绕次数，即该路径跨越规划时域的次数。因此，分配到路径 $\pathInRoute{f}{k}$ 的资源单位数为 $\routeAmount{\pathInRoute{f}{k}} \cdot \wrapnum_{fk}$。
 
 % ========================
 
 然后，我们建立聚合映射 $\Phi$ 的核心性质。
 \input{thm/valid_relaxation/aggregation_properties.tex}
 
-接下来，我们引入路由存在性引理，该引理保证任何流量平衡的资源类型分配都可以分解为具体的循环路由。
+接下来，我们引入路径存在性引理，该引理保证任何流量平衡的资源类型分配都可以分解为具体的循环路径。
 \input{thm/pro_exist_routing_plan.tex}
 \input{thm/pro_exist_routing_plan_proof.tex}
 
-路由分解建立后，我们定义若干辅助关系和集合，以便于后续对跨时间截面的资源计数进行评估。
+路径分解建立后，我们定义若干辅助关系和集合，以便于后续对跨时间截面的资源计数进行评估。
 
 \subparagraph*{由 $\Phi_{\arcSet}$ 导出的原像记号。}
 设 $\Phi_{\arcSet}:\full{\arcSet}\to\widetilde{\arcSet}$ 为定义松弛解时构造的弧映射。
@@ -56,7 +56,7 @@ $\pathInRoute{f}{k}$ 表示资源类型 $f$ 的第 $k$ 条路由。$\routeAmount
     x_{af}\ge0,
     \label{eq:fleet_avail.aggregate}
 \]
-由上述路由存在性引理，完整网络流 $\bar{\fleetAssignVar}_{\cdot f}$ 允许路由分解：
+由上述路径存在性引理，完整网络流 $\bar{\fleetAssignVar}_{\cdot f}$ 允许路径分解：
 \[
     \bar{\fleetAssignVar}_{a'f}
         = \sum_{k\in K_f}

@@ -1,6 +1,6 @@
 \paragraph*{间隔约束 \eqref{constr:relax.cooldown}。}
 固定任意航段 $(i,j)$ 和 $t\in\discretization_i$，设 $t^{+}$ 为 $\discretization_i$ 中 $t$ 之后的下一个时间点。
-定义在 $(i,t)$ 处聚合的精细出发时间集合为
+定义在 $(i,t)$ 处聚合的原始网络中的出发时间集合为
 \[
     \Theta_{ijt}=\{\tau\in\discretizationFull_i\mid t\le\tau<t^{+}\},
 \]
@@ -27,7 +27,7 @@
 将 $\Delta$ 按非递减顺序排列：$\tilde{\delta}_1\le\tilde{\delta}_2\le\cdots\le\tilde{\delta}_K$。
 
 我们断言 $\Delta$ 的连续元素之间至少相隔 $\minInterdepTime_{ij}$。
-事实上，假设 $\tilde{\delta}_r$ 和 $\tilde{\delta}_{r+1}$ 对应于在精细离散化中分别以时间 $\tau_r$ 和 $\tau_{r+1}$ 出发的弧 $a'_r$ 和 $a'_{r+1}$（在 $t^{+}<t$ 时撤销展开后）。
+事实上，假设 $\tilde{\delta}_r$ 和 $\tilde{\delta}_{r+1}$ 对应于在原始网络中分别以时间 $\tau_r$ 和 $\tau_{r+1}$ 出发的弧 $a'_r$ 和 $a'_{r+1}$（在 $t^{+}<t$ 时撤销展开后）。
 若 $\tilde{\delta}_{r+1}-\tilde{\delta}_r<\minInterdepTime_{ij}$，则 $\tau_{r}\le\tau_{r+1}<\tau_r+\minInterdepTime_{ij}$（模 $H$），因此两条弧都属于 $\arcDuringSepTime_{ij\tau_r}^{\discretizationFull}$。
 完整模型的约束~\eqref{constr:main.cooldown} 将强制
 \[

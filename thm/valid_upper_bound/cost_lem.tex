@@ -1,10 +1,10 @@
 \begin{lemma}
 \label{lem:time_invariance_cost}
-对任意时间离散化 $\discretization$，将资源类型 $f \in \fleetSet$ 分配到服务弧 $a \in \segArcSet{s}$ 的运营成本仅取决于空间航段 $s \in \segSet$ 和资源类型，与出发或到达时间无关。因此，任意可行路由方案 $\mathbf{\fleetAssignVar}$ 的总运营成本完全由宏观服务频率 $\freq_{sf} = \sum_{a \in \segArcSet{s}} \fleetAssignVar_{af}$ 决定。
+对任意时间离散化 $\discretization$，将资源类型 $f \in \fleetSet$ 分配到服务弧 $a \in \segArcSet{s}$ 的运营成本仅取决于空间航段 $s \in \segSet$ 和资源类型，与出发或到达时间无关。因此，任意可行路径方案 $\mathbf{\fleetAssignVar}$ 的总运营成本完全由宏观服务频率 $\freq_{sf} = \sum_{a \in \segArcSet{s}} \fleetAssignVar_{af}$ 决定。
 \end{lemma}
 
 \begin{proof}
-由问题定义，对于使用资源类型 $f$ 经过航段 $(i,j)$ 的任意服务弧 $a$，其运营成本 $\cost_{af}$ 是空间常数 $\cost_{sf}$。设 $\mathbf{\fleetAssignVar}$ 为给定时间离散化上的可行路由向量。总运营成本为：
+由问题定义，对于使用资源类型 $f$ 经过航段 $(i,j)$ 的任意服务弧 $a$，其运营成本 $\cost_{af}$ 是空间常数 $\cost_{sf}$。设 $\mathbf{\fleetAssignVar}$ 为给定时间离散化上的可行路径向量。总运营成本为：
 \begin{equation*}
     \cost(\mathbf{\fleetAssignVar}) = \sum_{f \in \fleetSet} \sum_{a \in \arcSet} \cost_{af} \fleetAssignVar_{af}
 \end{equation*}

@@ -14,7 +14,7 @@ $\inArcSet{(i,t)}$ 是 $\biguplus_{(i,\tau)\in\Phi_{\nodeSet}^{-1}(i,t)}\inArcSe
 \end{aligned}
 \end{equation*}
 完整网络中每个节点 $(i,\tau)\in\full{\nodeSet}$ 满足完整模型的流量平衡，因此对 $\Phi_{\nodeSet}^{-1}(i,t)$ 求和得零。
-$\Phi_{\arcSet}^{-1}(\bot)$ 中的弧起止于同一集合 $\Phi_{\nodeSet}^{-1}(i,t)$ 内，因此其贡献相互抵消，确保无残余流量。
+$\Phi_{\arcSet}^{-1}(\bot)$ 中的弧起止于同一集合 $\Phi_{\nodeSet}^{-1}(i,t)$ 内，因此其贡献相互抵消，不会影响松弛模型里的流量平衡。
 \[
 \sum_{a\in\outArcSet{(i,t)}}\fleetAssignVar_{af} - \sum_{a\in\inArcSet{(i,t)}}\fleetAssignVar_{af} = \sum_{(i,\tau)\in\Phi_{\nodeSet}^{-1}(i,t)} (\sum_{a'\in\outArcSet{(i,\tau)}}\bar{\fleetAssignVar}_{a'f} - \sum_{a'\in\inArcSet{(i,\tau)}}\bar{\fleetAssignVar}_{a'f}) = 0.
 \]
