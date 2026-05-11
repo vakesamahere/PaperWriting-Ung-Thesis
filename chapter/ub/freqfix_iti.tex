@@ -1,27 +1,11 @@
 \subsection{完整网络上的上界修复模型}
 \label{sec:ub}
 
-下界模型在聚合网络上给出有效下界，但其解在映射回精确运营时间时往往物理不可行。为获得原问题的可行解，本节提出一个始终建立在完整时空网络$\full{\net}$上的MIP修复模型。该模型利用下界解提供的宏观结构信息——服务频率模式和超级行程收入上界——来引导完整网络上的排班修复，从而高效地产生高质量可行解作为上界。
+下界模型在聚合网络和超级行程空间上给出有效下界，但其解在映射回精确运营时间时往往物理不可行。为获得原问题的可行解，本文在完整时空网络$\full{\net}$上构造上界修复模型。一方面，超级行程诱导的收入结构被转化为完整网络中的收入层强化约束，用于限制同一聚合选择集内原始行程可共同获得的收入；另一方面，松弛解给出的路段--资源频率提供物理服务骨架，减少完整网络上的排班搜索空间。由此，上界模型在完整网络上保持可行性，同时继承超级行程表示对收入高估的抑制作用。
 
-\subsection{频率固定约束}
-频率固定的核心假设是，虽然松弛解定义在粗糙网络上——因此当映射到精确时间时可能物理不可行——但它在资源分配方面做出了高度准确的决策。因此，松弛模型确定的资源频率是高度可信的，可以在当前迭代中锁定。
+\subsubsection*{超级行程收入约束}
 
-令$\fleetAssignVar^{*}$为从松弛模型获得的整数最优解。我们计算每个物理路段$s=(i,j)$和资源类型$f$的服务频率：
-\begin{equation}
-    \freq_{s,f} = \sum_{a \in \segArcSet{s}} \fleetAssignVar_{a,f}^{*}  \quad \in \mathbb{Z}_{\ge 0}
-\end{equation}
-
-然后我们通过强制执行这些计数来构造上界模型。我们将原始模型$\model{\discretizationFull}$中的通用频率约束~\eqref{constr:main.seg_freq}替换为：
-\begin{equation}
-    \sum_{a \in \full{\segArcSet{s}}} \fleetAssignVar_{a,f} = \freq_{s,f}, \quad \forall s \in \segSet, f \in \fleetSet
-    % temp-command \tag{3e}
-    \label{constr:ubm.freq_fix}
-\end{equation}
-
-通过强制求解器尊重松弛解的量，求解器的负担被减少为找到满足流平衡的最佳可行时间。这有效地将多方面的原始模型简化为纯调度问题。
-
-\subsection{通过行程割解决收入高估}
-标准频率固定仅在物理网络层面锁定了宏观资源分布，但留下了使模型难以求解的行程选择与收入高估问题。为了在完整网络上高效恢复可行解，我们将超级行程作为连接聚合空间与完整空间的结构化桥梁注入上界模型。我们引入连续市场份额变量$\shareSVar_{R,p,\ell} \in [0, 1]$，表示旅客类型$p$在票价等级$\ell$下选择超级行程$R$的市场需求比例。通过添加与超级行程绑定的行程割，我们强制完整网络上的细粒度行程组合必须受到其对应的超级行程收入上界的支配。这并非单纯的数值约束，而是利用聚合模型诱导的行程结构来限制完整空间中的搜索，从而显著收紧上界并加速分支定界过程的收敛。这些割的详细公式如下：
+为将超级行程表示反向嵌入完整网络，我们引入辅助连续变量$\shareSVar_{R,p,\ell} \in [0, 1]$，表示旅客类型$p$在票价等级$\ell$下选择超级行程$R$的市场需求比例。该变量仅用于表达超级行程层面的收入约束，并不替代完整模型中的原始行程份额变量$\shareVar$；UBM仍通过原始约束\eqref{constr:main.choice.ratio}--\eqref{constr:main.choice.covering}保证生成解在完整网络上可行。$\shareSVar$在完整网络上与超级行程的选择结构绑定：
 \begin{equation}
     \outAttr_{mp}\, \shareSVar_{Rp\ell} \;\le\; \attrSuper_{Rp\ell}\, \outsideShareVar_{mp}
     \quad \forall m\in \marketSet,\, \forall p\in \psgTypeSet,\, \forall R\in \itinSuperInMarket_{m},\, \forall \ell\in \fareClassSet
@@ -40,78 +24,95 @@
 \end{equation}
 \begin{equation}
     \sum_{m\in \marketSet}\sum_{p\in \psgTypeSet}\sum_{\ell\in \fareClassSet}\sum_{R\in \itinSuperUsingArc{m}{a}} 
-    \demand_{mp}\, \shareSVar_{Rp\ell}\;\le\; \sum_{a'\in \Phi^{-1}(a)}\sum_{f\in \fleetSet} \fleetCap_{f}\, \fleetAssignVar_{a'f}
+    \demand_{mp}\, \shareSVar_{Rp\ell}\;\le\; \sum_{a'\in \Phi_{\arcSet}^{-1}(a)}\sum_{f\in \fleetSet} \fleetCap_{f}\, \fleetAssignVar_{a'f}
     \quad \forall a\in \flightArc
     % temp-command \tag{3h}
     \label{constr:ubm.itinerary_cut.choice.capacity}
 \end{equation}
 \begin{equation}
-    \sum_{a'\in \Phi^{-1}(a)}\sum_{f\in \fleetSet} \fleetAssignVar_{a'f} \;\ge\; \shareSVar_{Rp\ell}
+    \sum_{a'\in \Phi_{\arcSet}^{-1}(a)}\sum_{f\in \fleetSet} \fleetAssignVar_{a'f} \;\ge\; \shareSVar_{Rp\ell}
     \quad \forall a\in \flightArc,\; \forall m\in \marketSet,\, \forall R\in \itinSuperUsingArc{m}{a},\, \forall p\in \psgTypeSet,\,\forall \ell\in\fareClassSet
     % temp-command \tag{3i}
     \label{constr:ubm.itinerary_cut.choice.covering}
 \end{equation}
+
+约束\eqref{constr:ubm.itinerary_cut.choice.ratio}--\eqref{constr:ubm.itinerary_cut.choice.covering}确保超级行程份额变量$\shareSVar_{R,p,\ell}$在宏观层面表示客户选择行为。在此基础上，收入约束将超级行程份额与底层原始行程份额显式关联：
 \begin{equation}
-   \shareSVar_{R,p,\ell} \cdot \fare_{R,\ell} \;\le\; \sum_{r \in R} \shareVar_{r, p, \ell} \cdot \fare_{r,\ell}
+   \sum_{r \in \eqClassByPathSig_{(R)}} \demand_{mp}\,\fare_{r,\ell}\, \shareVar_{r, p, \ell} \;\le\; \demand_{mp}\,\fare_{R,\ell}\, \shareSVar_{R,p,\ell}
+   \quad \forall m\in \marketSet,\, \forall p\in \psgTypeSet,\, \forall R\in \itinSuperInMarket_{m},\, \forall \ell\in \fareClassSet
    % temp-command \tag{3n}
    \label{constr:ubm.itinerary_cut.cut}
 \end{equation}
+该约束强制超级行程$R$内底层原始行程的总收入不超过超级行程层面的收入。通过这一结构化约束，聚合模型中对收入高估的抑制作用被传递到完整网络的搜索过程中，显著加速分支定界的收敛。
 
-总体而言，约束\eqref{constr:ubm.itinerary_cut.choice.ratio}-\eqref{constr:ubm.itinerary_cut.choice.covering}确保超级行程份额$\shareSVar_{R,p,\ell}$在宏观层面（部分网络中的时间窗口）表示客户选择行为，并产生不少于其组成细粒度行程聚合份额的份额。割\eqref{constr:ubm.itinerary_cut.cut}明确将超级行程份额变量与细粒度份额变量联系起来，确保超级行程的收入贡献支配其底层行程的总和。通过强制超级行程与其组成行程之间的这些关系，我们有效地收紧了上界并引导求解器朝向解空间中更有前景的区域，从而加速收敛到全局最优。
+\subsubsection*{频率固定约束}
 
-令$\textbf{c}^{\mathrm{LB}}$表示$\model{\discretization, \itinSetSuper}$最优目标值的成本项。令$\textbf{r}^{\mathrm{LB}}$表示$\model{\discretization, \itinSetSuper}$最优目标值的收入项。由命题~\ref{pro.valid_relaxation}，$\model{\discretization, \itinSetSuper}$构成完整模型的有效松弛；由此可得原始问题任何可行解的最优收入以$\textbf{r}^{\mathrm{LB}}$为下界。我们通过附加以下有效不等式来明确利用这一界：
+松弛解虽然定义在粗糙网络上，但其在路段--资源频率层面的决策通常高度准确。本文将松弛解给出的频率模式锁定为完整网络上的硬约束，从而将原问题简化为在给定服务骨架下的排班修复问题。
+
+令$\fleetAssignVar^{*}$为从松弛模型获得的整数最优解。计算每个物理路段$s=(i,j)$和资源类型$f$的服务频率：
 \begin{equation}
-    \sum_{m\in \marketSet}\sum_{p\in \psgTypeSet}\sum_{\ell\in \fareClassSet}\sum_{r\in \itinInMarket_m}
-    \demand_{mp}\, \fare_{r\ell}\, \shareVar_{rp\ell} \;\le\; \textbf{r}^{\mathrm{LB}}
-    % temp-command \tag{3o}
-    \label{constr:ubm.obj_cut}
+    \freq_{s,f} = \sum_{a \in \segArcSet{s}} \fleetAssignVar_{a,f}^{*}  \quad \in \mathbb{Z}_{\ge 0}
 \end{equation}
-该割明确排除了总收入严格低于已知下界的所有LP解，从而收紧可行域并减少分支定界过程的有效搜索空间。
+在完整网络上强制执行该频率：
+\begin{equation}
+    \sum_{a \in \full{\segArcSet{s}}} \fleetAssignVar_{a,f} = \freq_{s,f}, \quad \forall s \in \segSet, f \in \fleetSet
+    % temp-command \tag{3e}
+    \label{constr:ubm.freq_fix}
+\end{equation}
 
-因此，我们有一个协同结合频率固定和行程割的上界生成模块，有效地将松弛LB解修复为高质量可行解，引导精确求解器朝向全局最优，写作如下：
+\subsubsection*{变量缩减}
+
+基于固定的聚合频率$\freq_{s,f}$，可以执行一系列精确的变量缩减。对于任何物理路段$s \in \segSet$和资源类型$f \in \fleetSet$，如果$\freq_{s,f} = 0$，则路段$s$上不运营$f$型服务，相应变量固定为零：
+\begin{equation}
+    \fleetAssignVar_{a,f} = 0, \quad \forall a \in \full{\segArcSet{s}} \text{ 若 } \freq_{s,f} = 0
+\end{equation}
+
+由于行程$r$（或超级行程$R$）由一系列时空服务弧组成，移除其任何底层物理路段的所有容量直接切断物理路径。记$s \in r$（或$s \in R$）表示物理路段$s$被行程$r$（或超级行程$R$）的时空弧所经过。若行程依赖于$\sum_{f\in\fleetSet} \freq_{s,f} = 0$的路段，则该行程不可行，相应份额变量固定为零：
+\begin{equation}
+    \shareVar_{r,p,\ell} = 0, \quad \text{若 } \exists s \in r \text{ s.t. } \sum_{f\in\fleetSet} \freq_{s,f} = 0
+\end{equation}
+\begin{equation}
+    \shareSVar_{R,p,\ell} = 0, \quad \text{若 } \exists s \in R \text{ s.t. } \sum_{f\in\fleetSet} \freq_{s,f} = 0
+\end{equation}
+
+对于任何市场$m \in \marketSet$，如果其所有行程和超级行程均被消除，则外部选项份额变为常数$\outsideShareVar_{mp} = \outAttr_{mp}/\adjOutAttr_{mp}$，相关选择约束可从模型中完全移除。
+
+\subsubsection*{上界修复模型汇总与早停策略}
+
+在写出UBM之前，本文先根据上述变量缩减规则对变量进行固定和删除；下述模型定义在缩减后的变量集合上。
+
+由于服务运营成本仅依赖物理路段和资源类型（即$\cost_{af}=\cost_{\sfa{a},f}$），在频率$\freq_{s,f}$固定后，运营成本项成为常数：
+\[
+    \textbf{c}^{\mathrm{fix}} = \sum_{s\in\segSet}\sum_{f\in\fleetSet} \cost_{s,f}\,\freq_{s,f}.
+\]
+该模型保留完整网络$\full{\net}$上的原始运营约束和原始旅客选择约束，并额外加入频率固定约束与超级行程收入层约束。上界修复模型汇总如下：
 \begin{equation}\begin{aligned}
-    \ubm(\discretizationFull,\model{\discretization, \itinSetSuper}) = \min_{\shareSVar, \shareVar, \fleetAssignVar} \quad & \textbf{c}^{\mathrm{LB}} - \sum_{m\in \marketSet}\sum_{p\in \psgTypeSet}\sum_{\ell\in \fareClassSet}\sum_{r\in \itinInMarket_m} \demand_{mp}\, \shareVar_{rp\ell} \fare_{r,\ell}
+    \ubm(\discretizationFull,\model{\discretization, \itinSetSuper}) = \min_{\shareSVar, \shareVar, \fleetAssignVar} \quad & \textbf{c}^{\mathrm{fix}} - \sum_{m\in \marketSet}\sum_{p\in \psgTypeSet}\sum_{\ell\in \fareClassSet}\sum_{r\in \itinInMarket_m} \demand_{mp}\, \fare_{r,\ell}\, \shareVar_{rp\ell}
     % temp-command \tag{3a}
 \\
     \text{s.t.} \quad
     &
-    \eqref{constr:main.flow}, \eqref{constr:main.fleet_available}, \eqref{constr:main.cooldown}, \eqref{constr:main.seg_freq} \notag
+    \eqref{constr:main.flow}, \eqref{constr:main.fleet_available}, \eqref{constr:main.cooldown} \notag
 \\&
     \eqref{constr:main.choice.ratio}, \eqref{constr:main.choice.limit}, \eqref{constr:main.choice.capacity}, \eqref{constr:main.choice.covering} \notag
 \\&
     \eqref{constr:main.domain.x.flight}, \eqref{constr:main.domain.x.holding}, \eqref{constr:main.domain.w.out}, \eqref{constr:main.domain.w} \notag
 \\&
-    \eqref{constr:ubm.freq_fix}, \eqref{constr:ubm.itinerary_cut.choice.ratio}, \eqref{constr:ubm.itinerary_cut.choice.limit}, \eqref{constr:ubm.itinerary_cut.choice.capacity}, \eqref{constr:ubm.itinerary_cut.choice.covering}, \eqref{constr:ubm.itinerary_cut.cut}, \eqref{constr:ubm.obj_cut} \notag
+    \eqref{constr:ubm.freq_fix}, \eqref{constr:ubm.itinerary_cut.choice.ratio}, \eqref{constr:ubm.itinerary_cut.choice.limit}, \eqref{constr:ubm.itinerary_cut.choice.capacity}, \eqref{constr:ubm.itinerary_cut.choice.covering}, \eqref{constr:ubm.itinerary_cut.cut} \notag
+\\&
+    0 \le \shareSVar_{Rp\ell} \le 1 \quad \forall m\in\marketSet,\, R\in\itinSuperInMarket_m,\, p\in\psgTypeSet,\, \ell\in\fareClassSet \notag
 \end{aligned}\end{equation}
+
 以下定理保证完整网络修复模型$\ubm(\discretizationFull,\model{\discretization, \itinSetSuper})$所生成解的上界有效性。
 \input{thm/valid_upper_bound/_main.tex}
-% --- 关于UBM不可行性处理的明确说明 ---
-% 如果锁定的聚合频率无法在完整时空网络上实现，
-% UBM不可行；在我们的算法中这对应于+\infty的目标值
-% 候选上界被主算法（算法1）忽略。
-% 我们明确声明这一点以澄清不需要额外的后备修复：
-如果UB模型$\ubm(\discretizationFull,\model{\discretization, \itinSetSuper})$在锁定的聚合频率$\freq_{s,f}$下变得不可行，求解器有效地返回一个结果（在我们的算法逻辑中视为$+\infty$的上界）。在这种情况下，算法不更新现有UB，而是进入由LBM不可行性驱动的细化阶段。
-\subsection{变量缩减}
-为加速求解过程，我们基于固定的聚合频率$\freq_{s,f}$应用一系列精确的变量缩减。由于$\freq_{s,f}$决定了可用网络容量，任何零分配服务的物理路段从根本上破坏了连通性，使我们能够安全地将许多变量固定为零，并在将模型发送给求解器之前消除冗余的下游变量和约束。
 
-对于任何物理路段$s \in \segSet$和资源类型$f \in \fleetSet$，如果锁定频率$\freq_{s,f} = 0$，则意味着不能在路段$s$上运营$f$型服务。因此，我们立即将此零分配级联到所有底层服务分配变量：
-\begin{equation}
-    \fleetAssignVar_{a,f} = 0, \quad \forall a \in \full{\segArcSet{s}} \text{ if } \freq_{s,f} = 0
-\end{equation}
-这对这些组合内在地满足频率约束\eqref{constr:ubm.freq_fix}，使我们能够从域中移除这些变量和约束。
+如果UB模型在锁定的聚合频率$\freq_{s,f}$下不可行，则在算法逻辑中视为$+\infty$的上界，算法不更新现有UB，而是进入聚合表示细化阶段。
 
-由于行程$r$（或超级行程$R$）从根本上由一系列时空服务弧组成，移除其任何底层物理路段的所有容量直接切断了这些物理路径。为记号方便，我们写$s \in r$（或$s \in R$）表示物理路段$s$被行程$r$（或超级行程$R$）的时空弧所经过。如果行程依赖于没有任何资源类型分配服务的路段$s$（即$\sum_{f\in\fleetSet} \freq_{s,f} = 0$），则该行程变得物理不可能。由于覆盖约束\eqref{constr:main.choice.covering}和\eqref{constr:ubm.itinerary_cut.choice.covering}，与此类行程相关的市场份额降为零：
-\begin{equation}
-    \shareVar_{r,p,\ell} = 0, \quad \text{if } \exists s \in r \text{ s.t. } \sum_{f\in\fleetSet} \freq_{s,f} = 0
-\end{equation}
-\begin{equation}
-    \shareSVar_{R,p,\ell} = 0, \quad \text{if } \exists s \in R \text{ s.t. } \sum_{f\in\fleetSet} \freq_{s,f} = 0
-\end{equation}
-这些零值变量可以从模型中明确移除。因此，给定超级行程$R$的行程割约束\eqref{constr:ubm.itinerary_cut.cut}只有在其所有组成细粒度行程$r \in R$都被关闭（即固定为零）时才能完全删除。如果只有$r \in R$的子集被移除，约束\eqref{constr:ubm.itinerary_cut.cut}必须保留以将超级行程变量$sw_R$与剩余活跃的细粒度行程绑定。
-
-对于任何市场$m \in \marketSet$，如果其所有组成活跃行程$r \in \itinInMarket_{m}$和超级行程$R \in \itinSuperInMarket_{m}$都被上述缩减消除，则触发纯未服务场景。该市场中的旅客根本没有可选择的可用服务选项。
-根据选择限制恒等约束\eqref{constr:main.choice.limit}，外部选项份额变量$\outsideShareVar_{mp}$不可避免地变为完全由相应效用限制的确定性常数：
-\begin{equation}
-    \outsideShareVar_{mp} = \frac{\outAttr_{mp}}{\adjOutAttr_{mp}}, \quad \text{if } \shareVar_{r,p,\ell} = 0 \; \forall r \in \itinInMarket_m
-\end{equation}
-因此，我们可以将$\outsideShareVar_{mp}$作为变量完全消除，并将市场$m$相关的选择限制约束\eqref{constr:main.choice.limit}和比率限制约束\eqref{constr:main.choice.ratio}从优化框架中完全移除，显著压缩约束矩阵维度。
+由于上界修复模型的作用是为原问题生成可行解，而不一定需要完全求解到最优，本文在求解UBM时采用基于当前全局下界的早停策略。设当前下界模型给出的下界为$LB$，UBM当前找到的最好可行解目标值为$z^{\mathrm{inc}}$。一旦
+\[
+    z^{\mathrm{inc}} - LB \le \epsilon
+\]
+或满足相应的相对间隙容差，UBM即可提前终止；此时该可行解已经足以证明当前全局最优性容差。由于频率固定后成本项为常数$\textbf{c}^{\mathrm{fix}}$，上述条件等价于收入达到目标阈值：
+\[
+    \mathrm{Rev}^{\mathrm{inc}} \ge \textbf{c}^{\mathrm{fix}} - LB - \epsilon.
+\]
