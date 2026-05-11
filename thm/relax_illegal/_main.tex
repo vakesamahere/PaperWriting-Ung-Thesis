@@ -1,11 +1,11 @@
 \begin{theorem}
 \label{thm:relax_illegal}
-松弛模型 $\model{\discretization}$ 的解 $\solution = (\fleetAssignVar^*, \shareVar^*, \outsideShareVar^*)$ 在原始模型 $\model{\discretizationFull}$ 中是非法的，当且仅当以下三个条件之一成立：
+松弛模型 $\model{\discretization, \itinSetSuper}$ 的解 $\solution = (\fleetAssignVar^*, \shareVar^*, \outsideShareVar^*)$ 在原始模型 $\model{\discretizationFull}$ 中是非法的，当且仅当以下三个条件之一成立：
 \begin{enumerate}
     % 不可能出发：
     \item 存在至少一个节点 $(i, t)$ 和资源类型 $f$，使得节点 $(i, t)$ 处资源类型 $f$ 的出发需求超过可用供给，即 $\impDeparts(i,t,f) > 0$。
     % 间隔出发：
-    \item 存在航段 $(i,j)$ 和出发时间 $t$，使得在最小周转时间内从节点 $i$ 到 $j$ 有多于一次服务出发，即 $\arcDepartFlow_{ijt} > 1$。
+    \item 存在物理路段 $(i,j)$ 和出发时间 $t$，使得在最小间隔时间内从节点 $i$ 到 $j$ 有多于一次服务出发，即 $\arcDepartFlow_{ijt} > 1$。
     % 虚幻收益：
     \item 存在解中的某个超级行程，其收益贡献无法由原始行程的任何组合实现，即 $RFS(\solution) > 0$。
 \end{enumerate}

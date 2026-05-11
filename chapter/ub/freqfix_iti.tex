@@ -106,7 +106,7 @@
 以下定理保证完整网络修复模型$\ubm(\discretizationFull,\model{\discretization, \itinSetSuper})$所生成解的上界有效性。
 \input{thm/valid_upper_bound/_main.tex}
 
-如果UB模型在锁定的聚合频率$\freq_{s,f}$下不可行，则在算法逻辑中视为$+\infty$的上界，算法不更新现有UB，而是进入聚合表示细化阶段。
+如果UB模型在锁定的聚合频率$\freq_{s,f}$下不可行，则在算法逻辑中视为$+\infty$的上界，算法不更新现有UB，而是进入松弛解可实现性检验与时间点添加步骤。
 
 由于上界修复模型的作用是为原问题生成可行解，而不一定需要完全求解到最优，本文在求解UBM时采用基于当前全局下界的早停策略。设当前下界模型给出的下界为$LB$，UBM当前找到的最好可行解目标值为$z^{\mathrm{inc}}$。一旦
 \[

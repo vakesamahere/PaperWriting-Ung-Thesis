@@ -1,4 +1,4 @@
 \begin{theorem}
 \label{thm:refine_converge}
-第~\ref{sec:refine_process}小节中描述的细化策略，在松弛解于原始模型中非法时，将至少向时间离散化 $\discretization$ 中添加1个新时间点。因此，经过有限次迭代后，算法将收敛到全局最优解。
+第~\ref{sec:refine_process}~节中的时间点添加规则在松弛解非法时至少向当前离散化$\discretization$中加入一个尚未包含的完整网络时间点。由于始终有$\discretization\subseteq\discretizationFull$且$\discretizationFull$为有限集合，非法松弛解只能被排除有限次。因此，在不受最大迭代次数提前截断的情况下，算法在有限次迭代内收敛到全局最优解。
 \end{theorem}

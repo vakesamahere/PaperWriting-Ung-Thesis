@@ -23,4 +23,4 @@
 \begin{equation}
     \sepViolAmount_{ijt} > 0,
 \end{equation}
-则解包含间隔出发违规（定理~\ref{thm:relax_illegal}中的第二个非法条件）。该度量识别哪些物理路段和时间窗口需要细化或约束收紧。通过向离散化$\discretization^{1}$添加时间点，我们可以确保所有这些间隔出发违规在细化模型中不会发生。记细化后的离散化为$\discretization^{2}$。细化过程将在第~\ref{sec:refine_process}~小节中描述。
+则解包含间隔出发违规（定理~\ref{thm:relax_illegal}中的第二个非法条件）。该度量识别哪些物理路段和时间窗口需要添加时间点。通过向当前离散化$\discretization$添加相应时间点，可以确保所有这些间隔出发违规在更新后的离散化中不会发生。
