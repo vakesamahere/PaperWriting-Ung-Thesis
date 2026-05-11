@@ -1,10 +1,10 @@
 \chapter{问题描述}\label{sec:model_overview}
 
-本研究解决一个同时考虑服务调度、资源分配和旅客选择行为的服务网络设计问题。在给出数学公式之前，我们正式引入表征该问题的核心术语和参数。
+本研究解决一个同时考虑服务调度、资源分配和顾客选择行为的服务网络设计问题。在给出数学公式之前，我们正式引入表征该问题的核心术语和参数。
 
 \section{概念与参数}
 
-一个空间起讫点（OD）对及其相关的需求特征定义了一个市场，用集合$m \in \marketSet$表示。在每个市场中，总旅客需求初始给定为$\demand_{mp}$，对应不同旅客类型$p \in \psgTypeSet$（例如商务或休闲），代表不同的效用偏好和出行紧迫性。此外，票务产品按票价等级$\ell \in \fareClassSet$划分，以捕获定价结构。
+一个空间起讫点（OD）对及其相关的需求特征定义了一个市场，用集合$m \in \marketSet$表示。在每个市场中，总顾客需求初始给定为$\demand_{mp}$，对应不同顾客类型$p \in \psgTypeSet$（例如商务或休闲），代表不同的效用偏好和出行紧迫性。此外，票务产品按票价等级$\ell \in \fareClassSet$划分，以捕获定价结构。
 
 网络中两个节点之间的物理、时间无关的轨迹称为空间航段$s \in \segSet$。对于每个航段$s$，运营商通常规定在规划时域内需要执行的预定服务运营次数$\freq_s$以维持市场存在。此外，为确保稳定运营，在同一航段$s=(i,j)$上出发的服务必须遵守最小间隔时间；我们定义$\arcDuringSepTime_{ijt}$为从时间$t$开始在该间隔时间内在航段$s$上出发的服务弧集合。运营商部署一组服务资源类型$f \in \fleetSet$。每种资源类型有一个受限的最大可用单位数$\fleetAvail_f$，以及特定的容量$\fleetCap_{f}$和运营成本。
 
@@ -22,9 +22,9 @@
 
 完全离散化，记为$\discretizationFull$，表示以最小标准时间分辨率$\discretizationStep$（例如5分钟）制定的完整时间线，包含每一个可能的运营时刻。在该完整时间线上生成的图、节点和弧的集合代表了真实的、未松弛的完整问题空间。本文中按照惯例，当我们讨论时空网络、节点或弧（如$\net$、$\nodeSet$或$\flightArc$）而不带帽子记号时，它们通常属于一般的、可能缩减的离散化$\discretization$。当我们明确希望引用完全离散化$\discretizationFull$下的集合时，我们在集合上添加帽子记号（例如$\full{\net}$、$\full{\flightArc}$或$\full{\segArcSet{s}}$），以清楚区分精确的原始问题域与任何工作子集。
 
-旅客通过选择行程$r \in \itinSet$来完成其旅行。在我们的模型中，行程不仅仅是一系列空间航段，而是严格定义为在完全离散化$\discretizationFull$上建立的按时间顺序可连接的服务弧序列。服务市场$m$的所有有效行程的集合记为$\itinInMarket_m$。如果运营商的时刻表未提供有吸引力或可行的行程，旅客通过选择外部选项退出系统。
+顾客通过选择行程$r \in \itinSet$来完成其旅行。在我们的模型中，行程不仅仅是一系列空间航段，而是严格定义为在完全离散化$\discretizationFull$上建立的按时间顺序可连接的服务弧序列。服务市场$m$的所有有效行程的集合记为$\itinInMarket_m$。如果运营商的时刻表未提供有吸引力或可行的行程，顾客通过选择外部选项退出系统。
 
-为在优化框架中内生地捕获旅客选择行为，我们采用\cite{gallego2015general}提出的基于广义吸引力模型（GAM）的基于销售的线性规划（SBLP）。在此背景下，市场$m$中旅客类型$p$对特定行程-票价组合$(r, \ell)$的偏好由确定性名义吸引力参数量化，记为$\attr_{rp\ell}$。类似地，外部选项被赋予名义吸引力值$\outAttr_{mp}$。这些参数通常从离散选择模型导出，例如多项Logit（MNL）模型，其中$\attr_{rp\ell} = \exp(V_{rp\ell})$，$V_{rp\ell}$是市场$m$中旅客类型$p$在票价等级$\ell$下行程$r$的系统效用。
+为在优化框架中内生地捕获顾客选择行为，我们采用\cite{gallego2015general}提出的基于广义吸引力模型（GAM）的基于销售的线性规划（SBLP）。在此背景下，市场$m$中顾客类型$p$对特定行程-票价组合$(r, \ell)$的偏好由确定性名义吸引力参数量化，记为$\attr_{rp\ell}$。类似地，外部选项被赋予名义吸引力值$\outAttr_{mp}$。这些参数通常从离散选择模型导出，例如多项Logit（MNL）模型，其中$\attr_{rp\ell} = \exp(V_{rp\ell})$，$V_{rp\ell}$是市场$m$中顾客类型$p$在票价等级$\ell$下行程$r$的系统效用。
 
 如\cite{gallego2015general}所示，标准吸引力模型（如基本吸引力模型和多项Logit模型）在偏好选项不可用时往往高估回收率。为解决这一问题，GAM框架引入了影子吸引力的概念，以提供更灵活的替代行为表示。
 遵循该框架，我们定义$\adjAttr_{rp\ell}$为行程$r$在票价$\ell$下的调整吸引力，$\adjOutAttr_{mp}$为外部选项的调整吸引力。
@@ -33,15 +33,15 @@
 
 \section{基准数学模型}
 
-为对问题进行数学表述，我们引入以下表示服务运营和旅客选择的主要决策变量。
+为对问题进行数学表述，我们引入以下表示服务运营和顾客选择的主要决策变量。
 
 主要运营决策捕获了时空网络上服务资源的分配。我们定义$\fleetAssignVar_{af}$为分配到弧$a \in \arcSet$上的$f$型资源（$f \in \fleetSet$）的数量。对于服务弧$a \in \flightArc$，$\fleetAssignVar_{af} \in \{0, 1\}$作为二元变量，指示该特定服务是否由资源类型$f$运营。对于持有弧$a \in \holdingArc$，$\fleetAssignVar_{af} \ge 0$是连续变量，表示在节点处等待的空闲资源数量。
 
-此外，为捕获市场需求满足情况，我们定义$\shareVar_{rp\ell} \ge 0$为市场$m$中旅客类型$p \in \psgTypeSet$在票价等级$\ell \in \fareClassSet$下预订行程$r \in \itinInMarket_{m}$的旅客数量。相应地，$\outsideShareVar_{mp} \ge 0$表示市场$m$中旅客类型$p$选择"外部选项"（即不从运营商处购买任何服务）的旅客量。
+此外，为捕获市场需求满足情况，我们定义$\shareVar_{rp\ell} \ge 0$为市场$m$中顾客类型$p \in \psgTypeSet$在票价等级$\ell \in \fareClassSet$下预订行程$r \in \itinInMarket_{m}$的顾客数量。相应地，$\outsideShareVar_{mp} \ge 0$表示市场$m$中顾客类型$p$选择"外部选项"（即不从运营商处购买任何服务）的顾客量。
 
 \section{数学公式}
 
-我们采用\citet{wei2020airline}提出的数学公式$\model{\discretizationFull}$来处理考虑旅客选择的综合服务网络设计问题。该模型在离散选择框架下同时优化资源分配决策和旅客需求分配，捕获运营调度与收入生成之间的相互依赖关系。
+我们采用\citet{wei2020airline}提出的数学公式$\model{\discretizationFull}$来处理考虑顾客选择的综合服务网络设计问题。该模型在离散选择框架下同时优化资源分配决策和顾客需求分配，捕获运营调度与收入生成之间的相互依赖关系。
 
 \full{
 \noindent\textbf{目标函数}
@@ -80,7 +80,7 @@
     % temp-command \tag{1e}
     \label{constr:main.seg_freq}
 \end{equation}
-\noindent\textbf{旅客选择约束}
+\noindent\textbf{顾客选择约束}
 \begin{equation}
     \outAttr_{mp}\, \shareVar_{rp\ell} \;\le\; \attr_{rp\ell}\, \outsideShareVar_{mp}
     \quad \forall m\in \marketSet,\, \forall p\in \psgTypeSet,\, \forall r\in \itinInMarket_{m},\, \forall \ell\in \fareClassSet
@@ -134,11 +134,11 @@
 \end{equation}
 }
 
-该模型定义了在资源和时间约束下将服务与旅客行程匹配的综合计划。目标函数\eqref{objfun:main}最小化总运营成本减去总票务收入，有效地最大化运营商的整体利润。对于资源分配，约束\eqref{constr:main.flow}确保流守恒，即到达任何时空节点$(i, t)$的$f$型资源数量恰好等于离开的数量。约束\eqref{constr:main.fleet_available}限制资源利用率，确保在指定计数时间$\checkTime$处从事服务（$\flightArcTc{\checkTime}$）和持有（$\holdingArcTc{\checkTime}$）的资源总数不超过可用资源限制$\fleetAvail_f$。为管理运营密度，令$\arcDuringSepTime_{ijt} = \{a=((i,t^\prime)\rightarrow(j,t^{\prime\prime}))\;\forall a\in\flightArc\mid t\leq t^\prime<t+\minInterdepTime_{ij} \}$表示从时间$t$开始在最小间隔时间内在航段$s=(i,j)$上出发的服务弧集合。则约束\eqref{constr:main.cooldown}强制执行最小出发间隔时间，防止多个服务在集合$\arcDuringSepTime_{ijt}$指定的时间段内在同一空间航段$(i,j)$上出发，而约束\eqref{constr:main.seg_freq}强制时刻表恰好满足每个航段$s$所需的预定运营频率$\freq_s$。约束\eqref{constr:main.choice.ratio}-\eqref{constr:main.choice.covering}表示旅客选择约束。最后，约束\eqref{constr:main.domain.x.flight}至\eqref{constr:main.domain.w}将资源分配和旅客分配变量限制在其适当的域中。
+该模型定义了在资源和时间约束下将服务与顾客行程匹配的综合计划。目标函数\eqref{objfun:main}最小化总运营成本减去总票务收入，有效地最大化运营商的整体利润。对于资源分配，约束\eqref{constr:main.flow}确保流守恒，即到达任何时空节点$(i, t)$的$f$型资源数量恰好等于离开的数量。约束\eqref{constr:main.fleet_available}限制资源利用率，确保在指定计数时间$\checkTime$处从事服务（$\flightArcTc{\checkTime}$）和持有（$\holdingArcTc{\checkTime}$）的资源总数不超过可用资源限制$\fleetAvail_f$。为管理运营密度，令$\arcDuringSepTime_{ijt} = \{a=((i,t^\prime)\rightarrow(j,t^{\prime\prime}))\;\forall a\in\flightArc\mid t\leq t^\prime<t+\minInterdepTime_{ij} \}$表示从时间$t$开始在最小间隔时间内在航段$s=(i,j)$上出发的服务弧集合。则约束\eqref{constr:main.cooldown}强制执行最小出发间隔时间，防止多个服务在集合$\arcDuringSepTime_{ijt}$指定的时间段内在同一空间航段$(i,j)$上出发，而约束\eqref{constr:main.seg_freq}强制时刻表恰好满足每个航段$s$所需的预定运营频率$\freq_s$。约束\eqref{constr:main.choice.ratio}-\eqref{constr:main.choice.covering}表示顾客选择约束。最后，约束\eqref{constr:main.domain.x.flight}至\eqref{constr:main.domain.w}将资源分配和顾客分配变量限制在其适当的域中。
 
 \section{计算复杂性与规模}\label{sec:complexity}\label{sec:preconditioning}
 
-\problemName 问题是NP-难的。为证明这一点，考虑一个去除旅客选择的受限版本：每个市场具有固定需求、单一可接受行程和固定收入，选择一致性约束\eqref{constr:main.choice.ratio}--\eqref{constr:main.choice.limit}不活跃。剩余问题是时空网络上具有二元服务激活和资源分配决策、受容量和流平衡约束的服务网络设计问题。该类包含有容量固定费用多商品网络设计问题作为特例，已知其为NP-难。因此，\problemName 通过添加行程级选择变量和选择一致性约束推广了该受限问题，是NP-难的。
+\problemName 问题是NP-难的。为证明这一点，考虑一个去除顾客选择的受限版本：每个市场具有固定需求、单一可接受行程和固定收入，选择一致性约束\eqref{constr:main.choice.ratio}--\eqref{constr:main.choice.limit}不活跃。剩余问题是时空网络上具有二元服务激活和资源分配决策、受容量和流平衡约束的服务网络设计问题。该类包含有容量固定费用多商品网络设计问题作为特例，已知其为NP-难。因此，\problemName 通过添加行程级选择变量和选择一致性约束推广了该受限问题，是NP-难的。
 
 核心挑战在于可行行程的组合爆炸。每个市场允许由一个或多个在中间节点连接的服务弧组成的行程集合。此类行程的数量随网络规模、允许的中转次数和离散化的时间分辨率快速增长。考虑一个具有$|\airportSet|$个节点和$|\segSet|$条有向航段的网络。在24小时规划时域上以$\discretizationStep$分钟的离散化步长，每个航段允许最多$\lfloor 24 \times 60 / \discretizationStep \rfloor$个候选出发时间。对于最多$k$次中转和最大中转窗口$W$分钟的多段行程，可行行程的数量呈组合增长：每增加一段将可能性乘以中转窗口内兼容的后续出发数量。确切数量取决于网络拓扑、航段频率、中转时间规则和OD市场集合。
 

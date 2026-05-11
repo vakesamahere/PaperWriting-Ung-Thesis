@@ -1,7 +1,7 @@
 \subsection{虚假收入}
 当松弛解$\solution = (\fleetAssignVar^*, \shareVar^*, \outsideShareVar^*)$同时满足资源可用性和间隔出发约束时，如果它依赖于"虚假收入"，仍可能是非法的。当聚合超级行程声称的收入无法由其组成原始行程在完全离散化网络中的任何有效组合物理实现时，就会发生这种情况。
 
-由于基于销售的线性规划（SBLP）的高度耦合性质，外部选项份额$\outsideShareVar$作为动态变量。可用行程吸引力的局部降低可以将需求转移到外部选项，从而隐式地提高其他行程的选择界并重新分配旅客流。由于这种内生性，通过静态松弛分析评估虚假收入是不充分的。相反，我们建立一个收入可行性子问题（RFS）来建立严格的充要条件。该子问题仅用于检验当前松弛解的收入贡献能否由完整网络中的原始行程组合实现，并不作为下界模型或上界修复模型的一部分。
+由于基于销售的线性规划（SBLP）的高度耦合性质，外部选项份额$\outsideShareVar$作为动态变量。可用行程吸引力的局部降低可以将需求转移到外部选项，从而隐式地提高其他行程的选择界并重新分配顾客流。由于这种内生性，通过静态松弛分析评估虚假收入是不充分的。相反，我们建立一个收入可行性子问题（RFS）来建立严格的充要条件。该子问题仅用于检验当前松弛解的收入贡献能否由完整网络中的原始行程组合实现，并不作为下界模型或上界修复模型的一部分。
 
 在排除不可能出发和间隔出发违规后，考虑聚合运营解$\fleetAssignVar^*$的一个完整网络运营原像$\hat{\fleetAssignVar}$。给定该完整服务分配$\hat{\fleetAssignVar}$，我们寻求检测每条超级行程$R$的目标收入贡献（定义为$Rev_{Rpl}^* = \demand_{mp} \fare_{Rl} \shareVar_{Rpl}^*$）是否可以通过将有效份额$\shareVar_{rpl}$分配给其组成原始行程$r \in \eqClassByPathSig_{(R)}$来实现。我们引入连续松弛变量$s_{Rpl} \ge 0$来捕获每条超级行程的收入缺口。RFS被表述为以下线性规划：
 \full{\begin{align}
@@ -13,6 +13,6 @@ RFS(\solution)=\min_{\shareVar, \outsideShareVar, s} \quad & \sum_{m\in \marketS
 & \shareVar_{rpl} \ge 0, \quad \outsideShareVar_{mp} \ge 0, \quad s_{Rpl} \ge 0 \nonumber
 \end{align}}
 
-约束(\ref{eq:rfs_target})强制底层原始行程满足松弛收入，使用$s_{Rpl}$吸收任何不可避免的赤字。约束(\ref{eq:rfs_ratio})-(\ref{eq:rfs_cap})确保恢复的旅客流严格遵守完整网络服务分配$\hat{\fleetAssignVar}$的物理容量和原始离散选择界。
+约束(\ref{eq:rfs_target})强制底层原始行程满足松弛收入，使用$s_{Rpl}$吸收任何不可避免的赤字。约束(\ref{eq:rfs_ratio})-(\ref{eq:rfs_cap})确保恢复的顾客流严格遵守完整网络服务分配$\hat{\fleetAssignVar}$的物理容量和原始离散选择界。
 
 松弛解$\solution$包含虚假收入（因此是非法的）当且仅当RFS的最优目标值严格大于零（即$\sum s_{Rpl}^* > 0$）。对应于正松弛$s_{Rpl}^* > 0$的超级行程即为导致虚假收入的非法来源。通过向当前离散化$\discretization$添加相应时间点，可以确保所有这些虚假收入违规在更新后的离散化中不会发生。

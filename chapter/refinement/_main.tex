@@ -11,7 +11,7 @@
 \[
     \mathcal{P}(\fleetAssignVar^*) = \left\{\hat{\fleetAssignVar} \;\middle|\; \sum_{\hat{a}\in\Phi_{\arcSet}^{-1}(a)} \hat{\fleetAssignVar}_{\hat{a}f} = \fleetAssignVar^*_{af},\; \forall a\in\arcSet,\; \forall f\in\fleetSet \right\}.
 \]
-称松弛解$\solution_{rel}$相对于完整模型$\model{\discretizationFull}$是非法的，如果不存在$\hat{\fleetAssignVar}\in\mathcal{P}(\fleetAssignVar^*)$以及原始行程层面的旅客流分配$(\hat{\shareVar}, \hat{\outsideShareVar})$，使得$(\hat{\fleetAssignVar}, \hat{\shareVar}, \hat{\outsideShareVar})$在完整模型$\model{\discretizationFull}$中可行，并且其目标值不高于松弛解所声称的目标水平，即$Z(\hat{\fleetAssignVar}, \hat{\shareVar}, \hat{\outsideShareVar}) \le Z_{rel}^*$。
+称松弛解$\solution_{rel}$相对于完整模型$\model{\discretizationFull}$是非法的，如果不存在$\hat{\fleetAssignVar}\in\mathcal{P}(\fleetAssignVar^*)$以及原始行程层面的顾客流分配$(\hat{\shareVar}, \hat{\outsideShareVar})$，使得$(\hat{\fleetAssignVar}, \hat{\shareVar}, \hat{\outsideShareVar})$在完整模型$\model{\discretizationFull}$中可行，并且其目标值不高于松弛解所声称的目标水平，即$Z(\hat{\fleetAssignVar}, \hat{\shareVar}, \hat{\outsideShareVar}) \le Z_{rel}^*$。
 \end{definition}
 
 \input{chapter/refinement/impossible_departure.tex}

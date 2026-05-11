@@ -5,7 +5,7 @@
 
 \subsubsection*{超级行程收入约束}
 
-为将超级行程表示反向嵌入完整网络，我们引入辅助连续变量$\shareSVar_{R,p,\ell} \in [0, 1]$，表示旅客类型$p$在票价等级$\ell$下选择超级行程$R$的市场需求比例。该变量仅用于表达超级行程层面的收入约束，并不替代完整模型中的原始行程份额变量$\shareVar$；UBM仍通过原始约束\eqref{constr:main.choice.ratio}--\eqref{constr:main.choice.covering}保证生成解在完整网络上可行。$\shareSVar$在完整网络上与超级行程的选择结构绑定：
+为将超级行程表示反向嵌入完整网络，我们引入辅助连续变量$\shareSVar_{R,p,\ell} \in [0, 1]$，表示顾客类型$p$在票价等级$\ell$下选择超级行程$R$的市场需求比例。该变量仅用于表达超级行程层面的收入约束，并不替代完整模型中的原始行程份额变量$\shareVar$；UBM仍通过原始约束\eqref{constr:main.choice.ratio}--\eqref{constr:main.choice.covering}保证生成解在完整网络上可行。$\shareSVar$在完整网络上与超级行程的选择结构绑定：
 \begin{equation}
     \outAttr_{mp}\, \shareSVar_{Rp\ell} \;\le\; \attrSuper_{Rp\ell}\, \outsideShareVar_{mp}
     \quad \forall m\in \marketSet,\, \forall p\in \psgTypeSet,\, \forall R\in \itinSuperInMarket_{m},\, \forall \ell\in \fareClassSet
@@ -36,7 +36,7 @@
     \label{constr:ubm.itinerary_cut.choice.covering}
 \end{equation}
 
-约束\eqref{constr:ubm.itinerary_cut.choice.ratio}--\eqref{constr:ubm.itinerary_cut.choice.covering}确保超级行程份额变量$\shareSVar_{R,p,\ell}$在宏观层面表示客户选择行为。在此基础上，收入约束将超级行程份额与底层原始行程份额显式关联：
+约束\eqref{constr:ubm.itinerary_cut.choice.ratio}--\eqref{constr:ubm.itinerary_cut.choice.covering}确保超级行程份额变量$\shareSVar_{R,p,\ell}$在宏观层面表示顾客选择行为。在此基础上，收入约束将超级行程份额与底层原始行程份额显式关联：
 \begin{equation}
    \sum_{r \in \eqClassByPathSig_{(R)}} \demand_{mp}\,\fare_{r,\ell}\, \shareVar_{r, p, \ell} \;\le\; \demand_{mp}\,\fare_{R,\ell}\, \shareSVar_{R,p,\ell}
    \quad \forall m\in \marketSet,\, \forall p\in \psgTypeSet,\, \forall R\in \itinSuperInMarket_{m},\, \forall \ell\in \fareClassSet
@@ -85,7 +85,7 @@
 \[
     \textbf{c}^{\mathrm{fix}} = \sum_{s\in\segSet}\sum_{f\in\fleetSet} \cost_{s,f}\,\freq_{s,f}.
 \]
-该模型保留完整网络$\full{\net}$上的原始运营约束和原始旅客选择约束，并额外加入频率固定约束与超级行程收入层约束。上界修复模型汇总如下：
+该模型保留完整网络$\full{\net}$上的原始运营约束和原始顾客选择约束，并额外加入频率固定约束与超级行程收入层约束。上界修复模型汇总如下：
 \begin{equation}\begin{aligned}
     \ubm(\discretizationFull,\model{\discretization, \itinSetSuper}) = \min_{\shareSVar, \shareVar, \fleetAssignVar} \quad & \textbf{c}^{\mathrm{fix}} - \sum_{m\in \marketSet}\sum_{p\in \psgTypeSet}\sum_{\ell\in \fareClassSet}\sum_{r\in \itinInMarket_m} \demand_{mp}\, \fare_{r,\ell}\, \shareVar_{rp\ell}
     % temp-command \tag{3a}
