@@ -1,7 +1,7 @@
-\section{上界生成}
+\section{完整网络上的强化上界修复模型}
 \label{sec:ub}
 
-虽然LBM提供了有效的下界，但其在粗糙时空网络上的公式通常导致当映射回精确运营时间时物理不可行的解。我们提出一个基于MIP的上界（UB）生成模块，作为基于下界信息的修复算法。该方法旨在从松弛状态重构严格的高质量可行解。本节详细介绍我们\algoNotation 框架中的UB模块。与盲目基于池统计数据修剪活跃弧的纯数据驱动启发式不同，我们提出一种称为频率固定的结构感知宏锁定策略，并通过严格的行程割加以增强。上界模型$\ubm(\discretizationFull,\model{\discretization, \itinSetSuper})$在完整时空网络$\full{\net}$上建立，以确保生成的解对原始问题直接可行，从而提供有效的上界。
+下界模型在聚合网络上给出有效下界，但其解在映射回精确运营时间时往往物理不可行。为获得原问题的可行解，我们提出一个始终建立在完整时空网络$\full{\net}$上的MIP修复模型。该模型利用下界解提供的宏观结构信息——服务频率模式和超级行程收入上界——来引导完整网络上的排班修复，从而高效地产生高质量可行解作为上界。
 
 \subsection{频率固定约束}
 频率固定的核心假设是，虽然松弛解定义在粗糙网络上——因此当映射到精确时间时可能物理不可行——但它在资源分配方面做出了高度准确的决策。因此，松弛模型确定的资源频率是高度可信的，可以在当前迭代中锁定。
@@ -83,7 +83,7 @@
 \\&
     \eqref{constr:ubm.freq_fix}, \eqref{constr:ubm.itinerary_cut.choice.ratio}, \eqref{constr:ubm.itinerary_cut.choice.limit}, \eqref{constr:ubm.itinerary_cut.choice.capacity}, \eqref{constr:ubm.itinerary_cut.choice.covering}, \eqref{constr:ubm.itinerary_cut.cut}, \eqref{constr:ubm.obj_cut} \notag
 \end{aligned}\end{equation}
-以下定理保证$\ubm(\discretizationFull,\model{\discretization, \itinSetSuper})$为原始模型$\model{\discretizationFull}$生成的上界的有效性。
+以下定理保证完整网络修复模型$\ubm(\discretizationFull,\model{\discretization, \itinSetSuper})$所生成解的上界有效性。
 \input{thm/valid_upper_bound/_main.tex}
 % --- 关于UBM不可行性处理的明确说明 ---
 % 如果锁定的聚合频率无法在完整时空网络上实现，

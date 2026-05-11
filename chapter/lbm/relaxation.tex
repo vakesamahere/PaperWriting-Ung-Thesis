@@ -1,7 +1,7 @@
-\section{通过离散化和行程聚合的松弛模型$\model{\discretization, \itinSetSuper}$}
+\section{基于超级行程的下界模型 $\model{\discretization, \itinSetSuper}$}
 \label{sec:lbm}
 
-为解决完整时空网络的可处理性问题，我们引入一种时间松弛方法。该步骤的核心思想是在一个更粗糙的、部分离散化的时空网络上建立松弛模型，从而大幅减小问题规模，同时仍为精确算法保证有效的理论下界。该基础模型忽略了某些严格的时间可行性要求，这些要求在后续算法阶段中得到解决。本节提出的模型在本文其余部分称为下界模型（LBM）或松弛模型。
+为解决完整时空网络的可处理性问题，我们在聚合时空网络和超级行程空间上建立松弛模型。该模型的核心思想是：在一个较粗的工作离散化$\discretization$上构造时空网络，并将原始行程按路径签名合并为超级行程，从而大幅减小问题规模，同时通过超级行程吸引力上界的构造保证有效的理论下界。该模型忽略了某些严格的时间可行性要求，这些要求在上界修复模型和聚合表示细化阶段中得到解决。
 
 % \section*{Understanding $\discretization$}
 我们将$\discretization$视为$\discretizationFull$的一种变换。该变换可以看作时间弧的聚合。
@@ -367,7 +367,7 @@ r \eqRelByPathSig r' \iff \pathSig{r} = \pathSig{r'}
     \label{constr:relax.domain.w}
 \end{align}
 
-以下定理保证松弛模型$\model{\discretization, \itinSetSuper}$作为原始模型$\model{\discretizationFull}$下界的有效性。
+以下定理保证超级行程下界模型$\model{\discretization, \itinSetSuper}$的有效性：任意完整网络可行解都可以映射到聚合网络和超级行程空间，且目标值不劣化。
 \input{thm/valid_relaxation/_main.tex}
 
 % % ---------------------------------------- Re model ----------------------------------------

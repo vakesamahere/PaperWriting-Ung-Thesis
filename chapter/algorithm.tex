@@ -1,63 +1,54 @@
 \chapter{求解方法}\label{sec:solution_methodology}
 
-\section{总体求解算法}
+\section{超级行程表示与双侧界生成框架}
 \label{sec:algorithm}
 
-如第~\ref{sec:complexity}~节所讨论的，完整的\problemName 公式是NP-难的，由于时空网络和行程选择层的组合增长，在实践中变得计算困难。虽然标准的动态离散化发现（DDD）方法高效地压缩物理网络节点和弧，但它缺乏处理高度耦合的基于行程的旅客选择行为的机制。为弥合这一差距，我们提出行程聚合与动态细化（\algoNotation）。与标准DDD的根本区别在于，\algoNotation 将动态聚合从物理网络维度扩展到逻辑旅客维度。通过引入路径签名的概念，\algoNotation 将数百万条组成行程分组为紧凑的超级行程集合，而不丧失选择模型的结构完整性和解的最优性。通过这种双重聚合建立紧的下界、恢复逻辑有效的上界，以及精确插入缺失的时间点以纠正物理时序违规和行程级虚假收入，该算法框架保证收敛到精确的全局最优解。
+在完整模型$\model{\discretizationFull}$中，每条原始行程$r\in\itinSet$都是在完全离散化$\discretizationFull$上由若干精确服务弧组成的时序路径。随着网络规模、允许中转次数和时间分辨率增加，这类行程的数量迅速增长；同时，在旅客选择模型中，每条行程又对应独立的选择变量和收入项。因此，本文首先关注的不是如何单纯压缩物理时空网络，而是如何为大量精确行程构造一个能够保持选择结构的紧凑表示。
 
-本节概述了这一完整的精确求解框架，为三个基本算法构建模块奠定基础：提供有效下界的松弛模型（第~\ref{sec:lbm}~节）、作为修复算法的上界生成过程（第~\ref{sec:ub}~节）以及确保在迭代中收敛到全局最优的离散化细化策略（第~\ref{sec:refinement}~节）。
+为此，本文利用当前离散化$\discretization$为每条原始行程定义粗粒度路径签名。具体而言，原始行程中的精确出发时间被映射到$\discretization$中对应的聚合时间点，从而得到该行程在$\discretization$下的路径签名。此处时空聚合的作用是为原始行程空间诱导一个等价划分：在当前离散化中具有相同路径签名的原始行程可被归并为一条超级行程。
 
-\subsection{初始离散化}\label{sec:initial_discretization}
+超级行程不能被简单理解为其内部所有原始行程的直接求和。由于这些原始行程的某些组合可能对应过于接近的出发时间、共享同一服务资源，或依赖不能同时满足的时空连接，它们在完整模型中并不一定能够同时实现。若直接将同一超级行程组内所有原始行程的吸引力输入选择模型，模型就会把不可同时实现的行程选择机会共同计入收入，从而产生原问题中不存在的虚假收入。
 
-\algoNotation 算法从一个刻意粗糙的初始离散化$\discretization$开始，以保持松弛模型的小规模。然而，初始步长的选择对松弛质量有深远影响。如第~\ref{sec:lbm}~节将详细介绍的，用于在松弛网络中构造服务弧的下取整映射规则（性质~\ref{def:relax.flightArc}）在网格相对于航段旅行时间过于粗糙时可能产生物理上无意义的逆弧。为从一开始就消除这种病态，我们采用一种初始离散化，其中每个节点$i \in \airportSet$获得一个根据其最短入站旅行时间校准的个体步长$\initStep_i$。精确的构造及其理论证明在第~\ref{sec:init_disc_detail}~节中给出。
+因此，本文为每条超级行程构造其所代表的原始行程组合吸引力总和的上界。该上界并不是对组内全部原始行程吸引力的简单累加，而是在考虑当前离散化粒度下可同时实现的服务数量限制后，对可行原始行程组合选择潜力给出的乐观上界。换言之，任意完整网络中的可行行程组合都可以被该超级行程的吸引力上界覆盖，从而保证聚合模型不会低估原问题中的可行选择；同时，不可同时实现的原始行程不会被无约束地全部累加，从而抑制由时间聚合导致的虚假收入。
 
-\subsection{迭代框架}
-我们从初始离散化开始，迭代求解下界模型以获得松弛解及其对应的下界。然后，我们使用松弛解通过基于MIP的修复算法生成上界。如果上界和下界之间的间隙在预定义阈值$\epsilon>0$内，则终止算法。否则，我们根据当前解细化离散化并重复该过程，这确保收敛到完整模型的全局最优解。算法总结在算法~\ref{alg:refinement}中。
+有了上述超级行程表示后，原问题中的行程选择空间可以从两个互补方向重新建模。
+
+第一，在聚合层面，可以不再显式保留每条原始行程，而是以超级行程作为选择模型的基本决策单元。由于超级行程吸引力上界覆盖了其所代表的所有可行原始行程组合，聚合模型能够对完整网络上的任意可行服务计划作出乐观评价；在本文模型的最小化目标下，这种乐观评价对应于原问题最优值的有效下界。
+
+第二，在完整网络中超级行程可以反向嵌入原始模型中。具体而言，超级行程收入上界可以转化为完整时空网络中的收入割平面，用于限制同一超级行程组内原始行程变量可共同获得的总收入。这样，模型仍然在完整网络上生成原问题可行解，但其搜索过程受到超级行程收入结构的强化，从而更容易找到高质量可行解。
+
+由此，基于超级行程表示，本文将原问题的求解过程分解为两个互补的子问题：一个是在聚合行程空间中进行乐观评价的下界子问题，另一个是在完整时空网络上进行可行解修复的上界子问题。
+
+在上述基于超级行程的双侧界框架基础上，本文进一步引入了对聚合程度的细化机制（第~\ref{sec:refinement}~节），用于在双侧界尚未闭合时更新当前聚合表示，并最终保证全局最优性。
+
+算法~\ref{alg:refinement}给出了该框架的完整流程。
 
 \begin{algorithm}[ht]
-\caption{Iterative Refinement Algorithm for $\problemNotation$}
+\caption{基于超级行程表示的界生成与修复框架}
 \label{alg:refinement}
 \begin{algorithmic}[1]
-\State $LB \gets -\infty$.
-\State $UB \gets +\infty$.
-\State $\solution^{*} \gets \text{null}$.
+\State $LB \gets -\infty$，$UB \gets +\infty$，$\solution^{*} \gets \text{null}$
 \ForAll{$i\in\airportSet$}
-\Comment{Initialize (Section~\ref{sec:initial_discretization})}
+\Comment{初始化离散化}
     \State $\initStep_i\gets\min_{j:(j,i)\in\segSet}\{\travelTime_{ji}\}$
     \State $\discretization_i\gets\{t\mid t=\planningStart+k\,\initStep_i,\, k \in \mathbb{Z}_{\ge0}, t < \planningEnd\}$
 \EndFor
+\State 对所有市场执行吸引力平衡预处理（第~\ref{sec:preconditioning_solution}~节）
 \State $iter\gets 0$
 \Loop
     \State $iter \gets iter + 1$
-    \State $\solution, LB \gets\Call{ATF}{\arcSet}$
-    \Comment{Update Lower Bound}
-    \State $\solution^{*}_{new}, UB_{new} \gets \Call{UB\_Model}{\solution}$
+    \State 基于当前$\discretization$构造聚合路径签名与超级行程集合$\itinSetSuper$
+    \State $\solution, LB \gets$ 求解下界模型 $\model{\discretization, \itinSetSuper}$
+    \Comment{第~\ref{sec:lbm}~节}
+    \State $\solution^{*}_{new}, UB_{new} \gets$ 求解上界修复模型 $\ubm(\discretizationFull,\model{\discretization, \itinSetSuper})$
+    \Comment{第~\ref{sec:ub}~节}
     \If{$UB_{new} < UB$}
         \State $\solution^{*}, UB \gets \solution^{*}_{new}, UB_{new}$
-        \Comment{Update Upper Bound}
     \EndIf
     \If{$UB - LB \le \epsilon \;\textbf{or}\; iter \ge \text{maxIter}$}
         \State \textbf{break}
     \EndIf
-    % \ForAll{$i \in \airportSet, t \in \discretization_i, f \in \fleetSet$}
-    %     \Comment{Refinement}
-    %     \State $Q_{imp} \gets D(i, t, f) - H_{in}(i, t, f) - A_{legal}(i, t, f)$
-    %     \If{$Q_{imp} > 0$}
-    %         \State $\mathcal{K} \gets A_{illegal}(i, t, f)$
-    %         \State Sort $\mathcal{K}$ by flow volume $\fleetAssignVar_{k}$ in descending order
-    %         \State $covered \gets 0$
-    %         \ForAll{$k \in \mathcal{K}$}
-    %             \If{$covered < Q_{imp}$}
-    %                 \State $\discretization_i \gets \discretization_i \cup \{t_{\text{dep}}(k) + \travelTime_k\}$
-    %                 \State $covered \gets covered + \fleetAssignVar_{k}$
-    %             \Else
-    %                 \State \textbf{break}
-    %             \EndIf
-    %         \EndFor
-    %     \EndIf
-    % \EndFor
-    \State $\discretization \gets \Call{Refinement}{\solution, \discretization}$
-    \Comment{Refine Discretization}
+    \State $\discretization \gets$ 诊断伪影并细化聚合表示（第~\ref{sec:refinement}~节）
 \EndLoop
 \State \Return $\solution, \solution^{*}, LB, UB$
 \end{algorithmic}
