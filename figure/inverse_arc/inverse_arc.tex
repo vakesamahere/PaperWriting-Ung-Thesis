@@ -1,0 +1,61 @@
+\documentclass[tikz,border=5pt,multi=false]{standalone}
+\usetikzlibrary{calc}
+\tikzset{
+  timeaxis/.style={very thick, ->},
+  flight/.style={thick, ->},
+  timec/.style={dashed},
+  timecActive/.style={ultra thick, ->},
+  dot/.style={circle,fill=black,inner sep=1.2pt},
+}
+\begin{document}
+\begin{tikzpicture}[x=1cm,y=0.75cm]
+    % Top: full discretization
+    \draw[timeaxis] (0,3) -- (10,3);
+    \draw[timeaxis] (0,4) -- (10,4);
+    \node[left] at (0,3) {$i$};
+    \node[left] at (0,4) {$j$};
+    \foreach \x in {0,1,2,3,4,5,6,7,8,9}{
+      \node[dot] (i\x) at (\x+0.3,3) {};
+      \node[dot] (j\x) at (\x+0.3,4) {};
+    }
+    \foreach \k in {0,2,3,5,6,7}{
+      \draw[flight] (i\k) -- ($(j\k)+(2,0)$);
+    }
+    \draw[timec,gray!70] (5.8,2.7) -- (5.8,4.3);
+    \draw[timecActive,red!70] (4.3,3) -- (5.3,3);
+    \draw[timecActive,red!70] (5.3,3) -- (7.3,4);
+    \draw[timecActive,red!70] (7.3,4) -- (8.3,4);
+    \draw[timecActive,blue!70] (5.3,3) -- (6.3,3);
+    \draw[timecActive,blue!70] (6.3,3) -- (8.3,4);
+    \draw[timecActive,blue!70] (8.3,4) -- (9.3,4);
+    \draw[flight] (10.0,3) -- (10.25,3);
+    \draw[flight] (10.0,4) -- (10.25,4);
+
+    % Bottom: aggregated discretization with inverse arc
+    \draw[timeaxis] (0,0) -- (10,0);
+    \draw[timeaxis] (0,1) -- (10,1);
+    \node[left] at (0,0) {$i$};
+    \node[left] at (0,1) {$j$};
+    \foreach \x in {0,1,2,3,4,5,6,7,8,9}{
+      \node[dot] (ai\x) at (\x+0.3,0) {};
+    }
+    \foreach \x in {0,1,2,3,4,5,9}{
+      \node[dot] (aj\x) at (\x+0.3,1) {};
+    }
+    \foreach \k in {0,2,3,7}{
+      \draw[flight] (ai\k) -- ($(ai\k)+(2,1)$);
+    }
+    \foreach \k in {5,6}{
+      \draw[flight] (ai\k) -- ($(aj5)$);
+    }
+    \draw[timec,gray!70] (5.8,-0.3) -- (5.8,1.3);
+    \draw[timecActive,red!70] (4.3,0) -- (5.3,0);
+    \draw[timecActive,red!70] (5.3,0) -- (5.3,1);
+    \draw[timecActive,red!70] (5.3,1) -- (9.3,1);
+    \draw[timecActive,blue!70] (5.3,0) -- (6.3,0);
+    \draw[timecActive,blue!70] (6.3,0) -- (5.3,1);
+    \draw[timecActive,blue!70] (5.3,1.05) -- (9.3,1.05);
+    \draw[flight] (10.0,0) -- (10.25,0);
+    \draw[flight] (10.0,1) -- (10.25,1);
+\end{tikzpicture}
+\end{document}

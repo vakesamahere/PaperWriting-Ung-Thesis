@@ -1,7 +1,7 @@
 \section{超级行程构造}
 \label{sec:lbm}
 
-超级行程的构造包含两个层级。首先，需要建立从完整时空网络到聚合时空网络的拓扑映射，为原始行程提供降维映射的目标空间；其次，基于该映射将原始行程投影为路径签名，并制定超级行程的等价划分规则与吸引力上界构造机制。
+超级行程的构造包含两个层级。首先，需要建立从完整时空网络到聚合时空网络的拓扑映射，为原始行程提供降维映射的目标空间；其次，基于该映射将原始行程投影为路径签名，并制定超级行程的等价划分规则与吸引力构造机制。
 
 % \subsection{聚合时空网络与拓扑映射}
 
@@ -30,14 +30,12 @@
 面板3说明当使用上述的聚合手段将时间点$t_1, t_2, t_3$合并为单个窗口后考虑原问题时，我们上面定义的聚合网络将继承了这一缺陷。模型让聚合服务$f_{agg}$（$x=1$）提供完整服务时，底层的收入产生逻辑仍是利用了多个边际收益高的部分，以与完整模型LP松弛相同的方式再次产生$3r_0$收入。
 
 然而，在我们提出的行程聚合下，面板3中描述的情况被消除。
-超级行程构造明确检查组合原始行程的可行性。
+超级行程构造的核心在于为组内原始行程可同时实现的组合吸引力总和构造上界，而非简单累加全部原始行程。
 当$t_1, t_2, t_3$处的出发无法同时被合法运营时，它们构成单个超级行程的非法组合。
-我们的方法将吸引力求和限制在原始行程的有效子集上，从而剥离收入增益并得到一个现实的目标值的更紧的上界。具体的限制机制将在下文行程聚合过程中详细定义。
+我们的方法将吸引力求和限制在覆盖真实可兼容组合的候选组合族上，从而剥离由不可兼容行程简单累加造成的人为收入增益，使聚合模型给出的乐观评价更加接近完整模型的可实现收入。具体限制机制将在下文行程聚合过程中定义。
 
-我们引入一个\emph{行程聚合}过程。
-
-\paragraph{行程聚合过程。}
-给定由离散化$\discretization$定义的时间弧聚合，我们进一步执行与聚合时间弧一致的行程级聚合。
+\subsubsection*{路径签名与等价划分}
+给定由离散化$\discretization$定义的时间弧聚合，本文进一步执行与聚合时间弧一致的行程级聚合。
 令$\itinSet$表示完整网络中的原始行程集合。
 每条行程$r \in \itinSet$由有序的服务段序列组成，每个服务段使用原始离散化中的时间弧$(o,d,t)$（这里$o,d,t$表示起点、终点和出发时间，省略到达时间是因为在任意网络中给定起点、终点和出发时间时到达时间可以被唯一确定）。因此每条原始行程$r$可以表示为路径
 \begin{equation}
@@ -68,20 +66,17 @@ r \eqRelByPathSig r' \iff \pathSig{r} = \pathSig{r'}
 \fare_{r\ell} = \max_{r' \in \eqClassByPathSig_{(r)}} \fare_{r'\ell} \quad \forall r \in \itinSetSuper, \; \ell \in \fareClassSet
 \end{equation}
 
-超级行程的吸引力值设置为对应等价类中原始行程所有可能组合中吸引力的最大求和。这确保超级行程的吸引力至少与其代表的任何原始行程组合一样高。在原始网络中使用相同路径的原始行程可以同时运营而不冲突。因此，类似于通过离散化路径签名将$\itinSet$划分为等价类$\eqClassByPathSig$，对于每条超级行程$R$，我们也通过原始路径签名将$\eqClassByPathSig_{(R)}$划分为等价类$\eqClassByOrigPath^{R}$，两条行程$r,r' \in \eqClassByPathSig_{(R)}$被分配到同一组当且仅当它们共享相同的原始路径签名，即
+超级行程的吸引力不能简单等于组内全部原始行程吸引力的累加，而应反映其中可同时实现的组合所能达到的最大吸引力。为此，我们在商集$\eqClassByPathSig_{(R)} /\eqRelByOrigPath$上进一步划分：对于每条超级行程$R$，组内原始行程按原始路径签名再次分组，两条行程$r,r' \in \eqClassByPathSig_{(R)}$属于同一组当且仅当它们共享相同的原始路径签名，即
 \[r \eqRelByOrigPath r' \iff \origPath{r} = \origPath{r'}\]
-给定旅客类型$p$和票价等级$\ell$。对于每个等价类$\eqClassByOrigPath^{R}_r$，我们有对应等价类中所有原始行程的吸引力求和$\sum_{r\in \eqClassByOrigPath^{R}_r} \attr_{rp\ell}$。现在我们将超级行程$r$的吸引力值设置为商集$\eqClassByPathSig_{(R)} /\eqRelByOrigPath$中所有等价类中前$\combLimit_R$个最大求和，其中$\combLimit_R$为当前聚合粒度下超级行程$R$路径上可同时实现的最大服务组合数，如下所示：
+同一原始路径签名等价类$\eqClassByOrigPath$内的行程使用完全相同的物理服务弧序列，因此可以同时运营而不冲突。
+
+给定旅客类型$p$和票价等级$\ell$，超级行程$R$的吸引力按如下方式构造：从商集$\eqClassByPathSig_{(R)} /\eqRelByOrigPath$中选取若干等价类构成一个组合$\itinCombSet$，计算组合内所有原始行程的吸引力总和$\sum_{\eqClassByOrigPath\in\itinCombSet}\sum_{r\in\eqClassByOrigPath}\attr_{rp\ell}$，并在所有允许的组合中取最大值。所有允许的组合构成集族$\compatSet{R}$，我们由此可以定义超级行程$R$的吸引力$\attrSuper_{Rp\ell}$和调整吸引力$\adjAttrSuper_{Rp\ell}$如下：
 \begin{equation*}
     \begin{aligned}
         \maxAttrCombSet_{Rp\ell}
         & \;=\;
-        \arg\max_{\itinCombSet: \itinCombSet \subseteq \eqClassByPathSig_{(R)} /\eqRelByOrigPath,\; |\itinCombSet| \le \combLimit_R}
+        \arg\max_{\itinCombSet \in \compatSet{R}}
         \sum_{\mathscr{O} \in \itinCombSet} \sum_{r\in \mathscr{O}} \attr_{rp\ell}
-        \\
-        \combLimit_R
-        & \;=\;
-        \prod_{(o,d,\bar{t}) \in \pathSig{R}}
-        \min\{\departLimit_{od\bar{t}}, \freq_{o,d}\}
     \end{aligned}
 \end{equation*}
 \begin{equation}
@@ -98,8 +93,17 @@ r \eqRelByPathSig r' \iff \pathSig{r} = \pathSig{r'}
 % temp-command \tag{def$_{\adjAttrSuper_{Rp\ell}}$}
 \label{def:relax.shadowAttrSuper}
 \end{equation}
-其中$\departLimit_{od\bar{t}}$代表了物理路段$(o,d)$上在$\bar{t}$对应时间段的因最小出发间隔而产生的出发次数上界，其定义在(\ref{def:relax.departLimit})中给出，$\maxAttrCombSet_{Rp\ell}$是具有相同原始路径签名的原始行程等价类集合，该集合的元素在旅客类型$p$和票价等级$\ell$下拥有最大的总吸引力，受所选等价类数量不超过$\combLimit_R$的约束。对于超级行程路径上的每段$(o,d,\bar{t})$，在聚合时间窗口内可以物理共存的服务数量由$\min\{\departLimit_{od\bar{t}}, \freq_{o,d}\}$限制，反映了服务的最小间隔和路段频率。
-这确保在提供任意的服务数量时，超级行程不会低估旅客效用和目标值，同时防止多个分数流在同一时间窗口内利用多个相邻出发时间。
+上式中，$\maxAttrCombSet_{Rp\ell}$为其中使总吸引力最大的元素。为保证下界模型的有效性，$\compatSet{R}$必须覆盖完整网络中所有可同时实现的原始行程组合，但不要求精确等于可兼容组合集合——允许包含额外的不可兼容组合，这只会使超级行程的吸引力相对于其所代表的原始行程集合更加乐观。$\compatSet{R}$的具体构造决定了超级行程吸引力的紧度与计算代价之间的权衡，本文考虑以下两种方式：
+
+方法1（精确冲突建模）：以原始路径签名等价类为节点建立冲突图，节点权重为类内原始行程吸引力总和。若两个等价类所代表的原始行程在完整网络中不能同时实现（例如共享同一服务弧或违反最小出发间隔），则连边。在该冲突图上求解最大权重独立集（MWIS）即可得到真实可兼容组合的最大吸引力。该方法最紧，但MWIS问题本身是NP-难的，当超级行程内等价类数量较大时计算代价不可接受。
+
+方法2（窗口容量乘积近似）：不显式枚举冲突关系，而是利用路径上各段的窗口容量上界$\combLimit_R$限制可选等价类数量。对于路径上的每段$(o,d,\bar{t})$，$\departLimit_{od\bar{t}}$表示在聚合时间窗口$\bar{t}$内，受最小出发间隔限制，物理路段$(o,d)$最多可同时容纳的服务出发数量（其具体计算方式将在下界模型的间隔约束中给出）。候选组合族定义为：
+\[
+    \compatSet[2]{R} = \left\{\itinCombSet \mid \itinCombSet \subseteq \eqClassByPathSig_{(R)} /\eqRelByOrigPath,\; |\itinCombSet| \le \combLimit_R\right\},
+    \qquad
+    \combLimit_R = \prod_{(o,d,\bar{t}) \in \pathSig{R}} \min\{\departLimit_{od\bar{t}}, \freq_{o,d}\}.
+\]
+由于任意完整网络中的可兼容组合在路径上每段都不能超过该段的容量限制，$\compatSet[2]{R}$覆盖所有真实可兼容组合，因此由其得到的$\attrSuper_{Rp\ell}$不小于完整网络中任何可行整数解对应的原始行程吸引力总和，保证了下界模型的有效性。本文计算实验中采用方法2，以在保证下界有效性的同时避免求解NP-难的子问题。
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\linewidth]{figure/illustrate_valid_combinations/valid_combinations}
@@ -108,81 +112,22 @@ r \eqRelByPathSig r' \iff \pathSig{r} = \pathSig{r'}
 \end{figure}
 
 图~\ref{fig:valid_combinations}说明了为什么行程聚合保持下界性质。
-% Consider an equivalence class of original itineraries mapping to the same super-itinerary. These original itineraries (e.g., $r_1, r_2, r_3, r_4, r_5$) may have mutual conflicts due to separation time constraints in the full model. For instance, $r_1$ and $r_3$ cannot be simultaneously operated if they are too close.
-% Conceptually (Method 1), the super-itinerary's attraction $\attrSuper$ should be calculated by preventing all conflicts and finding the subset that maximizes the total attraction.
-% In the example, the valid subset $\{(r_1, r_2), (r_5)\}$ yields a total attribute of 0.5, which is greater than $\{(r_3, r_4)\}$'s 0.4.
-考虑映射到同一超级行程的原始行程等价类。这些原始行程（例如$r_1, r_2, r_3$）由于完整模型中的间隔时间约束可能存在相互冲突。例如，如果$r_1$和$r_2$过于接近则不能同时运营。
-从概念上（方法1），超级行程的吸引力$\attrSuper$应通过防止所有冲突并找到最大化总吸引力的子集来计算。
-在示例中，有效子集$\{(r_1), (r_3)\}$产生总属性0.3，大于$\{(r_2)\}$的0.2。
+考虑映射到同一超级行程的原始行程等价类。这些原始行程（例如$r_1, r_2, r_3$）由于完整模型中的间隔时间约束可能存在相互冲突。例如，如果$r_1$和$r_2$过于接近则不能同时运营。图中方法1对应精确冲突建模，方法2对应窗口容量乘积近似。方法2的候选组合族覆盖了精确冲突模型下的所有真实可兼容组合，因此其计算所得的超级行程吸引力不低于方法1的精确最大值，二者都保证不低于任何可行整数解对应的原始行程吸引力总和。
 
-然而，考虑所有冲突找到精确的最大权重独立集可能计算代价高昂。
-因此，在我们上述的公式中，我们采用简化且高效的近似（方法2）。对于路径上的每段$(o,d,\bar{t})$，每段容量由$\min\{\departLimit_{od\bar{t}}, \freq_{od}\}$限制，同时考虑间隔时间限制（公式~\ref{def:relax.departLimit}）和路段频率。总体的限制随后从这些每段限制导出，反映了具有不同原始路径签名的行程可能在共享路段上合并的事实。
-我们通过从商集$\eqClassByPathSig_{(R)} /\eqRelByOrigPath$中选择前$\combLimit_R$个等价类来近似最大可行吸引力。
-方法2计算的吸引力和保证大于或等于任何实际无冲突子集（方法1）的吸引力，因此与方法1一样，大于或等于任何可行整数解。
-
-综上所述，超级行程表示通过路径签名诱导的等价划分，将原始行程空间压缩为紧凑的超级行程集合；同时，通过吸引力上界刻画聚合时间窗口内可同时实现的原始行程组合，既覆盖完整模型中的可行选择结构，又抑制由简单累加不可兼容行程所导致的虚假收入。在此基础上，下一节将进一步从超级行程表示推导出两个互补的优化子模型以求解原问题。
+综上所述，超级行程表示通过路径签名诱导的等价划分，将原始行程空间压缩为紧凑的超级行程集合；同时，超级行程的吸引力被构造为其所代表的原始行程可兼容组合吸引力总和的上界，既覆盖完整模型中的可行选择结构，又抑制由简单累加不可兼容行程所导致的虚假收入。在此基础上，下一节将进一步从超级行程表示推导出两个互补的优化子模型以求解原问题。
 
 % \model{\discretization, \itinSetSuper}，最终松弛模型
 \section{基于超级行程的双侧界模型}\label{sec:bounds_models}
 
-上一节构造的超级行程表示为原问题提供了两种互补的建模方式。首先，在聚合层面，原始网络、原始行程变量可以由聚合网络、超级行程变量替代，并利用超级行程吸引力上界对完整网络上的可行选择结构进行乐观评价，由此得到一个规模更小的聚合下界模型。其次，超级行程表示可以在完整网络层面被重新嵌入原始行程模型中，其收入上界转化为收入割平面，并与下界解给出的服务频率结构共同强化可行解修复过程。基于这两个互补模型，本文能够同时获得原问题最优值的有效下界和可行上界。
+上一节构造的超级行程表示为原问题提供了两种互补的建模方式。首先，在聚合层面，原始网络、原始行程变量可以由聚合网络、超级行程变量替代，并利用超级行程吸引力对完整网络上的可行选择结构进行乐观评价，由此得到一个规模更小的聚合下界模型。其次，超级行程表示可以在完整网络层面被重新嵌入原始行程模型中，其收入上界转化为收入割平面，并与下界解给出的服务频率结构共同强化可行解修复过程。基于这两个互补模型，本文能够同时获得原问题最优值的有效下界和可行上界。
 
 本节首先给出聚合下界模型的构造，然后介绍完整网络上的上界修复模型。
 
 \subsection{聚合下界模型}\label{sec:lbm_formulation}
 
-对于本文讨论的最小化问题，构造下界模型即需要推导出一个原问题的有效松弛模型。
-在聚合时空网络$\net$上建立松弛模型时，原问题中的大部分约束（流守恒\eqref{constr:main.flow}、路段频率\eqref{constr:main.seg_freq}）仅需将弧和节点集合替换为聚合网络中的对应集合即可保持。然而，由于时间聚合可能产生逆弧或将原本间隔充分的出发归并到同一时间点，以下几类约束需要修正以确保松弛的有效性。
+给定当前离散化$\discretization$及其诱导的超级行程集合$\itinSetSuper$，聚合下界模型建立在两个相互耦合的层次上：运营层面使用聚合时空网络$\net=(\nodeSet,\arcSet)$上的资源分配变量$\fleetAssignVar_{af}$，选择层面则以超级行程作为旅客选择模型的基本决策单元。对于任意聚合服务弧$a\in\flightArc$，记$\itinSuperUsingArc{m}{a}$为市场$m$中路径签名经过弧$a$的超级行程集合。换言之，超级行程变量通过其聚合路径签名与聚合网络中的服务弧相连接。
 
-聚合网络中的资源分配变量$\fleetAssignVar_{af}$定义为原始网络中映射到同一聚合弧的所有分配之和：
-\[
-    \fleetAssignVar_{a^{\discretization},f}^{\net} = \sum_{a^{\discretizationFull}:\, \Phi(a^{\discretizationFull}) = a^{\discretization}}\fleetAssignVar_{a^{\discretizationFull},f}^{\full{\net}}
-\]
-为确保松弛的最优性，服务弧上的资源分配变量的变量域放宽为正整数，允许多个资源单位被分配到同一聚合服务弧上：
-\begin{equation}
-    \fleetAssignVar_{af}\in\mathbb{Z}_{\ge0} \quad \forall a\in \flightArc, \; \forall f\in \fleetSet
-    % temp-command \tag{2j}
-    \label{constr:relax.domain.x.flight}
-\end{equation}
-
-对于资源可用性约束，当聚合网络中存在逆弧（到达时间不晚于出发时间的服务弧）时，资源单位可能被重复计数。此时在$t_c$对资源计数时需要扣除重复计数的部分，令$\invertArcTc{t_c}$表示跨越$t_c$的逆弧集合：
-\begin{equation}
-\begin{aligned}
-    \invertArcTc{t_c} = \{a=((i,t)\rightarrow(j,t^\prime))\;\forall a\in\flightArc\mid t^\prime\leq t_c<t<t+\travelTime_{ij}<\planningEnd\}
-    % temp-command \tag{def$_{\invertArcTc{t_c}}$}
-    \label{def:relax.invertArcTc}
-\end{aligned}
-\end{equation}
-\input{figure/inverse_arc.tex}
-资源可用性约束相应修正为
-\begin{equation}
-    \sum_{a\in \holdingArcTc{\checkTime}} \fleetAssignVar_{af} + \sum_{a\in \flightArcTc{\checkTime}} \fleetAssignVar_{af} - \sum_{a\in \invertArcTc{\checkTime}} \fleetAssignVar_{af} \le \fleetAvail_{f}
-    \quad \forall f\in \fleetSet
-    % temp-command \tag{2c}
-    \label{constr:relax.fleet_available}
-\end{equation}
-
-对于间隔出发约束，聚合可能导致原本在完整网络中相距较远的服务在松弛模型中出现在相同时间点。为保持松弛有效性，需要允许在完整网络中合法的出发组合。定义在区间$[t, t+\minInterdepTime_{ij})$内可同时出发的服务数量上界$\departLimit_{ijt}$为：
-\begin{equation}
-\begin{aligned}
-    \departLimit_{ijt} & = \begin{cases}
-        \lceil \frac{t^{+}-t}{\minInterdepTime_{ij}}\rceil & t^{+}-t>0\notag\\
-        \lceil \frac{\planningEnd-\planningStart+t^{+}-t}{\minInterdepTime_{ij}}\rceil & t^{+}-t<0
-    \end{cases} \\
-    & = \lceil \frac{t^{+}-t+\frac{\planningEnd-\planningStart}{2}(\frac{t^{+}-t-|t^{+}-t|}{|t^{+}-t|})}{\minInterdepTime_{ij}}\rceil
-    % temp-command \tag{def$_{\departLimit_{ijt}}$}
-    \label{def:relax.departLimit}
-\end{aligned}
-\end{equation}
-其中$t^{+}=\min\{\bar{t}\in\discretization_i\mid\bar{t}>\max\{\bar{\bar{t}}\mid(i,\bar{\bar{t}},j,\bar{\bar{t}}^\prime)\in\arcDuringSepTime_{ijt}^\discretization\}\}$。间隔出发约束修正为
-\begin{equation}
-    \sum_{f\in \fleetSet}\sum_{a\in \arcDuringSepTime_{ijt}} \fleetAssignVar_{af} \le \departLimit_{ijt}
-    \quad \forall (i,j)\in \segSet,\; \forall t \in \discretization_i
-    % temp-command \tag{2d}
-    \label{constr:relax.cooldown}
-\end{equation}
-
-同时，涉及行程级变量的选择约束被更新以反映超级行程聚合。具体而言，原问题中的约束\eqref{constr:main.choice.ratio}--\eqref{constr:main.choice.covering}在超级行程空间中修改如下：
+模型使用第~\ref{sec:lbm}~节构造的超级行程吸引力$\attrSuper_{Rp\ell}$和调整吸引力$\adjAttrSuper_{Rp\ell}$替代原始行程层面的吸引力参数。由此，完整模型中涉及行程级变量的选择一致性约束、容量约束与可用性约束被改写为超级行程空间中的如下约束：
 \begin{equation}
     \outAttr_{mp}\, \shareVar_{rp\ell} \;\le\; \attrSuper_{rp\ell}\, \outsideShareVar_{mp}
     \quad \forall m\in \marketSet,\, \forall p\in \psgTypeSet,\, \forall r\in \itinSuperInMarket_{m},\, \forall \ell\in \fareClassSet
@@ -213,14 +158,71 @@ r \eqRelByPathSig r' \iff \pathSig{r} = \pathSig{r'}
     \label{constr:relax.choice.covering}
 \end{equation}
 
-我们将同时包含时间弧聚合和行程聚合的最终松弛模型记为$\model{\discretization, \itinSetSuper}$。当行程集合与完整模型相同时，记$\model{\discretization} = \model{\discretization, \itinSet}$。
+\subsubsection*{运营约束的聚合修正。}
+运营层面的资源流约束建立在聚合时空网络$\net$上。流守恒约束和路段总频率约束可以直接由完整模型投影得到（仅需将弧和节点集合替换为聚合网络中的对应集合）。为保证任意完整网络可行解均能映射为聚合模型中的可行解，服务弧变量域、资源可用性约束和间隔出发约束需要进行如下放宽。
+
+聚合网络中的资源分配变量$\fleetAssignVar_{af}$定义为原始网络中映射到同一聚合弧的所有分配之和：
+\[
+    \fleetAssignVar_{a^{\discretization},f}^{\net} = \sum_{a^{\discretizationFull}:\, \Phi(a^{\discretizationFull}) = a^{\discretization}}\fleetAssignVar_{a^{\discretizationFull},f}^{\full{\net}}
+\]
+为确保松弛的有效性，服务弧上的资源分配变量域放宽为非负整数：
+\begin{equation}
+    \fleetAssignVar_{af}\in\mathbb{Z}_{\ge0} \quad \forall a\in \flightArc, \; \forall f\in \fleetSet
+    % temp-command \tag{2j}
+    \label{constr:relax.domain.x.flight}
+\end{equation}
+
+当聚合网络中存在逆弧（到达时间不晚于出发时间的服务弧）时，资源单位在计数时刻$t_c$可能被重复计数。图~\ref{fig:inverse_arc}展示了逆弧导致重复计数的情形：若不扣除跨越$t_c$的逆弧，某些资源单位可能因相邻持有弧同时跨越$t_c$而被重复计入。为保持资源可用性约束对完整模型可行解的映射有效，本文引入逆弧集合$\invertArcTc{t_c}$并在资源计数中扣除其贡献：
+\begin{equation}
+\begin{aligned}
+    \invertArcTc{t_c} = \{a=((i,t)\rightarrow(j,t^\prime))\;\forall a\in\flightArc\mid t^\prime\leq t_c<t<t+\travelTime_{ij}<\planningEnd\}
+    % temp-command \tag{def$_{\invertArcTc{t_c}}$}
+    \label{def:relax.invertArcTc}
+\end{aligned}
+\end{equation}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\linewidth]{figure/inverse_arc/inverse_arc}
+    \caption{逆弧导致的资源重复计数示意图}
+    \label{fig:inverse_arc}
+\end{figure}
+资源可用性约束相应修正为
+\begin{equation}
+    \sum_{a\in \holdingArcTc{\checkTime}} \fleetAssignVar_{af} + \sum_{a\in \flightArcTc{\checkTime}} \fleetAssignVar_{af} - \sum_{a\in \invertArcTc{\checkTime}} \fleetAssignVar_{af} \le \fleetAvail_{f}
+    \quad \forall f\in \fleetSet
+    % temp-command \tag{2c}
+    \label{constr:relax.fleet_available}
+\end{equation}
+下文定理~\ref{pro.valid_relaxation}及其证明说明，包含该修正后的聚合模型能够保持完整网络可行解到聚合模型的有效映射。
+
+间隔出发约束使用第~\ref{sec:lbm}~节超级行程构造中引入的窗口容量上界$\departLimit_{ijt}$：
+\begin{equation}
+\begin{aligned}
+    \departLimit_{ijt} & = \begin{cases}
+        \lceil \frac{t^{+}-t}{\minInterdepTime_{ij}}\rceil & t^{+}-t>0\notag\\
+        \lceil \frac{\planningEnd-\planningStart+t^{+}-t}{\minInterdepTime_{ij}}\rceil & t^{+}-t<0
+    \end{cases} \\
+    & = \lceil \frac{t^{+}-t+\frac{\planningEnd-\planningStart}{2}(\frac{t^{+}-t-|t^{+}-t|}{|t^{+}-t|})}{\minInterdepTime_{ij}}\rceil
+    % temp-command \tag{def$_{\departLimit_{ijt}}$}
+    \label{def:relax.departLimit}
+\end{aligned}
+\end{equation}
+其中$t^{+}=\min\{\bar{t}\in\discretization_i\mid\bar{t}>\max\{\bar{\bar{t}}\mid(i,\bar{\bar{t}},j,\bar{\bar{t}}^\prime)\in\arcDuringSepTime_{ijt}^\discretization\}\}$。间隔出发约束修正为
+\begin{equation}
+    \sum_{f\in \fleetSet}\sum_{a\in \arcDuringSepTime_{ijt}} \fleetAssignVar_{af} \le \departLimit_{ijt}
+    \quad \forall (i,j)\in \segSet,\; \forall t \in \discretization_i
+    % temp-command \tag{2d}
+    \label{constr:relax.cooldown}
+\end{equation}
+
+通过上述构造，超级行程选择结构与聚合运营约束被统一纳入同一松弛模型中。该模型在显著压缩行程空间和时空网络规模的同时，保持对完整模型可行解的乐观覆盖，因此构成原问题的有效下界模型。我们将该模型记为$\model{\discretization, \itinSetSuper}$。当行程集合与完整模型相同时，记$\model{\discretization} = \model{\discretization, \itinSet}$。
 
 模型$\model{\discretization, \itinSetSuper}$写作如下：
 \begin{align}
     \min \;\; &
     \sum_{a\in \flightArc}\sum_{f\in \fleetSet} \cost_{af}\, \fleetAssignVar_{af}
     \;-\;
-    \sum_{m\in \marketSet}\sum_{p\in \psgTypeSet}\sum_{r\in \itinInMarket_{m}}\sum_{\ell\in \fareClassSet} 
+    \sum_{m\in \marketSet}\sum_{p\in \psgTypeSet}\sum_{r\in \itinSuperInMarket_{m}}\sum_{\ell\in \fareClassSet} 
     \demand_{mp}\,\fare_{r\ell}\, \shareVar_{rp\ell}
     % temp-command \tag{2a}
     \label{objfun:relax}
@@ -253,12 +255,12 @@ r \eqRelByPathSig r' \iff \pathSig{r} = \pathSig{r'}
     % temp-command \tag{2l}
     \label{constr:relax.domain.w.out}
 \\&
-    \shareVar_{rp\ell}\ge 0 \quad \forall r\in \itinSet, \; \forall p\in \psgTypeSet, \; \forall \ell\in \fareClassSet
+    \shareVar_{rp\ell}\ge 0 \quad \forall r\in \itinSetSuper, \; \forall p\in \psgTypeSet, \; \forall \ell\in \fareClassSet
     % temp-command \tag{2m}
     \label{constr:relax.domain.w}
 \end{align}
 
-以下定理保证超级行程下界模型$\model{\discretization, \itinSetSuper}$的有效性：任意完整网络可行解都可以映射到聚合网络和超级行程空间，且目标值不劣化。
+以下定理保证超级行程下界模型$\model{\discretization, \itinSetSuper}$的有效性：任意完整网络可行解都可以映射到聚合网络和超级行程空间，且目标值不劣。
 \input{thm/valid_relaxation/_main.tex}
 
 % % ---------------------------------------- Re model ----------------------------------------

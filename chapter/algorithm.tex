@@ -39,7 +39,7 @@
     \State $iter \gets iter + 1$
     \State 基于当前$\discretization$构造聚合路径签名与超级行程集合$\itinSetSuper$
     \State $\solution, LB \gets$ 求解下界模型 $\model{\discretization, \itinSetSuper}$
-    \Comment{第~\ref{sec:lbm}~节}
+    \Comment{第~\ref{sec:lbm_formulation}~节}
     \State $\solution^{*}_{new}, UB_{new} \gets$ 求解上界修复模型 $\ubm(\discretizationFull,\model{\discretization, \itinSetSuper})$
     \Comment{第~\ref{sec:ub}~节}
     \If{$UB_{new} < UB$}
