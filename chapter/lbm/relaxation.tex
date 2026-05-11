@@ -3,25 +3,19 @@
 
 超级行程的构造包含两个层级。首先，需要建立从完整时空网络到聚合时空网络的拓扑映射，为原始行程提供降维映射的目标空间；其次，基于该映射将原始行程投影为路径签名，并制定超级行程的等价划分规则与吸引力上界构造机制。
 
-\subsection{聚合时空网络与拓扑映射}
+% \subsection{聚合时空网络与拓扑映射}
 
-为了将庞大的原始行程空间降维，我们首先需要建立从完整时空网络$\full{\net}$到聚合时空网络$\net$的拓扑映射关系。具体而言，对于完整网络中的每一条原始服务弧，我们通过时间点投影原则，在聚合网络中找到其唯一对应的聚合服务弧；而对于持有弧，则根据聚合节点之间的时间连贯性直接推导生成。令$\Phi_{\arcSet}:\full{\arcSet}\to \widetilde{\arcSet}$表示该弧映射规则（其中$\widetilde{\arcSet}:=\arcSet\cup\{\bot\}$，$\bot$捕获被折叠的短持有弧），$\Phi_{\nodeSet}:\full{\nodeSet}\twoheadrightarrow\nodeSet$表示节点映射。它们能够将完整网络中的任意节点或弧唯一映射至聚合网络$\net$中的对应元素。关于聚合节点生成规则、逆弧消除的初始离散化构造，以及映射$\Phi$的严格数学定义，详见附录~\ref{sec:init_disc_detail}。
-
+为了将庞大的原始行程空间降维，我们首先需要建立从完整时空网络$\full{\net}$到聚合时空网络$\net$的拓扑映射关系。具体而言，对于完整网络中的每一条原始服务弧，我们通过时间点投影原则，在聚合网络中找到其唯一对应的聚合服务弧；而对于持有弧，则根据聚合节点之间的时间连贯性直接推导生成。令$\Phi_{\arcSet}:\full{\arcSet}\to \widetilde{\arcSet}$表示该弧映射规则（其中$\widetilde{\arcSet}:=\arcSet\cup\{\bot\}$，$\bot$捕获被折叠的短持有弧），$\Phi_{\nodeSet}:\full{\nodeSet}\twoheadrightarrow\nodeSet$表示节点映射。它们能够将完整网络中的任意节点或弧唯一映射至聚合网络$\net$中的对应元素。关于聚合节点生成规则、逆弧消除的初始离散化构造，以及本文映射$\Phi$的严格数学定义，详见附录~\ref{sec:init_disc_detail}。
 在后续分析中，我们使用$\Phi_{\arcSet}^{-1}(a)=\{a'\in\full{\arcSet}\mid\Phi_{\arcSet}(a')=a\}$表示聚合弧$a$的原像集合，$\Phi_{\nodeSet}^{-1}(i,t)=\{(i,\tau)\in\full{\nodeSet}\mid\Phi_{\nodeSet}(i,\tau)=(i,t)\}$表示聚合节点$(i,t)$的原像集合。
 
-\subsection{虚假收入与超级行程吸引力上界}
+% \subsection{虚假收入与超级行程吸引力上界}
 
-上述聚合时空网络为定义路径签名提供了底层拓扑。然而，仅有时空聚合并不足以产生紧的下界。完整模型通常表现出较大的最优性间隙，因为其LP松弛允许分数资源流在多个相邻出发时间弧之间分割。
+上述聚合时空网络为定义路径签名提供了底层拓扑。然而，仅有时空聚合并不足以产生紧的下界。完整模型在分支定界时通常表现出较大的最优性间隙，因为其LP松弛允许分数资源流在多个相邻出发时间弧之间分割。
 这使得单个资源单位可以被分数地重复使用，从多个相邻时间弧收集收入。
-此外，某些时间弧仅在相应资源流从零增加到小正值时才产生收入。
-因此，LP松弛可以利用多个时间弧的高初始收入部分而无需在任何单个弧上支付全部运营成本，导致显著的收入高估。
+此外，某些时间弧仅在相应资源流从零增加到小正值时才产生收入，即收入函数在零点附近具有较高的边际收益。因此这些弧的分数分配会享受到比实际允许的情况更多的高边际收益，产生比实际情况高得多的收入。
+因此，LP松弛可以利用多个时间弧的高边际收入部分（即初始部分）而无需在任何单个弧上支付全部运营成本，导致显著的收入高估。
 
-我们上面引入的基于时间弧聚合的松弛模型，其中每条时间弧代表更大的时间区间，是原始模型的有效松弛且设计为高效求解，并非为解决收入高估问题而引入。由分数资源重用引起的结构性收入高估问题被松弛模型继承。
-此外，由于聚合的性质，即使在松弛模型的整数解中，这一问题也可能持续存在。
-因此，虽然松弛在计算上具有吸引力，但它本身并不能消除由分数资源流产生的人为收入增益。
-
-由此产生的松弛值仍然接近完整模型LP松弛的值，后者仍然允许分数资源流利用多个收入生成机会。
-因此，这一问题难以仅通过细化时间离散化来解决。
+我们上面引入的聚合网络$\net$的每条时间弧代表更大的时间区间，在这样的网络中求解原问题使得整数解的资源分配重现了完整网络里的分数资源流的分布特征。因此，若在聚合网络上试图解决原问题，虽然实现了时空维度的降维，但仍然无法消除上述的结构性收入高估问题，甚至将其带入了模型的整数解中。换言之，使用聚合网络直接替换完整的网络将得到一个在计算上更紧凑但在目标值上可能严重高估的模型。其优点在于它能够更快地被求解器处理，但缺点在于它提供的是原问题的松弛解而且与原问题的LP松弛具有相似的结构性收入高估问题。因此从收入高估的角度来看，若直接将聚合网络应用在原问题上，得到的最优值应接近完整模型LP松弛的值。因此，虽然聚合网络在计算上具有吸引力，但它得到的结果却不是原问题的一个足够紧的下界，本文研究的问题难以仅通过时间离散化来解决。
 
 \begin{figure}[htbp]
     \centering
@@ -33,19 +27,19 @@
 图~\ref{fig:rev_overestimation}使用一个具体案例直观展示了这种高估现象。在图中，蓝色箭头表示服务分配，橙色条表示捕获的旅客，灰色线（面板3中）表示底层原始服务。
 在基准情况（面板1）中，最优整数解选择一个服务$f_0$（$x=1$），捕获该服务的收益部分（前三分之一），产生收入$r_0$。
 在LP松弛（面板2）中，求解器通过分配三个服务$f_1, f_2, f_3$各取值$x=\frac{1}{3}$来利用分数变量。因此每个分数分配包含服务的前三分之一，产生收入$3r_0$。这错误地暗示我们可以用仅一个资源单位等价的容量分散在时间上来服务所有潜在需求。
-面板3说明当时间点$t_1, t_2, t_3$合并为单个窗口时，我们上面定义的松弛模型继承了这一缺陷。模型可能允许聚合服务$f_{agg}$（$x=1$）声称底层原始服务的总需求，以与完整模型LP松弛相同的方式再次产生$3r_0$收入。
+面板3说明当使用上述的聚合手段将时间点$t_1, t_2, t_3$合并为单个窗口后考虑原问题时，我们上面定义的聚合网络将继承了这一缺陷。模型让聚合服务$f_{agg}$（$x=1$）提供完整服务时，底层的收入产生逻辑仍是利用了多个边际收益高的部分，以与完整模型LP松弛相同的方式再次产生$3r_0$收入。
 
 然而，在我们提出的行程聚合下，面板3中描述的情况被消除。
 超级行程构造明确检查组合原始行程的可行性。
-由于$t_1, t_2, t_3$处的出发过于接近，无法由单个资源单位合法运营（违反最小间隔时间），它们构成单个超级行程的非法组合。
-我们的方法将吸引力求和限制在原始行程的有效子集上（使用公式~\ref{def:relax.departLimit}中定义的$\departLimit$参数），从而剥离人为收入增益并恢复现实的目标值。
+当$t_1, t_2, t_3$处的出发无法同时被合法运营时，它们构成单个超级行程的非法组合。
+我们的方法将吸引力求和限制在原始行程的有效子集上，从而剥离收入增益并得到一个现实的目标值的更紧的上界。具体的限制机制将在下文行程聚合过程中详细定义。
 
-为解决这一挑战，我们引入一个与时间弧聚合互补的\emph{行程聚合}过程。
+我们引入一个\emph{行程聚合}过程。
 
 \paragraph{行程聚合过程。}
 给定由离散化$\discretization$定义的时间弧聚合，我们进一步执行与聚合时间弧一致的行程级聚合。
 令$\itinSet$表示完整网络中的原始行程集合。
-每条行程$r \in \itinSet$由有序的航段序列组成，每个航段使用原始离散化中的时间弧$(o,d,t)$。因此每条原始行程$r$可以表示为路径
+每条行程$r \in \itinSet$由有序的服务段序列组成，每个服务段使用原始离散化中的时间弧$(o,d,t)$（这里$o,d,t$表示起点、终点和出发时间，省略到达时间是因为在任意网络中给定起点、终点和出发时间时到达时间可以被唯一确定）。因此每条原始行程$r$可以表示为路径
 \begin{equation}
 \origPath{r} = \bigl( (o_1,d_1,t_1), (o_2,d_2,t_2), \dots \bigr)
 \end{equation}
@@ -58,17 +52,17 @@
 \end{equation}
 其中$\bar t_k$表示第$k$段的聚合出发时间。
 我们将有序元组$\pathSig{r}$定义为行程$r$的\emph{离散化路径签名}。
-在全文中，记号$(o,d,\bar{t})\in\pathSig{r}$表示具有起点$o$、终点$d$和聚合出发时间$\bar{t}$的航段作为元组中的一个条目出现；如果同一空间航段出现在行程的多个航段上，则在任何以$\pathSig{r}$为索引的求和或乘积中分别计数每次出现。
+在全文中，记号$(o,d,\bar{t})\in\pathSig{r}$表示具有起点$o$、终点$d$和聚合出发时间$\bar{t}$的服务段作为元组中的一个条目出现；如果同一物理路段出现在行程的多个服务段上，则在任何以$\pathSig{r}$为索引的求和或乘积中分别计数每次出现。
 
 行程聚合随后通过基于离散化路径签名将$\itinSet$划分为等价类$\eqClassByPathSig$来执行。
-两条行程$r,r' \in \itinSet$被分配到同一组当且仅当它们共享相同的路径签名，即
+两条行程$r,r' \in \itinSet$被分配到同一组当且仅当它们共享相同的离散化路径签名，即
 \[
 r \eqRelByPathSig r' \iff \pathSig{r} = \pathSig{r'}
 \]
 对于每个等价类，我们构造一条代表该类中所有原始行程的\emph{超级行程}。
-超级行程继承共同的节点序列和聚合时间弧，并在松弛模型中替换所有原始行程。超级行程的集合记为$\itinSetSuper$。超级行程$R$可以用与原始行程相同的方式由聚合路径签名表示。我们将此签名记为$\pathSig{R}$。
+超级行程继承共同的节点序列和聚合时间弧，并替换所有原始行程。超级行程的集合记为$\itinSetSuper$。超级行程$R$可以用与原始行程相同的方式由聚合路径签名表示。我们将此签名记为$\pathSig{R}$。
 
-与行程相关的属性以保守方式聚合。
+与行程相关的属性以乐观的方式聚合，这样若将新的行程集合替换原始行程进行求解，能够保证模型不会低估原问题的最优值。
 具体而言，对于每个票价等级，超级行程的票价设置为对应等价类中所有原始行程的最大值。
 \begin{equation}
 \fare_{r\ell} = \max_{r' \in \eqClassByPathSig_{(r)}} \fare_{r'\ell} \quad \forall r \in \itinSetSuper, \; \ell \in \fareClassSet
@@ -76,7 +70,7 @@ r \eqRelByPathSig r' \iff \pathSig{r} = \pathSig{r'}
 
 超级行程的吸引力值设置为对应等价类中原始行程所有可能组合中吸引力的最大求和。这确保超级行程的吸引力至少与其代表的任何原始行程组合一样高。在原始网络中使用相同路径的原始行程可以同时运营而不冲突。因此，类似于通过离散化路径签名将$\itinSet$划分为等价类$\eqClassByPathSig$，对于每条超级行程$R$，我们也通过原始路径签名将$\eqClassByPathSig_{(R)}$划分为等价类$\eqClassByOrigPath^{R}$，两条行程$r,r' \in \eqClassByPathSig_{(R)}$被分配到同一组当且仅当它们共享相同的原始路径签名，即
 \[r \eqRelByOrigPath r' \iff \origPath{r} = \origPath{r'}\]
-给定旅客类型$p$和票价等级$\ell$。对于每个等价类$\eqClassByOrigPath^{R}_r$，我们有对应等价类中所有原始行程的吸引力求和$\sum_{r\in \eqClassByOrigPath^{R}_r} \attr_{rp\ell}$。现在我们将超级行程$r$的吸引力值设置为商集$\eqClassByPathSig_{(R)} /\eqRelByOrigPath$中所有等价类中前$\departLimit$个最大求和，如下所示：
+给定旅客类型$p$和票价等级$\ell$。对于每个等价类$\eqClassByOrigPath^{R}_r$，我们有对应等价类中所有原始行程的吸引力求和$\sum_{r\in \eqClassByOrigPath^{R}_r} \attr_{rp\ell}$。现在我们将超级行程$r$的吸引力值设置为商集$\eqClassByPathSig_{(R)} /\eqRelByOrigPath$中所有等价类中前$\combLimit_R$个最大求和，其中$\combLimit_R$为当前聚合粒度下超级行程$R$路径上可同时实现的最大服务组合数，如下所示：
 \begin{equation*}
     \begin{aligned}
         \maxAttrCombSet_{Rp\ell}
@@ -104,8 +98,8 @@ r \eqRelByPathSig r' \iff \pathSig{r} = \pathSig{r'}
 % temp-command \tag{def$_{\adjAttrSuper_{Rp\ell}}$}
 \label{def:relax.shadowAttrSuper}
 \end{equation}
-其中$\departLimit_{od\bar{t}}$在(\ref{def:relax.departLimit})中定义，$\maxAttrCombSet_{Rp\ell}$是具有相同原始路径签名的原始行程等价类集合，该集合在旅客类型$p$和票价等级$\ell$下最大化总吸引力，受所选等价类数量不超过$\departLimit$的约束。对于超级行程路径上的每段$(o,d,\bar{t})$，在聚合时间窗口内可以物理共存的服务数量由$\min\{\departLimit_{od\bar{t}}, \freq_{o,d}\}$限制，反映了间隔时间容量和航段频率。由于具有不同路径签名的原始行程可能在某些航段上合并，总体限制$\departLimit$取为这些每段限制的最大值：只要存在至少一段可以容纳$\departLimit$个不同服务，相应的等价类就可以合法共存。
-这确保松弛模型不会低估旅客效用和目标值，同时防止多个分数流在同一时间窗口内利用多个相邻出发时间。
+其中$\departLimit_{od\bar{t}}$代表了物理路段$(o,d)$上在$\bar{t}$对应时间段的因最小出发间隔而产生的出发次数上界，其定义在(\ref{def:relax.departLimit})中给出，$\maxAttrCombSet_{Rp\ell}$是具有相同原始路径签名的原始行程等价类集合，该集合的元素在旅客类型$p$和票价等级$\ell$下拥有最大的总吸引力，受所选等价类数量不超过$\combLimit_R$的约束。对于超级行程路径上的每段$(o,d,\bar{t})$，在聚合时间窗口内可以物理共存的服务数量由$\min\{\departLimit_{od\bar{t}}, \freq_{o,d}\}$限制，反映了服务的最小间隔和路段频率。
+这确保在提供任意的服务数量时，超级行程不会低估旅客效用和目标值，同时防止多个分数流在同一时间窗口内利用多个相邻出发时间。
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\linewidth]{figure/illustrate_valid_combinations/valid_combinations}
@@ -122,12 +116,73 @@ r \eqRelByPathSig r' \iff \pathSig{r} = \pathSig{r'}
 在示例中，有效子集$\{(r_1), (r_3)\}$产生总属性0.3，大于$\{(r_2)\}$的0.2。
 
 然而，考虑所有冲突找到精确的最大权重独立集可能计算代价高昂。
-因此，在我们提出的模型中，我们采用简化且高效的近似（方法2）。对于路径上的每段$(o,d,\bar{t})$，每段容量由$\min\{\departLimit_{od\bar{t}}, \freq_{od}\}$限制，同时考虑间隔时间限制（公式~\ref{def:relax.departLimit}）和航段频率。总体$\departLimit$随后从这些每段限制导出，反映了具有不同原始路径签名的行程可能在共享航段上合并的事实。
-我们通过从商集中选择前$\departLimit$个等价类来近似最大可行吸引力。
-由于$\departLimit$是任何有效服务序列大小的上界，方法2计算的吸引力和保证大于或等于任何实际无冲突子集（方法1）的吸引力，因此大于或等于任何可行整数解。
-在松弛模型中选择超级行程有效地授予了这种"乐观"收入。
-对于原始问题中可行的任何有效解，其收入不能超过为超级行程计算的最大可能收入。因此，松弛目标（最小化成本 - 收入）保持小于或等于真实最优目标，保持了下界的有效性。
-涉及行程级变量的约束被更新以反映聚合。具体而言，约束(\ref{constr:main.choice.ratio}, \ref{constr:main.choice.limit}, \ref{constr:main.choice.capacity}, \ref{constr:main.choice.covering})修改如下：
+因此，在我们上述的公式中，我们采用简化且高效的近似（方法2）。对于路径上的每段$(o,d,\bar{t})$，每段容量由$\min\{\departLimit_{od\bar{t}}, \freq_{od}\}$限制，同时考虑间隔时间限制（公式~\ref{def:relax.departLimit}）和路段频率。总体的限制随后从这些每段限制导出，反映了具有不同原始路径签名的行程可能在共享路段上合并的事实。
+我们通过从商集$\eqClassByPathSig_{(R)} /\eqRelByOrigPath$中选择前$\combLimit_R$个等价类来近似最大可行吸引力。
+方法2计算的吸引力和保证大于或等于任何实际无冲突子集（方法1）的吸引力，因此与方法1一样，大于或等于任何可行整数解。
+
+综上所述，超级行程表示通过路径签名诱导的等价划分，将原始行程空间压缩为紧凑的超级行程集合；同时，通过吸引力上界刻画聚合时间窗口内可同时实现的原始行程组合，既覆盖完整模型中的可行选择结构，又抑制由简单累加不可兼容行程所导致的虚假收入。在此基础上，下一节将进一步从超级行程表示推导出两个互补的优化子模型以求解原问题。
+
+% \model{\discretization, \itinSetSuper}，最终松弛模型
+\section{基于超级行程的双侧界模型}\label{sec:bounds_models}
+
+上一节构造的超级行程表示为原问题提供了两种互补的建模方式。首先，在聚合层面，原始网络、原始行程变量可以由聚合网络、超级行程变量替代，并利用超级行程吸引力上界对完整网络上的可行选择结构进行乐观评价，由此得到一个规模更小的聚合下界模型。其次，超级行程表示可以在完整网络层面被重新嵌入原始行程模型中，其收入上界转化为收入割平面，并与下界解给出的服务频率结构共同强化可行解修复过程。基于这两个互补模型，本文能够同时获得原问题最优值的有效下界和可行上界。
+
+本节首先给出聚合下界模型的构造，然后介绍完整网络上的上界修复模型。
+
+\subsection{聚合下界模型}\label{sec:lbm_formulation}
+
+对于本文讨论的最小化问题，构造下界模型即需要推导出一个原问题的有效松弛模型。
+在聚合时空网络$\net$上建立松弛模型时，原问题中的大部分约束（流守恒\eqref{constr:main.flow}、路段频率\eqref{constr:main.seg_freq}）仅需将弧和节点集合替换为聚合网络中的对应集合即可保持。然而，由于时间聚合可能产生逆弧或将原本间隔充分的出发归并到同一时间点，以下几类约束需要修正以确保松弛的有效性。
+
+聚合网络中的资源分配变量$\fleetAssignVar_{af}$定义为原始网络中映射到同一聚合弧的所有分配之和：
+\[
+    \fleetAssignVar_{a^{\discretization},f}^{\net} = \sum_{a^{\discretizationFull}:\, \Phi(a^{\discretizationFull}) = a^{\discretization}}\fleetAssignVar_{a^{\discretizationFull},f}^{\full{\net}}
+\]
+为确保松弛的最优性，服务弧上的资源分配变量的变量域放宽为正整数，允许多个资源单位被分配到同一聚合服务弧上：
+\begin{equation}
+    \fleetAssignVar_{af}\in\mathbb{Z}_{\ge0} \quad \forall a\in \flightArc, \; \forall f\in \fleetSet
+    % temp-command \tag{2j}
+    \label{constr:relax.domain.x.flight}
+\end{equation}
+
+对于资源可用性约束，当聚合网络中存在逆弧（到达时间不晚于出发时间的服务弧）时，资源单位可能被重复计数。此时在$t_c$对资源计数时需要扣除重复计数的部分，令$\invertArcTc{t_c}$表示跨越$t_c$的逆弧集合：
+\begin{equation}
+\begin{aligned}
+    \invertArcTc{t_c} = \{a=((i,t)\rightarrow(j,t^\prime))\;\forall a\in\flightArc\mid t^\prime\leq t_c<t<t+\travelTime_{ij}<\planningEnd\}
+    % temp-command \tag{def$_{\invertArcTc{t_c}}$}
+    \label{def:relax.invertArcTc}
+\end{aligned}
+\end{equation}
+\input{figure/inverse_arc.tex}
+资源可用性约束相应修正为
+\begin{equation}
+    \sum_{a\in \holdingArcTc{\checkTime}} \fleetAssignVar_{af} + \sum_{a\in \flightArcTc{\checkTime}} \fleetAssignVar_{af} - \sum_{a\in \invertArcTc{\checkTime}} \fleetAssignVar_{af} \le \fleetAvail_{f}
+    \quad \forall f\in \fleetSet
+    % temp-command \tag{2c}
+    \label{constr:relax.fleet_available}
+\end{equation}
+
+对于间隔出发约束，聚合可能导致原本在完整网络中相距较远的服务在松弛模型中出现在相同时间点。为保持松弛有效性，需要允许在完整网络中合法的出发组合。定义在区间$[t, t+\minInterdepTime_{ij})$内可同时出发的服务数量上界$\departLimit_{ijt}$为：
+\begin{equation}
+\begin{aligned}
+    \departLimit_{ijt} & = \begin{cases}
+        \lceil \frac{t^{+}-t}{\minInterdepTime_{ij}}\rceil & t^{+}-t>0\notag\\
+        \lceil \frac{\planningEnd-\planningStart+t^{+}-t}{\minInterdepTime_{ij}}\rceil & t^{+}-t<0
+    \end{cases} \\
+    & = \lceil \frac{t^{+}-t+\frac{\planningEnd-\planningStart}{2}(\frac{t^{+}-t-|t^{+}-t|}{|t^{+}-t|})}{\minInterdepTime_{ij}}\rceil
+    % temp-command \tag{def$_{\departLimit_{ijt}}$}
+    \label{def:relax.departLimit}
+\end{aligned}
+\end{equation}
+其中$t^{+}=\min\{\bar{t}\in\discretization_i\mid\bar{t}>\max\{\bar{\bar{t}}\mid(i,\bar{\bar{t}},j,\bar{\bar{t}}^\prime)\in\arcDuringSepTime_{ijt}^\discretization\}\}$。间隔出发约束修正为
+\begin{equation}
+    \sum_{f\in \fleetSet}\sum_{a\in \arcDuringSepTime_{ijt}} \fleetAssignVar_{af} \le \departLimit_{ijt}
+    \quad \forall (i,j)\in \segSet,\; \forall t \in \discretization_i
+    % temp-command \tag{2d}
+    \label{constr:relax.cooldown}
+\end{equation}
+
+同时，涉及行程级变量的选择约束被更新以反映超级行程聚合。具体而言，原问题中的约束\eqref{constr:main.choice.ratio}--\eqref{constr:main.choice.covering}在超级行程空间中修改如下：
 \begin{equation}
     \outAttr_{mp}\, \shareVar_{rp\ell} \;\le\; \attrSuper_{rp\ell}\, \outsideShareVar_{mp}
     \quad \forall m\in \marketSet,\, \forall p\in \psgTypeSet,\, \forall r\in \itinSuperInMarket_{m},\, \forall \ell\in \fareClassSet
@@ -156,66 +211,6 @@ r \eqRelByPathSig r' \iff \pathSig{r} = \pathSig{r'}
     \quad \forall a\in \flightArc,\; \forall m\in \marketSet,\, \forall r\in \itinSuperUsingArc{m}{a},\, \forall p\in \psgTypeSet,\,\forall \ell\in\fareClassSet
     % temp-command \tag{2i}
     \label{constr:relax.choice.covering}
-\end{equation}
-
-通过这种行程聚合，在一个聚合时间窗口内使用不同原始时间弧的所有分数资源流被迫竞争同一超级行程。
-因此，在聚合时间弧上收集的收入对应于原始网络中最多$\departLimit_{ijt}$个完整资源流，有效消除了由相邻出发时间间分数资源重用引起的人为收入膨胀。
-
-% \model{\discretization, \itinSetSuper}，最终松弛模型
-\section{基于超级行程的双侧界模型}\label{sec:bounds_models}
-
-基于上节构造的超级行程表示，本节分别给出聚合下界模型和完整网络上界修复模型的数学公式。
-
-\subsection{聚合下界模型}\label{sec:lbm_formulation}
-
-在聚合时空网络$\net$上建立松弛模型时，原问题中的大部分约束（流守恒\eqref{constr:main.flow}、航段频率\eqref{constr:main.seg_freq}、选择约束\eqref{constr:main.choice.ratio}--\eqref{constr:main.choice.covering}）仅需将弧和节点集合替换为聚合网络中的对应集合即可保持。然而，由于时间聚合可能产生逆弧或将原本间隔充分的出发归并到同一时间点，以下两类约束需要修正以确保松弛的有效性。
-
-聚合网络中的机队分配变量$\fleetAssignVar_{af}$定义为原始网络中映射到同一聚合弧的所有分配之和：
-\[
-    \fleetAssignVar_{a^{\discretization},f}^{\net} = \sum_{a^{\discretizationFull}:\, \Phi(a^{\discretizationFull}) = a^{\discretization}}\fleetAssignVar_{a^{\discretizationFull},f}^{\full{\net}}
-\]
-为确保松弛的最优性，服务弧上的机队分配变量域放宽为
-\begin{equation}
-    \fleetAssignVar_{af}\in\mathbb{Z}_{\ge0} \quad \forall a\in \flightArc, \; \forall f\in \fleetSet
-    % temp-command \tag{2j}
-    \label{constr:relax.domain.x.flight}
-\end{equation}
-
-对于机队可用性约束，当聚合网络中存在逆弧（到达时间不晚于出发时间的服务弧）时，资源单位可能被重复计数。令$\invertArcTc{t_c}$表示跨越$t_c$的逆弧集合：
-\begin{equation}
-\begin{aligned}
-    \invertArcTc{t_c} = \{a=((i,t)\rightarrow(j,t^\prime))\;\forall a\in\flightArc\mid t^\prime\leq t_c<t<t+\travelTime_{ij}<\planningEnd\}
-    % temp-command \tag{def$_{\invertArcTc{t_c}}$}
-    \label{def:relax.invertArcTc}
-\end{aligned}
-\end{equation}
-\input{figure/inverse_arc.tex}
-机队可用性约束相应修正为
-\begin{equation}
-    \sum_{a\in \holdingArcTc{\checkTime}} \fleetAssignVar_{af} + \sum_{a\in \flightArcTc{\checkTime}} \fleetAssignVar_{af} - \sum_{a\in \invertArcTc{\checkTime}} \fleetAssignVar_{af} \le \fleetAvail_{f}
-    \quad \forall f\in \fleetSet
-    % temp-command \tag{2c}
-    \label{constr:relax.fleet_available}
-\end{equation}
-
-对于间隔出发约束，聚合可能导致原本在完整网络中相距较远的服务在松弛模型中出现在相同时间点。为保持松弛有效性，需要允许在完整网络中合法的出发组合。定义在区间$[t, t+\minInterdepTime_{ij})$内可同时出发的服务数量上界$\departLimit_{ijt}$为：
-\begin{equation}
-\begin{aligned}
-    \departLimit_{ijt} & = \begin{cases}
-        \lceil \frac{t^{+}-t}{\minInterdepTime_{ij}}\rceil & t^{+}-t>0\notag\\
-        \lceil \frac{\planningEnd-\planningStart+t^{+}-t}{\minInterdepTime_{ij}}\rceil & t^{+}-t<0
-    \end{cases} \\
-    & = \lceil \frac{t^{+}-t+\frac{\planningEnd-\planningStart}{2}(\frac{t^{+}-t-|t^{+}-t|}{|t^{+}-t|})}{\minInterdepTime_{ij}}\rceil
-    % temp-command \tag{def$_{\departLimit_{ijt}}$}
-    \label{def:relax.departLimit}
-\end{aligned}
-\end{equation}
-其中$t^{+}=\min\{\bar{t}\in\discretization_i\mid\bar{t}>\max\{\bar{\bar{t}}\mid(i,\bar{\bar{t}},j,\bar{\bar{t}}^\prime)\in\arcDuringSepTime_{ijt}^\discretization\}\}$。间隔出发约束修正为
-\begin{equation}
-    \sum_{f\in \fleetSet}\sum_{a\in \arcDuringSepTime_{ijt}} \fleetAssignVar_{af} \le \departLimit_{ijt}
-    \quad \forall (i,j)\in \segSet,\; \forall t \in \discretization_i
-    % temp-command \tag{2d}
-    \label{constr:relax.cooldown}
 \end{equation}
 
 我们将同时包含时间弧聚合和行程聚合的最终松弛模型记为$\model{\discretization, \itinSetSuper}$。当行程集合与完整模型相同时，记$\model{\discretization} = \model{\discretization, \itinSet}$。

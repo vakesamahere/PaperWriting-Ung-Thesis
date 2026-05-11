@@ -6,7 +6,7 @@
 \subsection{频率固定约束}
 频率固定的核心假设是，虽然松弛解定义在粗糙网络上——因此当映射到精确时间时可能物理不可行——但它在资源分配方面做出了高度准确的决策。因此，松弛模型确定的资源频率是高度可信的，可以在当前迭代中锁定。
 
-令$\fleetAssignVar^{*}$为从松弛模型获得的整数最优解。我们计算每个航段$s=(i,j)$和资源类型$f$的服务频率：
+令$\fleetAssignVar^{*}$为从松弛模型获得的整数最优解。我们计算每个物理路段$s=(i,j)$和资源类型$f$的服务频率：
 \begin{equation}
     \freq_{s,f} = \sum_{a \in \segArcSet{s}} \fleetAssignVar_{a,f}^{*}  \quad \in \mathbb{Z}_{\ge 0}
 \end{equation}
@@ -92,15 +92,15 @@
 % 我们明确声明这一点以澄清不需要额外的后备修复：
 如果UB模型$\ubm(\discretizationFull,\model{\discretization, \itinSetSuper})$在锁定的聚合频率$\freq_{s,f}$下变得不可行，求解器有效地返回一个结果（在我们的算法逻辑中视为$+\infty$的上界）。在这种情况下，算法不更新现有UB，而是进入由LBM不可行性驱动的细化阶段。
 \subsection{变量缩减}
-为加速求解过程，我们基于固定的聚合频率$\freq_{s,f}$应用一系列精确的变量缩减。由于$\freq_{s,f}$决定了可用网络容量，任何零分配服务的航段从根本上破坏了连通性，使我们能够安全地将许多变量固定为零，并在将模型发送给求解器之前消除冗余的下游变量和约束。
+为加速求解过程，我们基于固定的聚合频率$\freq_{s,f}$应用一系列精确的变量缩减。由于$\freq_{s,f}$决定了可用网络容量，任何零分配服务的物理路段从根本上破坏了连通性，使我们能够安全地将许多变量固定为零，并在将模型发送给求解器之前消除冗余的下游变量和约束。
 
-对于任何航段$s \in \segSet$和资源类型$f \in \fleetSet$，如果锁定频率$\freq_{s,f} = 0$，则意味着不能在航段$s$上运营$f$型服务。因此，我们立即将此零分配级联到所有底层服务分配变量：
+对于任何物理路段$s \in \segSet$和资源类型$f \in \fleetSet$，如果锁定频率$\freq_{s,f} = 0$，则意味着不能在路段$s$上运营$f$型服务。因此，我们立即将此零分配级联到所有底层服务分配变量：
 \begin{equation}
     \fleetAssignVar_{a,f} = 0, \quad \forall a \in \full{\segArcSet{s}} \text{ if } \freq_{s,f} = 0
 \end{equation}
 这对这些组合内在地满足频率约束\eqref{constr:ubm.freq_fix}，使我们能够从域中移除这些变量和约束。
 
-由于行程$r$（或超级行程$R$）从根本上由一系列时空服务弧组成，移除其任何底层空间航段的所有容量直接切断了这些物理路径。为记号方便，我们写$s \in r$（或$s \in R$）表示空间航段$s$被行程$r$（或超级行程$R$）的时空弧所经过。如果行程依赖于没有任何资源类型分配服务的航段$s$（即$\sum_{f\in\fleetSet} \freq_{s,f} = 0$），则该行程变得物理不可能。由于覆盖约束\eqref{constr:main.choice.covering}和\eqref{constr:ubm.itinerary_cut.choice.covering}，与此类行程相关的市场份额降为零：
+由于行程$r$（或超级行程$R$）从根本上由一系列时空服务弧组成，移除其任何底层物理路段的所有容量直接切断了这些物理路径。为记号方便，我们写$s \in r$（或$s \in R$）表示物理路段$s$被行程$r$（或超级行程$R$）的时空弧所经过。如果行程依赖于没有任何资源类型分配服务的路段$s$（即$\sum_{f\in\fleetSet} \freq_{s,f} = 0$），则该行程变得物理不可能。由于覆盖约束\eqref{constr:main.choice.covering}和\eqref{constr:ubm.itinerary_cut.choice.covering}，与此类行程相关的市场份额降为零：
 \begin{equation}
     \shareVar_{r,p,\ell} = 0, \quad \text{if } \exists s \in r \text{ s.t. } \sum_{f\in\fleetSet} \freq_{s,f} = 0
 \end{equation}

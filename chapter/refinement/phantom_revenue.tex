@@ -15,4 +15,4 @@ RFS(\solution)=\min_{\shareVar, \outsideShareVar, s} \quad & \sum_{m\in \marketS
 
 约束(\ref{eq:rfs_target})强制底层原始行程满足松弛收入，使用$s_{Rpl}$吸收任何不可避免的赤字。约束(\ref{eq:rfs_ratio})-(\ref{eq:rfs_cap})确保恢复的旅客流严格遵守$\fleetAssignVar^*$的物理容量和原始离散选择界。
 
-松弛解$\solution$包含虚假收入（因此是非法的）当且仅当RFS的最优目标值严格大于零（即$\sum s_{Rpl}^* > 0$）。对应于正松弛$s_{Rpl}^* > 0$的超级行程的时间槽（即一组航段-时间对）是导致虚假收入的罪魁祸首。通过向离散化$\discretization^{2}$添加时间点，我们可以确保所有这些虚假收入违规在细化模型中不会发生。记细化后的离散化为$\discretization^{3}$。细化过程将在第~\ref{sec:refine_process}~小节中描述。
+松弛解$\solution$包含虚假收入（因此是非法的）当且仅当RFS的最优目标值严格大于零（即$\sum s_{Rpl}^* > 0$）。对应于正松弛$s_{Rpl}^* > 0$的超级行程的时间槽（即一组路段-时间对）是导致虚假收入的罪魁祸首。通过向离散化$\discretization^{2}$添加时间点，我们可以确保所有这些虚假收入违规在细化模型中不会发生。记细化后的离散化为$\discretization^{3}$。细化过程将在第~\ref{sec:refine_process}~小节中描述。
