@@ -1,0 +1,21 @@
+为改善选择约束中的数值病态，本文在所有模型求解前对吸引力参数进行市场级缩放预处理。对于每个市场$m \in \marketSet$和旅客类型$p \in \psgTypeSet$，识别最小非零绝对吸引力值：
+\begin{equation*}
+    \attrMin_{mp} = \min \left\{ \left|\outAttr_{mp}\right|, \, \left|\attr_{rp\ell}\right|, \, \left|\adjAttr_{rp\ell}\right| \mid r \in \itinInMarket_m, \, \ell \in \fareClassSet, \, \text{value} \neq 0 \right\}
+\end{equation*}
+然后应用缩放因子$\attrScale_{mp} = 1.0 / \attrMin_{mp}$均匀缩放该市场-旅客组合内的所有吸引力参数：
+\begin{equation*}
+\begin{aligned}
+    \outAttr_{mp} &\leftarrow \attrScale_{mp} \cdot \outAttr_{mp}\\
+    \attr_{rp\ell} &\leftarrow \attrScale_{mp} \cdot \attr_{rp\ell} \quad \forall r \in \itinInMarket_m, \, \ell \in \fareClassSet\\
+    \shadowAttr_{rp\ell} &\leftarrow \attrScale_{mp} \cdot \shadowAttr_{rp\ell} \quad \forall r \in \itinInMarket_m, \, \ell \in \fareClassSet
+\end{aligned}
+\end{equation*}
+因此，调整吸引力也按相同因子缩放，即$\adjAttr_{rp\ell} \leftarrow \attrScale_{mp} \cdot \adjAttr_{rp\ell}$和$\adjOutAttr_{mp} \leftarrow \attrScale_{mp} \cdot \adjOutAttr_{mp}$。
+
+由于选择约束\eqref{constr:main.choice.ratio}和\eqref{constr:main.choice.limit}在每个市场-旅客组合内对吸引力参数是齐次的，将所有吸引力值乘以正常数$\attrScale_{mp}$严格保持可行域和最优解。为验证这一点，观察约束\eqref{constr:main.choice.ratio}变为：
+\begin{equation*}
+    (\attrScale_{mp} \cdot \outAttr_{mp})\, \shareVar_{rp\ell} \;\le\; (\attrScale_{mp} \cdot \attr_{rp\ell})\, \outsideShareVar_{mp}
+\end{equation*}
+从两边消去公共正因子$\attrScale_{mp}$后等价于原始约束。类似地，约束\eqref{constr:main.choice.limit}仍然有效，因为系数中的分子和分母按相同因子缩放，保持了比率$\adjAttr_{rp\ell}/\attr_{rp\ell}$和$\adjOutAttr_{mp}/\outAttr_{mp}$。
+
+在计算上，该预处理确保选择约束中最小的非零系数恰好为$1.0$，消除矩阵病态，大幅加速下界收敛并增强整体算法稳定性。

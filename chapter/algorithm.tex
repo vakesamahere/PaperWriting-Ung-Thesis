@@ -33,7 +33,7 @@
     \State $\initStep_i\gets\min_{j:(j,i)\in\segSet}\{\travelTime_{ji}\}$
     \State $\discretization_i\gets\{t\mid t=\planningStart+k\,\initStep_i,\, k \in \mathbb{Z}_{\ge0}, t < \planningEnd\}$
 \EndFor
-\State 对所有市场执行吸引力平衡预处理（第~\ref{sec:preconditioning_solution}~节）
+\State 对所有市场执行吸引力平衡预处理（附录~\ref{sec:preconditioning_solution}）
 \State $iter\gets 0$
 \Loop
     \State $iter \gets iter + 1$
@@ -54,36 +54,9 @@
 \end{algorithmic}
 \end{algorithm}
 
-\section{吸引力平衡预处理}\label{sec:preconditioning_solution}
-
-为稳定优化过程，我们提出一种市场特定的数值预处理技术，称为吸引力平衡。对于每个市场$m \in \marketSet$和旅客类型$p \in \psgTypeSet$，我们在所有吸引力相关参数中识别最小非零绝对吸引力值：
-\begin{equation*}
-    \attrMin_{mp} = \min \left\{ \left|\outAttr_{mp}\right|, \, \left|\attr_{rp\ell}\right|, \, \left|\adjAttr_{rp\ell}\right| \mid r \in \itinInMarket_m, \, \ell \in \fareClassSet, \, \text{value} \neq 0 \right\}
-    \label{eq:attr_min}
-\end{equation*}
-
-然后我们应用缩放因子$\attrScale_{mp} = 1.0 / \attrMin_{mp}$来均匀缩放该市场-旅客组合内的所有吸引力参数。由于根据GAM定义$\adjAttr_{rp\ell} = \attr_{rp\ell} - \shadowAttr_{rp\ell}$，我们缩放底层的名义吸引力和影子吸引力：
-\begin{equation*}
-\begin{aligned}
-    \outAttr_{mp} &\leftarrow \attrScale_{mp} \cdot \outAttr_{mp}\\
-    \attr_{rp\ell} &\leftarrow \attrScale_{mp} \cdot \attr_{rp\ell} \quad \forall r \in \itinInMarket_m, \, \ell \in \fareClassSet\\
-    \shadowAttr_{rp\ell} &\leftarrow \attrScale_{mp} \cdot \shadowAttr_{rp\ell} \quad \forall r \in \itinInMarket_m, \, \ell \in \fareClassSet
-\end{aligned}
-\end{equation*}
-因此，调整吸引力也按相同因子缩放，即$\adjAttr_{rp\ell} \leftarrow \attrScale_{mp} \cdot \adjAttr_{rp\ell}$和$\adjOutAttr_{mp} \leftarrow \attrScale_{mp} \cdot \adjOutAttr_{mp}$。
-
-从数学上看，由于选择约束\eqref{constr:main.choice.ratio}和\eqref{constr:main.choice.limit}在每个市场-旅客组合内对吸引力参数是齐次的，将所有吸引力值乘以正常数$\attrScale_{mp}$严格保持可行域和最优解。为验证这一点，观察约束\eqref{constr:main.choice.ratio}变为：
-\begin{equation*}
-    (\attrScale_{mp} \cdot \outAttr_{mp})\, \shareVar_{rp\ell} \;\le\; (\attrScale_{mp} \cdot \attr_{rp\ell})\, \outsideShareVar_{mp}
-\end{equation*}
-这在从两边消去公共正因子$\attrScale_{mp}$后等价于原始约束。类似地，约束\eqref{constr:main.choice.limit}仍然有效，因为系数中的分子和分母按相同因子缩放，保持了比率$\adjAttr_{rp\ell}/\attr_{rp\ell}$和$\adjOutAttr_{mp}/\outAttr_{mp}$。
-
-在计算上，这种预处理确保选择约束中最小的非零系数恰好为$1.0$，有效消除了矩阵病态。这一简单但关键的变换在我们求解框架的下界模型和上界模型组件中都起到催化剂作用，大幅加速了下界的收敛并增强了整体算法稳定性。本文报告的所有实验结果均在所有实例上统一采用了这一吸引力平衡预处理步骤。
-
-一种解决数值不稳定性的替代方法是将$\shareVar_{rp\ell}$替换为$\demand_{mp} \shareVar_{rp\ell}$，其中唯一的$m$满足$r\in \itinInMarket_m$，并从目标函数和约束中移除$\demand_{mp}$。同时，$\shareVar_{rp\ell}$和$\outsideShareVar_{mp}$的域变为$[0, \demand_{mp}]$（或简单地$[0,+\infty]$）。这种方法可以有效消除目标函数和选择约束中的大系数，特别是$\demand_{mp}\fare_{r\ell}$项。新$\shareVar$变量的值表示选择行程$r$在票价$\ell$下的实际旅客数量，而非需求份额，后者通常是$[10^{-5}, 10^{-4}]$中的小分数。
-
 \input{chapter/lbm/relaxation.tex}
 
 \input{chapter/ub/freqfix_iti.tex}
 
+\section{自适应聚合表示细化与有限收敛}\label{sec:refinement_wrapper}
 \input{chapter/refinement/_main.tex}

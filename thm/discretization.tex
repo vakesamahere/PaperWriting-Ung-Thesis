@@ -1,0 +1,59 @@
+本附录给出聚合时空网络的严格构造规则以及初始离散化的拓扑感知设计。
+
+\paragraph{聚合时空网络的构造规则。}
+给定工作离散化$\discretization$，聚合时空网络$\net = (\nodeSet, \arcSet)$定义为$\nodeSet = \{(i,t)\mid \forall i\in\airportSet, t\in\discretization_i\}$，$\arcSet = \holdingArc \cup \flightArc$，满足以下性质：
+\begin{property}[离散化$\discretization$的域]
+    $\forall i\in\airportSet,\,\{\planningStart\}\subseteq\discretization_i\subseteq\discretizationFull_i$
+\end{property}
+\begin{property}[节点 $\nodeSet = \Phi_{\nodeSet}(\netFlat, \discretization)$]
+    节点集$N$包含节点$(i,\planningStart)\;\forall i\in\airportSet$
+\end{property}
+\begin{property}[持有弧]
+    \label{def:relax.holdingArc}
+    每条地面弧$a\in\holdingArc$定义为$a=((i,t),(i,t^{+}))$，其中
+    $t^{+}=\begin{cases}
+            \min\{\bar{t}\mid\bar{t}>t,\bar{t}\in\discretization_i\} & ,\exists\bar{t}>t,\bar{t}\in\discretization_i\\
+            \planningStart & ,\text{otherwise}
+    \end{cases}$
+\end{property}
+\begin{property}[服务弧]
+    \label{def:relax.flightArc}
+    每条服务弧$a\in\flightArc$定义为$a=((i,t),(j,t^\prime)),\;\forall (i,j)\in\segSet,t\in\discretization_i$，其中
+    $t^\prime=\max\{\bar{t}\mid\bar{t}\leq(t+\travelTime_{ij})\;\text{mod}\;(\planningEnd-\planningStart)+\planningStart,\bar{t}\in\discretization_j\}$
+\end{property}
+
+\paragraph{弧映射$\Phi$的严格定义。}
+对每个节点$i\in\airportSet$，引入投影
+\[
+    \phi_i:\discretizationFull_i\to\discretization_i,\qquad 
+    \phi_i(\tau)=\max\{\bar{t}\in\discretization_i\mid \bar{t}\le \tau\}.
+\]
+节点映射为$\Phi_{\nodeSet}((i,\tau))=(i,\phi_i(\tau))$。弧映射$\Phi_{\arcSet}:\full{\arcSet}\to\widetilde{\arcSet}$（其中$\widetilde{\arcSet}:=\arcSet\cup\{\bot\}$）定义为：
+\begin{equation}
+    \Phi_{\arcSet}(((i,\tau)\rightarrow(j,\tau'))) =
+    \begin{cases}
+        ((i,\phi_i(\tau))\rightarrow(j,\phi_j(\tau'))), & \text{if } i\neq j,\\[2pt]
+        ((i,\phi_i(\tau))\rightarrow(i,\phi_i(\tau'))), & \text{if } i=j,\ \phi_i(\tau)<\phi_i(\tau'),\\[2pt]
+        \bot, & \text{if } i=j,\ \phi_i(\tau)=\phi_i(\tau').
+    \end{cases}
+\end{equation}
+每条服务弧将其尾部保持在向下取整的聚合时间上，并将其头部设置为旅行时间不增加的最晚聚合时间点；持有弧桥接到下一个聚合节点，若两端点投影到同一聚合节点则折叠为$\bot$。
+
+\paragraph{初始离散化与逆弧消除。}
+为给行程聚合提供一个无逆弧的初始聚合网络，本文采用拓扑感知的异构初始离散化。性质~\ref{def:relax.holdingArc}--\ref{def:relax.flightArc}中定义的弧映射规则揭示了均匀粗糙离散化的结构脆弱性。在性质~\ref{def:relax.flightArc}下，在航段$(j,i)$上从$t \in \discretization_j$出发的服务弧的到达时间被设置为$\discretization_i$中不晚于$t + \travelTime_{ji}$的最晚网格点（下取整映射）。如果对所有节点应用均匀步长$\discretizationStep$且对某些航段$(j,i)$有$\discretizationStep > \travelTime_{ji}$，则映射的到达时间$t'$可能满足$t' \le t$，产生资源单位看起来到达不晚于出发的逆弧。为从源头消除逆弧，每个节点$i \in \airportSet$获得一个定义为最小入站旅行时间的个体初始步长$\initStep_i$：
+\begin{equation}\label{eq:init_step}
+    \initStep_i = \min_{j:\,(j,i)\in\segSet} \left\{ \travelTime_{ji} \right\}.
+\end{equation}
+对于没有入站航段的节点，我们设置$\initStep_i = \planningEnd - \planningStart$作为安全默认值。节点$i$的初始时间点集合随后生成为等差数列
+\begin{equation}\label{eq:init_discretization}
+    \discretization_i = \left\{ t \;\middle|\; t = \planningStart + k \cdot \initStep_i,\quad k \in \mathbb{Z}_{\ge 0},\quad t < \planningEnd \right\}.
+\end{equation}
+
+\begin{proposition}[消除逆弧]\label{prop:no_inverse}
+    在由\eqref{eq:init_step}--\eqref{eq:init_discretization}定义的初始离散化下，松弛网络$\net$不包含逆弧，即对于每条服务弧$a = ((j,t) \to (i,t')) \in \flightArc$且$(j,i) \in \segSet$，有$t' > t$。
+\end{proposition}
+\begin{proof}
+    由性质~\ref{def:relax.flightArc}，$t' = \max\{\bar{t} \in \discretization_i \mid \bar{t} \le t + \travelTime_{ji}\}$。由于$\discretization_i$是公差为$\initStep_i \le \travelTime_{ji}$（由\eqref{eq:init_step}）的等差数列，区间$(t,\, t + \travelTime_{ji}]$的长度为$\travelTime_{ji} \ge \initStep_i$，因此包含$\discretization_i$的至少一个网格点。故$t' \ge t + \initStep_i > t$（注意$\initStep_i > 0$由构造保证）。
+\end{proof}
+
+异构步长自然适应真实世界服务网络的枢纽辐射结构。接收许多短途服务的枢纽节点获得较小的$\initStep_i$，因此获得保持时间精度的更细网格。主要由长途航段服务的辐射节点获得较大的$\initStep_i$和相应更粗的网格。这种自适应行为在不牺牲网络物理有效性的情况下保持初始时间点总数紧凑，避免了当均匀细密网格应用于大规模实例时出现的内存溢出故障。通过排除逆弧，初始松弛模型从第一次迭代就产生了显著更紧的下界，减少了收敛所需的细化迭代次数。
