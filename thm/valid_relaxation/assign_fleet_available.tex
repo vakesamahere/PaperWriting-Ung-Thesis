@@ -1,5 +1,5 @@
 \paragraph*{频率约束 \eqref{constr:relax.fleet_available}。}
-结合引理~\ref{lem:fleet_avail.expand} 和~\ref{lem:fleet_avail.wrap} 得到
+结合引理~\ref{lem:fleet_avail.expand}~和~\ref{lem:fleet_avail.wrap}~得到
 \[
     \sum_{a\in\holdingArcTc{\checkTime}}\fleetAssignVar_{af}
     + \sum_{a\in\flightArcTc{\checkTime}}\fleetAssignVar_{af}
@@ -34,7 +34,7 @@
         t_d(a')+H, & t_o(a')+\travelTime_{a'} \ge \planningEnd.
     \end{cases}
 \]
-应用引理~\ref{lem:fleet_avail.expand} 中使用的相同情况讨论，对每个 $r$ 得到
+应用引理~\ref{lem:fleet_avail.expand}~中使用的相同情况讨论，对每个 $r$ 得到
 \[
     a'_{k,r}\in\holdingArcTc{\checkTime}\cup\flightArcTc{\checkTime}
     \iff \widetilde{t}_o(a'_{k,r}) \le \checkTime < \widetilde{t}_d(a'_{k,r}).
@@ -44,7 +44,7 @@
     \arcPosi^{\mathrm{full}}
         := \{a'_{k,r}\mid \widetilde{t}_o(a'_{k,r}) \le \checkTime < \widetilde{t}_d(a'_{k,r})\}.
 \]
-因为原始网络中路径的反向弧都是隔夜航班产生的，即 $\arcNega^{\mathrm{full}}$ 为空，由引理~\ref{lem:fleet_avail.wrap} 可得 $|\arcPosi^{\mathrm{full}}|=\wrapnum_{fk}$。
+因为原始网络中路径的反向弧都是隔夜航班产生的，即 $\arcNega^{\mathrm{full}}$ 为空，由引理~\ref{lem:fleet_avail.wrap}~可得 $|\arcPosi^{\mathrm{full}}|=\wrapnum_{fk}$。
 由于 $\bar{\fleetAssignVar}_{\cdot f}$ 满足 \eqref{constr:main.fleet_available}，我们有
 \[
     \sum_{k\in K_f}\routeAmount{\pathInRoute{f}{k}}\wrapnum_{fk}

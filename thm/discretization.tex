@@ -40,7 +40,7 @@
 每条服务弧将其尾部保持在向下取整的聚合时间上，并将其头部设置为旅行时间不增加的最晚聚合时间点；持有弧桥接到下一个聚合节点，若两端点投影到同一聚合节点则折叠为$\bot$。
 
 \paragraph{初始离散化与逆弧消除。}
-为给行程聚合提供一个无逆弧的初始聚合网络，本文采用拓扑感知的异构初始离散化。性质~\ref{def:relax.holdingArc}--\ref{def:relax.flightArc}中定义的弧映射规则揭示了均匀粗糙离散化的结构脆弱性。在性质~\ref{def:relax.flightArc}下，在航段$(j,i)$上从$t \in \discretization_j$出发的服务弧的到达时间被设置为$\discretization_i$中不晚于$t + \travelTime_{ji}$的最晚网格点（下取整映射）。如果对所有节点应用均匀步长$\discretizationStep$且对某些航段$(j,i)$有$\discretizationStep > \travelTime_{ji}$，则映射的到达时间$t'$可能满足$t' \le t$，产生资源单位看起来到达不晚于出发的逆弧。为从源头消除逆弧，每个节点$i \in \airportSet$获得一个定义为最小入站旅行时间的个体初始步长$\initStep_i$：
+为给行程聚合提供一个无逆弧的初始聚合网络，本文采用拓扑感知的异构初始离散化。性质~\ref{def:relax.holdingArc}--\ref{def:relax.flightArc}中定义的弧映射规则揭示了均匀粗糙离散化的结构脆弱性。在性质~\ref{def:relax.flightArc}~下，在航段$(j,i)$上从$t \in \discretization_j$出发的服务弧的到达时间被设置为$\discretization_i$中不晚于$t + \travelTime_{ji}$的最晚网格点（下取整映射）。如果对所有节点应用均匀步长$\discretizationStep$且对某些航段$(j,i)$有$\discretizationStep > \travelTime_{ji}$，则映射的到达时间$t'$可能满足$t' \le t$，产生资源单位看起来到达不晚于出发的逆弧。为从源头消除逆弧，每个节点$i \in \airportSet$获得一个定义为最小入站旅行时间的个体初始步长$\initStep_i$：
 \begin{equation}\label{eq:init_step}
     \initStep_i = \min_{j:\,(j,i)\in\segSet} \left\{ \travelTime_{ji} \right\}.
 \end{equation}
