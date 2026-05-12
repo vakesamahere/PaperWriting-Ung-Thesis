@@ -2,9 +2,9 @@
     以下引理建立了我们模型中成本结构的一个关键性质，这对于证明 $\ubm(\discretizationFull, \model{\discretization, \itinSetSuper})$ 所提供的上界的有效性至关重要。
     \input{thm/valid_upper_bound/cost_lem.tex}
 
-    现在我们准备证明定理~\ref{thm:valid_upper_bound}。
+    现在我们准备证明定理\ref{thm:valid_upper_bound}。
 
     记原始模型 $\model{\discretizationFull}$ 的可行域为 $\bar{\mathcal{P}}$。由定义，$\bar{\mathcal{P}} = \{\solution \mid \text{s.t.}\;\eqref{constr:main.flow}-\eqref{constr:main.domain.w}\}$。记上界模型 $\ubm(\discretizationFull, \model{\discretization, \itinSetSuper})$ 的可行域为 $\mathcal{P}_{UBM}$。由定义，$\mathcal{P}_{UBM} = \{\solution \mid \text{s.t.}\;\eqref{constr:main.flow}-\eqref{constr:main.domain.w}, \eqref{constr:ubm.freq_fix}-\eqref{constr:ubm.obj_cut}\}$。显然，上界模型是通过在原始可行域 $\bar{\mathcal{P}}$ 上施加额外约束——具体为频率固定约束 \eqref{constr:ubm.freq_fix}、行程结构割 \eqref{constr:ubm.itinerary_cut.choice.ratio}-\eqref{constr:ubm.itinerary_cut.choice.covering} 和收益目标割 \eqref{constr:ubm.obj_cut}——而构造的。因此，我们有子集关系 $\mathcal{P}_{UBM} \subseteq \bar{\mathcal{P}}$。对任意解 $\solution^* = (\mathbf{x}^*, \mathbf{w}^*) \in \mathcal{P}_{UBM}$，有 $\solution^* \in \bar{\mathcal{P}}$，即 $\solution^*$ 是原始问题的可行解。
     
-    关于目标值，由引理~\ref{lem:time_invariance_cost}，因为我们将松弛模型的频率固定约束 \eqref{constr:ubm.freq_fix} 应用于上界模型，上界模型中的成本项——等于松弛解成本的常数——等于由原始模型成本项公式计算的成本，即 $\full{\textbf{c}^{\mathrm{LB}} = \sum_{a\in \flightArc}\sum_{f\in \fleetSet} \cost_{af}\, \fleetAssignVar_{af}}$。因此，任意解 $\solution \in \mathcal{P}_{UBM}$ 的目标函数可以表示为与 $\model{\discretizationFull}$ 相同的公式~\eqref{objfun:main}。因此，上界模型的任意可行解也是原始模型的可行解。此外，目标值得到保持，定理得证。
+    关于目标值，由引理\ref{lem:time_invariance_cost}，因为我们将松弛模型的频率固定约束 \eqref{constr:ubm.freq_fix} 应用于上界模型，上界模型中的成本项——等于松弛解成本的常数——等于由原始模型成本项公式计算的成本，即 $\full{\textbf{c}^{\mathrm{LB}} = \sum_{a\in \flightArc}\sum_{f\in \fleetSet} \cost_{af}\, \fleetAssignVar_{af}}$。因此，任意解 $\solution \in \mathcal{P}_{UBM}$ 的目标函数可以表示为与 $\model{\discretizationFull}$ 相同的公式~\eqref{objfun:main}。因此，上界模型的任意可行解也是原始模型的可行解。此外，目标值得到保持，定理得证。
 \end{proof}

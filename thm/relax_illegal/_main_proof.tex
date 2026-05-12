@@ -1,5 +1,5 @@
 \begin{proof}
-由定义~\ref{def:illegal_solution}，松弛解 $\solution_{rel} = (\fleetAssignVar^*, \shareVar^*, \outsideShareVar^*)$ 目标值为 $Z_{rel}^*$ 是非法的，如果我们无法找到有效的顾客分配 $(\shareVar, \outsideShareVar)$ 使得 $\solution = (\fleetAssignVar^*, \shareVar, \outsideShareVar)$ 在完整模型 $\model{\discretizationFull}$ 中可行且达到 $Z = Z_{rel}^*$。我们通过建立充分性和必要性来证明该定理。
+由定义\ref{def:illegal_solution}，松弛解 $\solution_{rel} = (\fleetAssignVar^*, \shareVar^*, \outsideShareVar^*)$ 目标值为 $Z_{rel}^*$ 是非法的，如果我们无法找到有效的顾客分配 $(\shareVar, \outsideShareVar)$ 使得 $\solution = (\fleetAssignVar^*, \shareVar, \outsideShareVar)$ 在完整模型 $\model{\discretizationFull}$ 中可行且达到 $Z = Z_{rel}^*$。我们通过建立充分性和必要性来证明该定理。
 
 \textbf{充分性（若任一条件成立，则解是非法的）：} \\
 我们通过证明每个条件显式产生一个与完整模型 $\model{\discretizationFull}$ 约束公式严格矛盾的数学不等式来建立充分性。
@@ -43,9 +43,9 @@
 \end{itemize}
 
 \textbf{必要性（若解是非法的，则至少一个条件必须成立）：} \\
-假设 $\solution_{rel}$ 是非法的。由定义~\ref{def:illegal_solution}，在固定分配 $\fleetAssignVar^*$ 下，要么 $\model{\discretizationFull}$ 中顾客分配的可行空间为空，要么空间非空但最大可达目标严格小于 $Z_{rel}^*$。
+假设 $\solution_{rel}$ 是非法的。由定义\ref{def:illegal_solution}，在固定分配 $\fleetAssignVar^*$ 下，要么 $\model{\discretizationFull}$ 中顾客分配的可行空间为空，要么空间非空但最大可达目标严格小于 $Z_{rel}^*$。
 \begin{itemize}
-    \item 若可行空间为空，则 $\fleetAssignVar^*$ 破坏了 $\model{\discretizationFull}$ 的物理公式。由于聚合空间流量和选择界由映射严格保持（定理~\ref{pro.valid_relaxation}），代数矛盾必须发生在精确时序约束中。它必须严格违反流量守恒限制（触发条件 1 的不等式）或严格违反瞬时间隔容量（触发条件 2 的不等式）。
+    \item 若可行空间为空，则 $\fleetAssignVar^*$ 破坏了 $\model{\discretizationFull}$ 的物理公式。由于聚合空间流量和选择界由映射严格保持（定理\ref{pro.valid_relaxation}），代数矛盾必须发生在精确时序约束中。它必须严格违反流量守恒限制（触发条件 1 的不等式）或严格违反瞬时间隔容量（触发条件 2 的不等式）。
     \item 若可行空间非空但最大可达目标为 $Z < Z_{rel}^*$，则非法性完全由收益高估造成。因为 RFS 在数学上等价于在完整模型约束 \eqref{constr:main.choice.ratio}-\eqref{constr:main.choice.covering} 上优化，无法达到目标收益严格迫使 RFS 惩罚目标 $\sum s_{Rpl}^*$ 严格为正（触发条件 3）。
 \end{itemize}
 因此，非法解必须触发三个互斥穷尽条件中的至少一个，证明完毕。

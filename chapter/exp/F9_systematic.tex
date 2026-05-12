@@ -22,7 +22,7 @@ Although \algoNotation is an exact framework with finite-convergence guarantees,
 
 We construct 18 benchmark instances derived from Frontier Airlines (F9), an ultra-low-cost carrier operating in the United States. The instances are organized along two dimensions: network size and planning horizon. Three network sizes are considered---small (20 airports), medium (40 airports), and full (60 airports)---each paired with six planning horizons ranging from 12 hours to 72 hours. The horizons are labeled $0.5\times$, $1.0\times$, $1.5\times$, $2.0\times$, $2.5\times$, and $3.0\times$ relative to a base 24-hour period.
 
-Table~\ref{tab:f9_instances} summarizes the instance characteristics. The number of candidate scheduled service departures (Services column) and the number of feasible passenger itineraries grow substantially with both network size and horizon length. The largest instance (\textCase{full\_3.0$\times$}) contains more than 1.4 million feasible itineraries.
+Table\ref{tab:f9_instances} summarizes the instance characteristics. The number of candidate scheduled service departures (Services column) and the number of feasible passenger itineraries grow substantially with both network size and horizon length. The largest instance (\textCase{full\_3.0$\times$}) contains more than 1.4 million feasible itineraries.
 
 \begin{table}[htbp]
 \centering
@@ -59,7 +59,7 @@ Instance & Airports & Segments & Services & Markets & Itineraries & Horizon \\
 \section{Main Performance Comparison}
 \label{sec:main_performance}
 
-Table~\ref{tab:comp_results} reports the certified optimality gap achieved by each method under 1-hour and 5-hour computational budgets across all 18 instances.
+Table\ref{tab:comp_results} reports the certified optimality gap achieved by each method under 1-hour and 5-hour computational budgets across all 18 instances.
 
 \begin{table}[htbp]
 \centering
@@ -111,7 +111,7 @@ To isolate the contribution of each algorithmic component, we conduct three abla
 
 \subsection{Attraction Balancing}
 
-Attraction Balancing (Section~\ref{sec:preconditioning_solution}) rescales the choice-model coefficients to eliminate numerical ill-conditioning. Table~\ref{tab:ablation_ab} compares the full \algoNotation framework against a variant that omits this preprocessing step.
+Attraction Balancing (Section\ref{sec:preconditioning_solution}) rescales the choice-model coefficients to eliminate numerical ill-conditioning. Table\ref{tab:ablation_ab} compares the full \algoNotation framework against a variant that omits this preprocessing step.
 
 \begin{table}[htbp]
 \centering
@@ -132,7 +132,7 @@ Without Attraction Balancing, the solver encounters numerical difficulties in th
 
 \subsection{Itinerary Aggregation in the Lower Bound}
 
-The core mechanism of the lower-bound model is itinerary aggregation via super-itineraries. To quantify its contribution, we compare the full \algoNotation lower bound against a variant that applies time aggregation only, without grouping itineraries into super-itineraries. Table~\ref{tab:ablation_ia} reports the lower-bound gaps.
+The core mechanism of the lower-bound model is itinerary aggregation via super-itineraries. To quantify its contribution, we compare the full \algoNotation lower bound against a variant that applies time aggregation only, without grouping itineraries into super-itineraries. Table\ref{tab:ablation_ia} reports the lower-bound gaps.
 
 \begin{table}[htbp]
 \centering
@@ -153,7 +153,7 @@ Removing itinerary aggregation substantially weakens the lower bound. Without su
 
 \subsection{Itinerary Cuts in the Upper Bound}
 
-The upper-bound repair module combines frequency fixing with itinerary cuts (Section~\ref{sec:ub}). Table~\ref{tab:ablation_ic} isolates the effect of itinerary cuts by comparing the full \algoNotation upper bound against a variant that uses frequency fixing alone.
+The upper-bound repair module combines frequency fixing with itinerary cuts (Section\ref{sec:ub}). Table\ref{tab:ablation_ic} isolates the effect of itinerary cuts by comparing the full \algoNotation upper bound against a variant that uses frequency fixing alone.
 
 \begin{table}[htbp]
 \centering
@@ -190,7 +190,7 @@ The optimal passenger allocation utilizes $112$ multi-leg connecting itineraries
 \section{Cross-Domain Proof-of-Concept}
 \label{sec:cross_domain}
 
-To demonstrate that the itinerary-aggregation mechanism applies beyond airline scheduling, we conduct a proof-of-concept experiment on an intercity bus network. Table~\ref{tab:cross_domain} compares the airline reference instance with the bus case.
+To demonstrate that the itinerary-aggregation mechanism applies beyond airline scheduling, we conduct a proof-of-concept experiment on an intercity bus network. Table\ref{tab:cross_domain} compares the airline reference instance with the bus case.
 
 \begin{table}[htbp]
 \centering

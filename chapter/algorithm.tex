@@ -19,9 +19,9 @@
 
 由此，基于超级行程表示，本文将原问题的求解过程分解为两个互补的子问题：一个是在聚合行程空间中进行乐观评价的下界子问题，另一个是在完整时空网络上进行可行解修复的上界子问题。
 
-在上述基于超级行程的双侧界框架基础上，本文进一步引入了对聚合程度的细化机制（第~\ref{sec:refinement}~节），用于在双侧界尚未闭合时更新当前聚合表示，并最终保证全局最优性。
+在上述基于超级行程的双侧界框架基础上，本文进一步引入了对聚合程度的细化机制（第\ref{sec:refinement}节），用于在双侧界尚未闭合时更新当前聚合表示，并最终保证全局最优性。
 
-算法~\ref{alg:refinement}~给出了该框架的完整流程，图~\ref{fig:framework}展示了框架的整体结构。
+算法\ref{alg:refinement}给出了该框架的完整流程，图\ref{fig:framework}展示了框架的整体结构。
 
 \begin{figure}[htbp]
     \centering
@@ -40,22 +40,22 @@
     \State $\initStep_i\gets\min_{j:(j,i)\in\segSet}\{\travelTime_{ji}\}$
     \State $\discretization_i\gets\{t\mid t=\planningStart+k\,\initStep_i,\, k \in \mathbb{Z}_{\ge0}, t < \planningEnd\}$
 \EndFor
-\State 对所有市场执行吸引力平衡预处理（附录~\ref{sec:preconditioning_solution}）
+\State 对所有市场执行吸引力平衡预处理（附录\ref{sec:preconditioning_solution}）
 \State $iter\gets 0$
 \Loop
     \State $iter \gets iter + 1$
     \State 基于当前$\discretization$构造聚合路径签名与超级行程集合$\itinSetSuper$
     \State $\solution, LB \gets$ 求解下界模型 $\model{\discretization, \itinSetSuper}$
-    \Comment{第~\ref{sec:lbm_formulation}~节}
+    \Comment{第\ref{sec:lbm_formulation}节}
     \State $\solution^{*}_{new}, UB_{new} \gets$ 求解上界修复模型 $\ubm(\discretizationFull,\model{\discretization, \itinSetSuper})$
-    \Comment{第~\ref{sec:ub}~节}
+    \Comment{第\ref{sec:ub}节}
     \If{$UB_{new} < UB$}
         \State $\solution^{*}, UB \gets \solution^{*}_{new}, UB_{new}$
     \EndIf
     \If{$UB - LB \le \epsilon \;\textbf{or}\; iter \ge \text{maxIter}$}
         \State \textbf{break}
     \EndIf
-    \State $\discretization \gets$ 检验可实现性并添加时间点（第~\ref{sec:refinement}~节）
+    \State $\discretization \gets$ 检验可实现性并添加时间点（第\ref{sec:refinement}节）
 \EndLoop
 \State \Return $\solution, \solution^{*}, LB, UB$
 \end{algorithmic}
