@@ -21,7 +21,14 @@
 
 在上述基于超级行程的双侧界框架基础上，本文进一步引入了对聚合程度的细化机制（第~\ref{sec:refinement}~节），用于在双侧界尚未闭合时更新当前聚合表示，并最终保证全局最优性。
 
-算法~\ref{alg:refinement}~给出了该框架的完整流程。
+算法~\ref{alg:refinement}~给出了该框架的完整流程，图~\ref{fig:framework}展示了框架的整体结构。
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{figure/img/framework.png}
+    \caption{\algoNotation 算法框架示意图}
+    \label{fig:framework}
+\end{figure}
 
 \begin{algorithm}
 \caption{基于超级行程表示的界生成与修复框架}
