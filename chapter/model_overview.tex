@@ -24,9 +24,9 @@
 
 顾客通过选择行程$r \in \itinSet$来完成其旅行。在我们的模型中，行程不仅仅是一系列空间航段，而是严格定义为在完全离散化$\discretizationFull$上建立的按时间顺序可连接的服务弧序列。服务市场$m$的所有有效行程的集合记为$\itinInMarket_m$。如果运营商的时刻表未提供有吸引力或可行的行程，顾客通过选择外部选项退出系统。
 
-为在优化框架中内生地捕获顾客选择行为，我们采用\cite{gallego2015general}提出的基于广义吸引力模型（GAM）的基于销售的线性规划（SBLP）。在此背景下，市场$m$中顾客类型$p$对特定行程-票价组合$(r, \ell)$的偏好由确定性名义吸引力参数量化，记为$\attr_{rp\ell}$。类似地，外部选项被赋予名义吸引力值$\outAttr_{mp}$。这些参数通常从离散选择模型导出，例如多项Logit（MNL）模型，其中$\attr_{rp\ell} = \exp(V_{rp\ell})$，$V_{rp\ell}$是市场$m$中顾客类型$p$在票价等级$\ell$下行程$r$的系统效用。
+为在优化框架中内生地捕获顾客选择行为，我们采用\citet{gallego2015general}提出的基于广义吸引力模型（GAM）的基于销售的线性规划（SBLP）。在此背景下，市场$m$中顾客类型$p$对特定行程-票价组合$(r, \ell)$的偏好由确定性名义吸引力参数量化，记为$\attr_{rp\ell}$。类似地，外部选项被赋予名义吸引力值$\outAttr_{mp}$。这些参数通常从离散选择模型导出，例如多项Logit（MNL）模型，其中$\attr_{rp\ell} = \exp(V_{rp\ell})$，$V_{rp\ell}$是市场$m$中顾客类型$p$在票价等级$\ell$下行程$r$的系统效用。
 
-如\cite{gallego2015general}所示，标准吸引力模型（如基本吸引力模型和多项Logit模型）在偏好选项不可用时往往高估回收率。为解决这一问题，GAM框架引入了影子吸引力的概念，以提供更灵活的替代行为表示。
+如\citet{gallego2015general}所示，标准吸引力模型（如基本吸引力模型和多项Logit模型）在偏好选项不可用时往往高估回收率。为解决这一问题，GAM框架引入了影子吸引力的概念，以提供更灵活的替代行为表示。
 遵循该框架，我们定义$\adjAttr_{rp\ell}$为行程$r$在票价$\ell$下的调整吸引力，$\adjOutAttr_{mp}$为外部选项的调整吸引力。
 
 根据GAM定义，调整吸引力$\adjAttr_{rp\ell}$表示名义吸引力减去相应的影子吸引力$\shadowAttr_{rp\ell}$，即$\adjAttr_{rp\ell} = \attr_{rp\ell} - \shadowAttr_{rp\ell}$。因此$0 \le \adjAttr_{rp\ell} \le \attr_{rp\ell}$。相反，调整后的外部吸引力$\adjOutAttr_{mp} = \outAttr_{mp} + \sum_{r\in \itinSet}\sum_{\ell\in \fareClassSet} \shadowAttr_{rp\ell}$，满足$\adjOutAttr_{mp} \ge \outAttr_{mp}$。这些调整参数随后直接用于SBLP公式的需求平衡约束中，以准确建模溢出和回收效应。
@@ -41,7 +41,7 @@
 
 \section{数学公式}
 
-我们采用\citet{wei2020airline}提出的数学公式$\model{\discretizationFull}$来处理考虑顾客选择的综合服务网络设计问题。该模型在离散选择框架下同时优化资源分配决策和顾客需求分配，捕获运营调度与收入生成之间的相互依赖关系。
+我们拓展\citet{wei2020airline}提出的模型，得到模型$\model{\discretizationFull}$来处理考虑顾客选择的综合服务网络设计问题。该模型在离散选择框架下同时优化资源分配决策和顾客需求分配，捕获运营调度与收入生成之间的相互依赖关系。
 
 \full{
 \noindent\textbf{目标函数}
@@ -133,7 +133,6 @@
     \label{constr:main.domain.w}
 \end{equation}
 }
-
 该模型定义了在资源和时间约束下将服务与顾客行程匹配的综合计划。目标函数\eqref{objfun:main}最小化总运营成本减去总票务收入，有效地最大化运营商的整体利润。对于资源分配，约束\eqref{constr:main.flow}确保流守恒，即到达任何时空节点$(i, t)$的$f$型资源数量恰好等于离开的数量。约束\eqref{constr:main.fleet_available}限制资源利用率，确保在指定计数时间$\checkTime$处从事服务（$\flightArcTc{\checkTime}$）和持有（$\holdingArcTc{\checkTime}$）的资源总数不超过可用资源限制$\fleetAvail_f$。为管理运营密度，令$\arcDuringSepTime_{ijt} = \{a=((i,t^\prime)\rightarrow(j,t^{\prime\prime}))\;\forall a\in\flightArc\mid t\leq t^\prime<t+\minInterdepTime_{ij} \}$表示从时间$t$开始在最小间隔时间内在航段$s=(i,j)$上出发的服务弧集合。则约束\eqref{constr:main.cooldown}强制执行最小出发间隔时间，防止多个服务在集合$\arcDuringSepTime_{ijt}$指定的时间段内在同一空间航段$(i,j)$上出发，而约束\eqref{constr:main.seg_freq}强制时刻表恰好满足每个航段$s$所需的预定运营频率$\freq_s$。约束\eqref{constr:main.choice.ratio}-\eqref{constr:main.choice.covering}表示顾客选择约束。最后，约束\eqref{constr:main.domain.x.flight}至\eqref{constr:main.domain.w}将资源分配和顾客分配变量限制在其适当的域中。
 
 \section{计算复杂性与规模}\label{sec:complexity}\label{sec:preconditioning}
