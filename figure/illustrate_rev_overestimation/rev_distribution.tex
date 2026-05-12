@@ -1,5 +1,5 @@
 \documentclass[tikz]{standalone}
-
+\usepackage{ctex}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,fit,shapes.geometric,calc,decorations.pathreplacing,backgrounds}
 
@@ -55,14 +55,14 @@
   % Case 1: Original Integer Optimal (Ground Truth)
   % ----------------------------------------------------------------------
   \begin{scope}[shift={(0,0)}]
-    \node[title] at (\xMax/2+0.5, \timeArcDy + 1.5) {Original Integer Opt\\(Base Case)};
+    \node[title] at (\xMax/2+0.5, \timeArcDy + 1.5) {原始整数解\\（基准情况）};
     \groupBg
     
     % One complete fleet assignment (f0) at t2
     \draw[flight, \activeColor] (i2) -- ($(i2) + (\timeArcDx,\timeArcDy)$) coordinate (dest2) node[midway, above, sloped, text=black] {\scriptsize $x=1$};
     
     % Attraction Max Line
-    \draw[attrLine] (i2) ++(\psgMaxRatio*\timeArcDx - 0.3, \psgMaxRatio*\timeArcDy) -- ++(0.6, 0) node[right, font=\tiny, red, align=left] {Maximum passengers attracted\\for all itineraries\\using this service};
+    \draw[attrLine] (i2) ++(\psgMaxRatio*\timeArcDx - 0.3, \psgMaxRatio*\timeArcDy) -- ++(0.6, 0) node[right, font=\tiny, red, align=left] {使用该服务的所有行程\\可吸引的最大顾客量};
 
     % Orange revenue segment (only 0.33 attracted)
     \draw[line, \psgColor, line width=2pt] (i2) -- ($(i2) + (\psgMaxRatio*\timeArcDx,\psgMaxRatio*\timeArcDy)$);
@@ -79,7 +79,7 @@
   % Case 2: Original LP Relaxation (Overestimation)
   % ----------------------------------------------------------------------
   \begin{scope}[shift={(9,0)}]
-    \node[title] at (\xMax/2+0.5, \timeArcDy + 1.5) {Original LP Relaxation\\(Overestimation)};
+    \node[title] at (\xMax/2+0.5, \timeArcDy + 1.5) {原始LP松弛\\（收入高估）};
     \groupBg
     
     % 3 fractional flights (f1, f2, f3) at t1, t2, t3
@@ -105,13 +105,13 @@
   % Case 3: Discretization Aggregation (Persistence of Problem)
   % ----------------------------------------------------------------------
   \begin{scope}[shift={(18,0)}]
-    \node[title] at (\xMax/2+0.5, \timeArcDy + 1.5) {Discretization Aggregation\\(Problem Persists)};
+    \node[title] at (\xMax/2+0.5, \timeArcDy + 1.5) {离散化整数解\\（存在收入高估问题）};
     
     % 1. Rect
     \begin{scope}[on background layer]
         \fill[gray!20, opacity=0.8, rounded corners] (0.5, -0.5) rectangle (3.5 + \timeArcDx, \timeArcDy + 0.5);
     \end{scope}
-    \node[gray, font=\scriptsize] at (2, 2.8) {Aggregated Window};
+    \node[gray, font=\scriptsize] at (2, 2.2) {聚合时间窗口};
 
     \groupBg
     
