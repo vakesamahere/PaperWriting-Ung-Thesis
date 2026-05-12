@@ -104,6 +104,7 @@ r \eqRelByPathSig r' \iff \pathSig{r} = \pathSig{r'}
     \combLimit_R = \prod_{(o,d,\bar{t}) \in \pathSig{R}} \min\{\departLimit_{od\bar{t}}, \freq_{o,d}\}.
 \]
 由于任意完整网络中的可兼容组合在路径上每段都不能超过该段的容量限制，$\compatSet[2]{R}$覆盖所有真实可兼容组合，因此由其得到的$\attrSuper_{Rp\ell}$不小于完整网络中任何可行整数解对应的原始行程吸引力总和，保证了下界模型的有效性。本文计算实验中采用方法2，以在保证下界有效性的同时避免求解NP-难的子问题。
+
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.7\linewidth]{figure/illustrate_valid_combinations/valid_combinations}
