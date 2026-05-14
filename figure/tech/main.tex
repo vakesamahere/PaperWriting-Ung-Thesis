@@ -1,0 +1,208 @@
+% !TeX program = xelatex
+% 编译方式：xelatex main.tex
+%
+% ===== 只改下面 5 个数字即可调节层间箭头长度 =====
+
+\documentclass[tikz,border=6pt]{standalone}
+
+\usepackage[UTF8,fontset=fandol]{ctex}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+\usetikzlibrary{arrows.meta, positioning, fit, calc}
+
+\begin{document}
+
+\begin{tikzpicture}[
+    >=Latex,
+    font=\small,
+    box/.style={
+        draw=black!75,
+        line width=0.55pt,
+        rounded corners=2pt,
+        align=center,
+        inner sep=4.5pt,
+        minimum height=1.05cm,
+        text width=3.05cm,
+        fill=white
+    },
+    corebox/.style={
+        draw=black,
+        line width=0.8pt,
+        rounded corners=2pt,
+        align=center,
+        inner sep=4.5pt,
+        minimum height=1.05cm,
+        text width=3.05cm,
+        fill=black!6,
+        font=\small\bfseries
+    },
+    groupbox/.style={
+        draw=black!45,
+        dashed,
+        rounded corners=3pt,
+        inner xsep=7pt,
+        inner ysep=10pt
+    },
+    arrow/.style={
+        ->,
+        draw=black!75,
+        line width=0.65pt,
+        shorten >=2pt,
+        shorten <=2pt
+    },
+    titlelabel/.style={
+        font=\bfseries\small,
+        fill=white,
+        inner xsep=2pt,
+        inner ysep=1pt
+    },
+    note/.style={
+        font=\scriptsize,
+        text=black!60
+    }
+]
+
+% ===== 改这 5 个数字调节各层位置和箭头长度 =====
+\def\LayerA{12.5}   % 层1 研究背景
+\def\LayerB{9.2}   % 层2 模型构建
+\def\LayerC{6.2}   % 层3 计算困难
+\def\LayerD{3.1}   % 层4 核心方法
+\def\LayerE{0}  % 层5 实验验证
+% ================================================
+
+% =========================================================
+% 第一层：研究背景与问题提出
+% =========================================================
+\node[box] (bg1) at (-5.2,\LayerA)
+{\textbf{现实服务运营场景}\\[-1mm]
+航空/铁路/城际客运\\等定时服务网络};
+
+\node[box] (bg2) at (0,\LayerA)
+{\textbf{顾客选择行为}\\[-1mm]
+时间/价格/中转/外部选项\\影响实际需求};
+
+\node[box, fill=black!3] (bg3) at (5.2,\LayerA)
+{\textbf{SN-CC问题}\\[-1mm]
+服务计划与顾客选择\\相互耦合};
+
+\draw[arrow] (bg1) -- (bg2);
+\draw[arrow] (bg2) -- (bg3);
+
+\node[groupbox, fit=(bg1)(bg2)(bg3)] (Gbg) {};
+\node[titlelabel, anchor=west] at ([xshift=3mm,yshift=-2mm]Gbg.north west) {研究背景与问题提出};
+
+% =========================================================
+% 第二层：模型构建
+% =========================================================
+\node[box] (m1) at (-5.2,\LayerB)
+{\textbf{时空网络建模}\\[-1mm]
+服务弧/持有弧\\资源流与容量约束};
+
+\node[box] (m2) at (0,\LayerB)
+{\textbf{GAM/SBLP 选择模型}\\[-1mm]
+吸引力参数\\选择份额变量};
+
+\node[box, fill=black!3] (m3) at (5.2,\LayerB)
+{\textbf{完整混合整数规划}\\[-1mm]
+运营决策$x$与\\选择份额$w$强耦合};
+
+\draw[arrow] (m1) -- (m3);
+\draw[arrow] (m2) -- (m3);
+
+\node[groupbox, fit=(m1)(m2)(m3)] (Gmodel) {};
+\node[titlelabel, anchor=west] at ([xshift=3mm,yshift=-2mm]Gmodel.north west) {模型构建};
+
+% =========================================================
+% 第三层：计算困难识别
+% =========================================================
+\node[box, fill=black!3, text width=2.65cm] (d1) at (-6.3,\LayerC)
+{\textbf{行程空间爆炸}\\[-1mm]
+候选行程数量\\快速增长};
+
+\node[box, fill=black!3, text width=2.65cm] (d2) at (-2.1,\LayerC)
+{\textbf{选择--运营耦合}\\[-1mm]
+容量约束\\连接$x$与$w$};
+
+\node[box, fill=black!3, text width=2.65cm] (d3) at (2.1,\LayerC)
+{\textbf{虚假收入}\\[-1mm]
+松弛中累加\\不可实现收入};
+
+\node[box, fill=black!3, text width=2.65cm] (d4) at (6.3,\LayerC)
+{\textbf{直接求解困难}\\[-1mm]
+大规模MIP\\难以证明最优};
+
+\node[groupbox, fit=(d1)(d2)(d3)(d4)] (Gdiff) {};
+\node[titlelabel, anchor=west] at ([xshift=3mm,yshift=-2mm]Gdiff.north west) {计算困难识别};
+
+% =========================================================
+% 第四层：核心方法
+% =========================================================
+\node[corebox, text width=2.85cm] (c1) at (-6.3,\LayerD)
+{超级行程构造\\[-1mm]
+\normalfont 路径签名诱导\\行程等价划分};
+
+\node[corebox, text width=2.85cm] (c2) at (-2.1,\LayerD)
+{吸引力上界\\[-1mm]
+\normalfont 覆盖可兼容组合\\抑制虚假收入};
+
+\node[corebox, text width=2.85cm] (c3) at (2.1,\LayerD)
+{双侧界模型\\[-1mm]
+\normalfont 聚合下界LBM\\+ 完整网络上界UBM};
+
+\node[corebox, text width=2.85cm] (c4) at (6.3,\LayerD)
+{可实现性检验\\[-1mm]
+\normalfont 添加时间点\\排除非法松弛解};
+
+\draw[arrow] (c1) -- (c2);
+\draw[arrow] (c2) -- (c3);
+\draw[arrow] (c3) -- (c4);
+
+\node[groupbox, fit=(c1)(c2)(c3)(c4)] (Gcore) {};
+\node[titlelabel, anchor=west] at ([xshift=3mm,yshift=-2mm]Gcore.north west) {基于行程聚合与动态细化的求解框架};
+
+% =========================================================
+% 第五层：实验验证
+% =========================================================
+\node[box, text width=2.65cm] (v1) at (-6.3,\LayerE)
+{\textbf{数据构建}\\[-1mm]
+真实航空\\排班实例};
+
+\node[box, text width=2.65cm] (v2) at (-2.1,\LayerE)
+{\textbf{规模测试}\\[-1mm]
+多规划时域\\扩展验证};
+
+\node[box, text width=2.65cm] (v3) at (2.1,\LayerE)
+{\textbf{性能比较}\\[-1mm]
+与原始模型\\直接对比};
+
+\node[box, text width=2.65cm] (v4) at (6.3,\LayerE)
+{\textbf{方案分析}\\[-1mm]
+排班与中转\\行程解释};
+
+\draw[arrow] (v1) -- (v2);
+\draw[arrow] (v2) -- (v3);
+\draw[arrow] (v3) -- (v4);
+
+\node[groupbox, fit=(v1)(v2)(v3)(v4)] (Gval) {};
+\node[titlelabel, anchor=west] at ([xshift=3mm,yshift=-2mm]Gval.north west) {真实实例验证与结果解释};
+
+% =========================================================
+% 组间粗箭头（居中）
+% =========================================================
+\draw[-{Latex[length=4mm,width=3mm]}, line width=1.5pt, draw=black!70]
+    (Gbg.south) -- (Gmodel.north);
+\draw[-{Latex[length=4mm,width=3mm]}, line width=1.5pt, draw=black!70]
+    (Gmodel.south) -- (Gdiff.north);
+\draw[-{Latex[length=4mm,width=3mm]}, line width=1.5pt, draw=black!70]
+    (Gdiff.south) -- (Gcore.north);
+\draw[-{Latex[length=4mm,width=3mm]}, line width=1.5pt, draw=black!70]
+    (Gcore.south) -- (Gval.north);
+
+% % 注释
+% \pgfmathsetmacro{\noteY}{\LayerE - 1.2}
+% \node[note] at (0,\noteY)
+% {注：本图展示论文整体研究路线，算法内部流程在求解方法章节展开。};
+
+\end{tikzpicture}
+
+\end{document}

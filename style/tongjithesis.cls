@@ -747,13 +747,18 @@
 % ==========================================
 
 \theoremstyle{definition}
+\newtheorem{property}{性质\hspace{0.05pt}}[chapter]
 \newtheorem{thm}{定理\hspace{0.05pt}}[chapter]
+\newtheorem{theorem}{定理\hspace{0.05pt}}[chapter]
 \newtheorem{cor}{推论\hspace{0.05pt}}[chapter]
 \newtheorem{lem}{引理\hspace{0.05pt}}[chapter]
+\newtheorem{lemma}{引理\hspace{0.05pt}}[chapter]
 \newtheorem{prop}{命题\hspace{0.05pt}}[chapter]
+\newtheorem{proposition}{命题\hspace{0.05pt}}[chapter]
 \newtheorem{conj}{猜想\hspace{0.05pt}}[chapter]
 \newtheorem{assume}{假设\hspace{0.05pt}}[chapter]
 \newtheorem{dfn}{定义\hspace{0.05pt}}[chapter]
+\newtheorem{definition}{定义\hspace{0.05pt}}[chapter]
 \newtheorem{exmp}{例\hspace{0.05pt}}[chapter]
 \newtheorem{rem}{注\hspace{0.05pt}}[chapter]
 \newtheorem*{pf}{证明}
