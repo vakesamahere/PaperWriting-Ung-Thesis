@@ -1,18 +1,18 @@
 \section{实验结果}
 
-% Page 1: Experimental Setup
-\begin{frame}{计算实验}
+% Page 10: 实验设置
+\begin{frame}{实验设置}
 \tiny 数据来自DB1B\cite{DOT_DB1B_2025}和AOTP\cite{DOT_OTP_2025}，经过合成得到 Frontier Airlines 的实例。
 \begin{columns}[T,totalwidth=\textwidth]
 \column{0.55\textwidth}
 \begin{block}{Frontier Airlines (F9)}
 \begin{itemize}
     \item 美国超低成本航空公司（ULCC）
-    \item 60 个机场，259 条航段
-    \item 382 个 OD 市场 （起点-终点对）
+    \item 60 个机场，259 条有向航段
+    \item 382 个 OD 市场（起点-终点对）
     \item Airbus A320 系列机队（4 个子类型）
     \item 座位容量 186--228 座
-    \item 最多 1 次中转，最大 3 小时中转时间
+    \item 最多 2 次中转，最大 3 小时中转时间
 \end{itemize}
 \end{block}
 
@@ -24,7 +24,6 @@
 \toprule
 实例 & 时间跨度 & 候选行程 \\
 \midrule
-% F9-0.5x & 12h & 81,252 \\
 F9-1.0x & 24h & 475,776 \\
 F9-1.5x & 36h & 557,028 \\
 F9-2.0x & 48h & 951,552 \\
@@ -44,66 +43,54 @@ AMD EPYC 9654 96-Core Processor，512GB RAM
 \end{frame}
 
 
-% Page 2: Main results table
+% Page 11: 计算性能对比
 \begin{frame}{计算性能对比}
 \tiny
 Raw Model：使用 Gurobi 直接求解原始模型\\
-IA-DR：使用我们提出的 IA-DR 框架求解\\
-Gap 定义为 $|\frac{\text{UB}-\text{LB}}{\text{LB}}|$
-\begin{block}{Raw Model vs. IA-DR}
+\algoNotation：使用本文提出的行程聚合与动态细化框架\\
+Gap 按求解器最优性间隙口径计算
+
+\begin{block}{Raw Model vs. \algoNotation}
 \centering
 \small
-\begin{tabular}{lcccc}
+\begin{tabular}{llccc}
 \toprule
-实例 & Raw Gap (2h) & IA-DR Gap (2h) & Raw Gap (12h) & IA-DR Gap (12h) \\
+实例 & 方法 & 时限 & 最优性间隙 & 实际用时 \\
 \midrule
-% F9-0.5x & 9.44\%  & 11.79\% & 3.10\%  & 6.11\%  \\
-F9-1.0x & 18.40\% & 1.84\%  & 4.75\%  & $<$1\% (2.1h) \\
-F9-1.5x & 13.09\% & $<$1\% (0.1h) & $<$1\% (5.7h) & $<$1\% (0.1h) \\
-F9-2.0x & --      & 1.25\%  & 15.26\% & 1.25\%  \\
-F9-2.5x & 19.65\% & 1.91\%  & 18.06\% & 1.89\%  \\
-F9-3.0x & --      & $<$1\% (1.3h) & -- & $<$1\% (1.3h) \\
+\multirow{3}{*}{F9-1.0x}
+ & \algoNotation & 5h & $<$1\% & 0.92h \\
+ & Raw & 5h & 13.62\% & 5h \\
+ & Raw & 12h & 11.60\% & 12h \\
+\midrule
+\multirow{3}{*}{F9-1.5x}
+ & \algoNotation & 5h & $<$1\% & 1.14h \\
+ & Raw & 5h & 7.57\% & 5h \\
+ & Raw & 12h & 7.37\% & 12h \\
+\midrule
+\multirow{3}{*}{F9-2.0x}
+ & \algoNotation & 5h & $<$1\% & 1.39h \\
+ & Raw & 5h & 8.39\% & 5h \\
+ & Raw & 12h & 8.38\% & 12h \\
+\midrule
+\multirow{3}{*}{F9-2.5x}
+ & \algoNotation & 5h & $<$1\% & 4.13h \\
+ & Raw & 5h & -- & -- \\
+ & Raw & 12h & -- & -- \\
+\midrule
+\multirow{3}{*}{F9-3.0x}
+ & \algoNotation & 5h & $<$1\% & 2.46h \\
+ & Raw & 5h & -- & -- \\
+ & Raw & 12h & -- & -- \\
 \bottomrule
 \end{tabular}
 \vspace{0.1cm}
 
-\footnotesize\tiny ``--'' 表示 Raw Model 在时限内未产生可用的可行解或界。
+\footnotesize\tiny ``--'' 表示 Raw Model 在时限内未返回可用结果。
 \end{block}
 
-\vspace{0.15cm}
+\vspace{0.1cm}
 \small
-\begin{itemize}
-    \item 实例越大，IA-DR 优势越明显
-    \item F9-3.0x（142万 itineraries）：Raw Model 无法求解，IA-DR 在 1.3h 内达到 $<$1\%
-\end{itemize}
+\only<1>{\textcolor{red}{\small $\to$ 所有实例均于 5h 内达到 $<$1\% 间隙}}
+\only<2>{\textcolor{red}{\small $\to$ 百万级行程实例：Raw Model 无法返回可用结果}}
+\only<3>{\textcolor{red}{\small $\to$ 最大实例 F9-3.0x：\algoNotation{} 仅需 2.46h}}
 \end{frame}
-
-
-% Page 3: B&B tree comparison
-\begin{frame}{F9-1.0x分支定界树对比（Gurobi \& IA-DR上界模型）}
-\begin{columns}[T,totalwidth=\textwidth]
-\column{0.55\textwidth}
-\begin{center}
-    \includegraphics[width=\linewidth]{../figure/img/unexpl_raw_end_both.pdf}
-\end{center}
-
-\column{0.42\textwidth}
-\begin{block}{观察}
-\begin{itemize}
-    \item Raw Model 的搜索树持续膨胀
-    \item IA-DR 上界在搜索树早期收敛到下界模型提供的紧下界
-\end{itemize}
-\end{block}
-
-% \vspace{0.2cm}
-% \begin{block}{关键机制}
-% \begin{itemize}
-%     \item Raw Model：弱 LP 松弛 $\Rightarrow$ 大量无效分支
-%     \item IA-DR：紧下界 $\Rightarrow$ 搜索空间大幅缩小
-% \end{itemize}
-% \end{block}
-\end{columns}
-\end{frame}
-
-
-

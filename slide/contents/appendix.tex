@@ -2,44 +2,8 @@
 \section{附录}
 
 
-% ===== 附录 A：原始模型 =====
-\begin{frame}{附录 A：原始模型 SN-PC$(\hat{\discretization})$}
-\scriptsize
-\textbf{目标函数}（最小化 运营成本 $-$ 票务收入 $=$ 最大化利润）
-\vspace{-0.2cm}
-\begin{equation*}
-\min \sum_{a\in \full{\flightArc}}\sum_{f\in\fleetSet} \cost_{af}\fleetAssignVar_{af}
-- \sum_{m\in\marketSet}\sum_{p\in\psgTypeSet}\sum_{r\in\itinInMarket_m}\sum_{\ell\in\fareClassSet} \demand_{mp}\fare_{r\ell}\shareVar_{rp\ell}
-\end{equation*}
-\vspace{-0.4cm}
-\begin{columns}[T,totalwidth=\textwidth]
-\column{0.48\textwidth}
-\textbf{资源约束}
-\vspace{-0.15cm}
-\begin{align*}
-& \sum_{a\in \outArcSet{i,t}} \fleetAssignVar_{af} - \sum_{a\in \inArcSet{i,t}} \fleetAssignVar_{af} = 0 & \forall (i,t),f \\
-& \sum_{a\in \holdingArcTc{\checkTime}} \fleetAssignVar_{af} + \sum_{a\in \flightArcTc{\checkTime}} \fleetAssignVar_{af} \le \fleetAvail_f & \forall f \\
-& \sum_{f}\sum_{a\in \arcDuringSepTime_{ijt}} \fleetAssignVar_{af} \le 1 & \forall (i,j),t \\
-& \sum_{f}\sum_{a\in \segArcSet{s}} \fleetAssignVar_{af} = \freq_s & \forall s
-\end{align*}
-
-\column{0.48\textwidth}
-\textbf{顾客选择约束（SBLP/GAM）}
-\vspace{-0.15cm}
-\begin{align*}
-& \outAttr_{mp}\shareVar_{rp\ell} \le \attr_{rp\ell}\outsideShareVar_{mp} & \forall m,p,r,\ell \\
-& \tfrac{\adjOutAttr_{mp}}{\outAttr_{mp}} \outsideShareVar_{mp} + \sum_{r,\ell} \tfrac{\adjAttr_{rp\ell}}{\attr_{rp\ell}}\shareVar_{rp\ell} = 1 & \forall m,p \\
-& \sum_{m,p,\ell}\sum_{r\in \itinUsingArc{m}{a}} \demand_{mp}\shareVar_{rp\ell} \le \sum_f\fleetCap_f\fleetAssignVar_{af} & \forall a \\
-& \sum_f \fleetAssignVar_{af} \ge \shareVar_{rp\ell} & \forall a,r,p,\ell
-\end{align*}
-\end{columns}
-\vspace{0.1cm}
-\textbf{变量域：} $\fleetAssignVar_{af}\in\{0,1\}$ (service arcs), $\fleetAssignVar_{af}\ge0$ (holding arcs), $\shareVar_{rp\ell}\ge0$, $\outsideShareVar_{mp}\ge0$
-\end{frame}
-
-
-% ===== 附录 B：下界模型构建 =====
-\begin{frame}{附录 B：下界模型 LBM 的构建}
+% ===== 附录 A：下界模型构建 =====
+\begin{frame}{附录 A：下界模型 LBM 的构建}
 \scriptsize
 \begin{columns}[T,totalwidth=\textwidth]
 \column{0.48\textwidth}
@@ -63,7 +27,7 @@
 \begin{itemize}\setlength\itemsep{0.05cm}
     \item 按聚合路径签名 $\pathSig{r}=(o_k,d_k,\bar{t}_k)$ 分组
     \item 同签名的原始 itineraries $\to$ 一个 super-itinerary $R$
-    \item Attraction 取合法组合的 optimistic 上界（见附录 E）
+    \item Attraction 取合法组合的 optimistic 上界（见附录 D）
 \end{itemize}
 
 \vspace{0.15cm}
@@ -84,79 +48,72 @@
 \end{frame}
 
 
-% ===== 附录 C：上界模型的 Cuts =====
-\begin{frame}{附录 C：上界模型 UBM 的 Cuts}
+% ===== 附录 B：上界模型的强化约束 =====
+\begin{frame}{附录 B：上界修复模型的强化约束}
 \scriptsize
 \begin{block}{核心思想}
-在原始完整网络 $\full{\net}$ 上求解，锁定 LBM 的资源分配频率，注入 cuts 加速收敛。
+在完整网络 $\full{\net}$ 上求解，锁定 LBM 的资源分配频率，注入超级行程收入约束加速收敛。
 \end{block}
 \vspace{0.1cm}
 \begin{columns}[T,totalwidth=\textwidth]
 \column{0.48\textwidth}
-\textbf{1. Frequency Fixing}
+\textbf{1. 频率固定}
 \vspace{-0.1cm}
 \begin{equation*}
 \sum_{a\in\full{\segArcSet{s}}}\fleetAssignVar_{af} = \freq_{s,f}^{*} \quad \forall s,f
 \end{equation*}
-锁定每条航段每种机型的服务次数，将问题简化为纯调度问题。
-
-\vspace{0.2cm}
-\textbf{2. Revenue Upper Bound Cut}
-\vspace{-0.1cm}
-\begin{equation*}
-\sum_{m,p,\ell}\sum_{r\in\itinInMarket_m}\demand_{mp}\fare_{r\ell}\shareVar_{rp\ell} \le \mathbf{r}^{\mathrm{LB}}
-\end{equation*}
-总收入不超过 LBM 的收入上界，排除不可能的高收入区域。
+锁定每条物理路段每种资源类型的服务次数，将问题简化为排班修复。
 
 \column{0.48\textwidth}
-\textbf{3. Itinerary Cuts}
+\textbf{2. 超级行程选择约束}
 
-引入 super-itinerary 份额变量 $\shareSVar_{Rp\ell}$：
+引入超级行程份额变量 $\shareSVar_{Rp\ell}$：
 \vspace{-0.1cm}
 \begin{align*}
 & \outAttr_{mp}\shareSVar_{Rp\ell} \le \attrSuper_{Rp\ell}\outsideShareVar_{mp} \\
 & \tfrac{\adjOutAttr_{mp}}{\outAttr_{mp}}\outsideShareVar_{mp} + \sum_{R,\ell}\tfrac{\adjAttrSuper_{Rp\ell}}{\attrSuper_{Rp\ell}}\shareSVar_{Rp\ell} \le 1 \\
-& \sum_{m,p,\ell}\sum_{R\in\itinSuperUsingArc{m}{a}}\demand_{mp}\shareSVar_{Rp\ell} \le \sum_{a'\in\Phi^{-1}(a)}\sum_f\fleetCap_f\fleetAssignVar_{a'f}
+& \sum_{m,p,\ell}\sum_{R\in\itinSuperUsingArc{m}{a}}\demand_{mp}\shareSVar_{Rp\ell} \le \sum_{a'\in\Phi_{\arcSet}^{-1}(a)}\sum_f\fleetCap_f\fleetAssignVar_{a'f}
 \end{align*}
-\vspace{-0.1cm}
-\textbf{4. Linking Cut}
+
+\vspace{0.1cm}
+\textbf{3. 超级行程收入约束}
 \vspace{-0.1cm}
 \begin{equation*}
-\shareSVar_{Rp\ell}\cdot\fare_{R\ell} \le \sum_{r\in R}\shareVar_{rp\ell}\cdot\fare_{r\ell}
+\sum_{r\in \eqClassByPathSig_{(R)}}\demand_{mp}\fare_{r\ell}\shareVar_{rp\ell} \le \demand_{mp}\fare_{R\ell}\shareSVar_{Rp\ell}
 \end{equation*}
-Super-itinerary 收入必须被其细粒度 itineraries 支撑。
+底层原始行程总收入不超过超级行程层面的收入上界。
 \end{columns}
 \end{frame}
 
 
-% ===== 附录 D：Refinement 三类 Artifact =====
-\begin{frame}{附录 D：Refinement 检测的三类 Artifact}
+% ===== 附录 C：三类非法情形 =====
+\begin{frame}{附录 C：松弛解可实现性检验——三类非法情形}
 \scriptsize
 \begin{columns}[T,totalwidth=\textwidth]
 \column{0.32\textwidth}
-\begin{block}{\centering 1. Impossible Departures\\（时序违规）}
+\begin{block}{\centering 1. 不可能出发\\（时序违规）}
 \begin{itemize}\setlength\itemsep{0.05cm}
     \item 聚合后某弧的到达时间 $\le$ 出发时间（逆弧效应）
-    \item 资源"穿越时间"到达，虚假满足出发需求
-    \item \textbf{修复}：插入真实到达时间 $t_{\mathrm{dep}}+\travelTime$ 到 $\discretization_i$
+    \item 资源被提前到达，虚假满足出发需求
+    \item 修复：插入真实到达时间 $t_{\mathrm{dep}}+\travelTime$ 到 $\discretization_i$
 \end{itemize}
 \end{block}
 
 \column{0.32\textwidth}
-\begin{block}{\centering 2. Inter Departures\\（间隔违规）}
+\begin{block}{\centering 2. 间隔出发违规\\（间隔违规）}
 \begin{itemize}\setlength\itemsep{0.05cm}
     \item 多个物理服务被聚合到同一时间窗
     \item 实际出发间隔 $<$ 最小间隔 $\minInterdepTime_{ij}$
-    \item \textbf{修复}：插入冲突服务的真实出发时间到 $\discretization_i$
+    \item 修复：插入冲突服务的真实出发时间到 $\discretization_i$
 \end{itemize}
 \end{block}
 
 \column{0.32\textwidth}
-\begin{block}{\centering 3. Phantom Revenue\\（虚假收入）}
+\begin{block}{\centering 3. 虚假收入\\（收入不可实现）}
 \begin{itemize}\setlength\itemsep{0.05cm}
-    \item Super-itinerary 的聚合 attraction 无法被任何原始组合实现
-    \item 离散化太粗，无法区分冲突的原始 itineraries
-    \item \textbf{修复}：插入相关 itinerary 的物理时间点，打破等价类
+    \item 超级行程的吸引力无法被任何原始行程组合实现
+    \item 离散化太粗，无法区分冲突的原始行程
+    \item 修复：插入相关行程的物理时间点，打破等价类
 \end{itemize}
 \end{block}
 \end{columns}
@@ -164,24 +121,24 @@ Super-itinerary 收入必须被其细粒度 itineraries 支撑。
 \vspace{0.2cm}
 \begin{alertblock}{}
 \centering\small
-\textbf{定理}：松弛解非法 $\Leftrightarrow$ 存在至少一类 artifact。持续消除 $\Rightarrow$ 有限步收敛到全局最优。
+定理：松弛解非法 $\Leftrightarrow$ 存在至少一类非法情形。持续消除 $\Rightarrow$ 有限步收敛到全局最优。
 \end{alertblock}
 \end{frame}
 
 
 % ===== 附录 E-1：行程聚合图示 =====
-\begin{frame}{附录 E：行程聚合消除不可行组合}
+\begin{frame}{附录 D：行程聚合抑制虚假收入}
 \begin{center}
     \includegraphics[width=0.5\linewidth]{../figure/illustrate_valid_combinations/valid_combinations.pdf}
 \end{center}
 \vspace{-0.1cm}
 \centering\scriptsize
-同一 super-itinerary 内的原始 itineraries 可能因最小间隔约束互斥。\\
-聚合 attraction 仅在\textbf{物理可共存}的组合上求和，排除不可行组合。
+同一超级行程内的原始行程可能因最小间隔约束互斥。\\
+聚合吸引力通过候选组合上界进行计算，避免将同一超级行程内所有原始行程无约束累加。
 \end{frame}
 
 % ===== 附录 E-2：行程聚合公式 =====
-\begin{frame}{附录 E（续）：Attraction 聚合公式}
+\begin{frame}{附录 D（续）：Attraction 聚合公式}
 \tiny
 \begin{block}{路径签名分组}
 原始 itinerary $r$ 的聚合路径签名：$\pathSig{r}=(o_1,d_1,\bar{t}_1),\ldots,(o_k,d_k,\bar{t}_k)$。

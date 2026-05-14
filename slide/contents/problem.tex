@@ -1,61 +1,44 @@
 \section{问题背景}
 
-% Page 1: 什么是服务网络设计
-\begin{frame}{服务网络设计（Service Network Design）}
+% Page 1: 服务网络设计
+\begin{frame}{服务网络设计}
 \begin{block}{定义}
 \justifying
 服务网络设计是指在给定物理网络上，决定\hl{开设哪些服务}（路线、频率、时刻、资源分配），以最优化运营目标的规划问题。
-$$\min_{\tiny\text{提供的服务}} \{\text{成本}-\text{收益}\}$$
 \end{block}
 
-\begin{block}{现实应用}
+\vspace{0.2cm}
+\begin{block}{应用场景}
 \begin{itemize}
     \item \hl{航空}：航班时刻表与机队分配
-    \item \hl{城市公交}：线路频率与车辆调度
-    \item \hl{货运物流}：干线运输网络规划
+    \item \hl{铁路}：列车开行方案与编组计划
+    \item \hl{城际客运}：线路频率与车辆调度
 \end{itemize}
 \end{block}
-% \begin{columns}[T,totalwidth=\textwidth]
-% \column{0.48\textwidth}
 
-% % \column{0.48\textwidth}
-% % \begin{block}{共同特征}
-% % \begin{itemize}
-% %     \item 服务供给决定了顾客可选的出行方案
-% %     \item 顾客选择反过来影响服务的盈利性
-% %     \item 供给与需求之间存在\hl{反馈耦合}
-% % \end{itemize}
-% \end{block}
-% \end{columns}
+\vspace{0.2cm}
+\begin{block}{核心目标}
+\centering
+在满足运营约束下：$\min_{\text{服务方案}} \{\text{运营成本}-\text{服务收益}\}$
+\end{block}
 \end{frame}
 
 
-% Page 2: 在SND中引入顾客选择
-\begin{frame}{考虑顾客选择的服务网络设计}
+% Page 2: 为什么要考虑顾客选择
+\begin{frame}{为什么要考虑顾客选择}
 \begin{columns}[T,totalwidth=\textwidth]
 \column{0.45\textwidth}
-在传统的服务网络设计中，顾客需求通常被视为\hl{外生输入}。
-\begin{block}{考虑顾客选择的服务网络设计}
-\justifying
-需要同时考虑：
-\begin{itemize}
-    \item 开哪些服务、分配哪类资源
-    \item 顾客如何选择
-\end{itemize}
-\hl{供给决策} 与 \hl{需求分配} 相互反馈。
-\end{block}
+传统服务网络设计将需求视为\hl{外生固定输入}。
 
-% \vspace{0.3cm}
-% \begin{block}{核心矛盾}
-% \centering
-% \Large
-% \textbf{模型更真实}\par
-% \vspace{0.15cm}
-% $\Downarrow$\par
-% \vspace{0.15cm}
-% \Large
-% \textcolor{BadRed}{\textbf{直接求解更困难}}
-% \end{block}
+\vspace{0.2cm}
+\begin{block}{客运场景的特殊性}
+\justifying
+\begin{itemize}
+    \item 服务方案决定了可选行程
+    \item 顾客选择决定了实际收益
+    \item \hl{供给}与\hl{需求}存在反馈耦合
+\end{itemize}
+\end{block}
 
 \column{0.53\textwidth}
 \begin{center}
@@ -70,73 +53,137 @@ $$\min_{\tiny\text{提供的服务}} \{\text{成本}-\text{收益}\}$$
 \end{frame}
 
 
-% Page 3: 为什么难
-\begin{frame}{难点分析}
+% Page 3: 基准模型
+\begin{frame}{基准模型：运营决策与顾客选择的耦合}
 \begin{columns}[T,totalwidth=\textwidth]
-\column{0.85\textwidth}
-\begin{block}{建模方式}
+\column{0.55\textwidth}
+\begin{block}{目标函数}
+\small
+\vspace{-0.3cm}
+\[\min \sum_{a\in \hat{\mathcal{A}}^F}\sum_{f\in\mathcal{F}} C_{af}x_{af}-\sum_{m,p,r,\ell}D_{mp}\mathit{TP}_{r\ell}w_{rp\ell}\]
+\end{block}
+\vspace{-0.1cm}
+\begin{block}{关键耦合约束}
+\small
+选择约束：
+\vspace{-0.2cm}
+\[\alpha^0_{mp} w_{rp\ell} \le \alpha_{rp\ell} w^0_{mp}\]
+\vspace{-0.4cm}
+
+容量约束：
+\vspace{-0.2cm}
+\[\sum_{m,p,\ell}\sum_{r\in R_m(a)} D_{mp}w_{rp\ell}\le \sum_f Q_f x_{af}\]
+\end{block}
+
+\column{0.42\textwidth}
+\begin{block}{变量含义}
+\small
 \begin{itemize}
-    \item 基于\hl{混合整数规划}（MIP）
-    \item 网络层：多商品流（MCF）建模服务与资源
-    \item 需求层：离散选择模型建模顾客行为
+    \item $x_{af}\in\{0,1\}$：服务弧 $a$ 是否由资源 $f$ 运营
+    \item $w_{rp\ell}\ge 0$：顾客选择行程 $r$ 的需求份额
+    \item 目标 = 运营成本 $-$ 票务收入
 \end{itemize}
 \end{block}
 
 \vspace{0.2cm}
-\begin{block}{计算困难的来源}
-\begin{itemize}
-    \item 顾客选择是\hl{内生需求}，不是固定流量——供给变则需求变
-    \item 决策变量同时包含二元服务变量 $\fleetAssignVar$ 和连续选择变量 $\shareVar$，两者耦合
-    \item 可选的行程（itinerary）数量随网络规模呈现极快的增长
-\end{itemize}
-\end{block}
-
-% \column{0.44\textwidth}
-% \begin{center}
-% \begin{tikzpicture}[node distance=0.6cm, every node/.style={font=\small}]
-%     \node[draw=structure,rounded corners,thick,fill=structure!8,minimum width=4.5cm,minimum height=0.9cm,align=center] (a) {网络层：MCF + 整数变量};
-%     \node[draw=structure,rounded corners,thick,fill=structure!8,below=of a,minimum width=4.5cm,minimum height=0.9cm,align=center] (b) {需求层：离散选择模型};
-%     \node[draw=BadRed,rounded corners,thick,fill=BadRed!8,below=of b,minimum width=4.5cm,minimum height=1cm,align=center] (c) {耦合 $\Rightarrow$ 变量爆炸\newline LP 松弛极弱};
-%     \draw[-{Latex[length=2.5mm]},thick] (a) -- (b);
-%     \draw[-{Latex[length=2.5mm]},thick] (b) -- (c);
-%     \draw[-{Latex[length=2.5mm]},thick,dashed,bend right=40] (c.west) to node[left,font=\scriptsize]{反馈} (a.west);
-% \end{tikzpicture}
-% \end{center}
+\begin{alertblock}{\small 耦合是难点}
+\small
+选择约束刻画顾客如何分配需求；容量约束把 $w$ 与 $x$ 连接起来。这种耦合是模型难求解的根源。
+\end{alertblock}
 \end{columns}
 \end{frame}
 
 
-% Page 4: 现有方法的不足
-\begin{frame}{现有方法的不足}
+% Page 4: 完整模型
+\begin{frame}{完整模型 SN-CC$(\hat{\discretization})$}
+\scriptsize
+\textbf{目标函数}（最小化 运营成本 $-$ 票务收入）
+\vspace{-0.2cm}
+\tikz[remember picture]\coordinate(obj-start);%
+\begin{equation*}
+\min \sum_{a\in \full{\flightArc}}\sum_{f\in\fleetSet} \cost_{af}\fleetAssignVar_{af}
+- \sum_{m\in\marketSet}\sum_{p\in\psgTypeSet}\sum_{r\in\itinInMarket_m}\sum_{\ell\in\fareClassSet} \demand_{mp}\fare_{r\ell}\shareVar_{rp\ell}
+\end{equation*}
+\tikz[remember picture]\coordinate(obj-end);%
+\vspace{-0.4cm}
 \begin{columns}[T,totalwidth=\textwidth]
-\column{0.65\textwidth}
-\begin{block}{分支定界}
-\begin{itemize}
-    \item 变量太多，求解器难以直接处理
-    \item 退化严重，分支定界树膨胀
-\end{itemize}
-\end{block}
+\column{0.48\textwidth}
+\tikz[remember picture]\coordinate(res-start);%
+\textbf{资源约束}
+\vspace{-0.15cm}
+\begin{align*}
+& \sum_{a\in \outArcSet{i,t}} \fleetAssignVar_{af} - \sum_{a\in \inArcSet{i,t}} \fleetAssignVar_{af} = 0 & \forall (i,t),f \\
+& \sum_{a\in \holdingArcTc{\checkTime}} \fleetAssignVar_{af} + \sum_{a\in \flightArcTc{\checkTime}} \fleetAssignVar_{af} \le \fleetAvail_f & \forall f \\
+& \sum_{f}\sum_{a\in \arcDuringSepTime_{ijt}} \fleetAssignVar_{af} \le 1 & \forall (i,j),t \\
+& \sum_{f}\sum_{a\in \segArcSet{s}} \fleetAssignVar_{af} = \freq_s & \forall s
+\end{align*}
+\tikz[remember picture]\coordinate(res-end);%
 
-\vspace{0.18cm}
-\begin{block}{Dynamic Discretization Discovery (DDD) \cite{boland2017continuous}框架}
-\begin{itemize}
-    \item 核心思想：对\hl{时空网络做聚合}，逐步细化时间点
-    \item 能有效压缩物理时空网络
-    \item 但\hl{无法处理行程维度的数量爆炸}
-\end{itemize}
-\end{block}
-
-% \column{0.48\textwidth}
-% \begin{center}
-% \begin{tikzpicture}[node distance=0.7cm]
-%     \node[draw=BadRed,rounded corners,thick,fill=BadRed!8,minimum width=4.7cm,minimum height=0.9cm,align=center] (a) {Raw model 太大};
-%     \node[draw=WarnOrange,rounded corners,thick,fill=WarnOrange!12,below=of a,minimum width=4.7cm,minimum height=0.9cm,align=center] (b) {DDD 只压缩时间层};
-%     \node[draw=GoodGreen,rounded corners,thick,fill=GoodGreen!10,below=of b,minimum width=4.7cm,minimum height=1cm,align=center] (c) {需要同时压缩\newline 物理网络 + 顾客行程层};
-%     \draw[-{Latex[length=2.5mm]},thick] (a) -- (b);
-%     \draw[-{Latex[length=2.5mm]},thick] (b) -- (c);
-% \end{tikzpicture}
-% \end{center}
+\column{0.48\textwidth}
+\tikz[remember picture]\coordinate(choice-start);%
+\textbf{顾客选择约束（SBLP/GAM）}
+\vspace{-0.15cm}
+\begin{align*}
+& \outAttr_{mp}\shareVar_{rp\ell} \le \attr_{rp\ell}\outsideShareVar_{mp} & \forall m,p,r,\ell \\
+& \tfrac{\adjOutAttr_{mp}}{\outAttr_{mp}} \outsideShareVar_{mp} + \sum_{r,\ell} \tfrac{\adjAttr_{rp\ell}}{\attr_{rp\ell}}\shareVar_{rp\ell} = 1 & \forall m,p \\
+& \sum_{m,p,\ell}\sum_{r\in \itinUsingArc{m}{a}} \demand_{mp}\shareVar_{rp\ell} \le \sum_f\fleetCap_f\fleetAssignVar_{af} & \forall a \\
+& \sum_f \fleetAssignVar_{af} \ge \shareVar_{rp\ell} & \forall a,r,p,\ell
+\end{align*}
+\tikz[remember picture]\coordinate(choice-end);%
 \end{columns}
+\vspace{0.1cm}
+\tikz[remember picture]\coordinate(coupling-start);%
+\textbf{变量域：} $\fleetAssignVar_{af}\in\{0,1\}$（服务弧），$\fleetAssignVar_{af}\ge0$（持有弧），$\shareVar_{rp\ell}\ge0$，$\outsideShareVar_{mp}\ge0$
+\tikz[remember picture]\coordinate(coupling-end);%
+%% Overlay annotations (4-step animation)
+\begin{tikzpicture}[remember picture, overlay]
+  \only<2>{
+    \draw[red, ultra thick, rounded corners=3pt]
+      ([shift={(-3pt,10pt)}]obj-start) rectangle ([shift={(3pt,-3pt)}]obj-end);
+    \node[red, font=\small\bfseries, anchor=west] at ([shift={(5pt,3pt)}]obj-end) {成本 $-$ 收入};
+  }
+  \only<3>{
+    \draw[red, ultra thick, rounded corners=3pt]
+      ([shift={(-3pt,10pt)}]res-start) rectangle ([shift={(3pt,-3pt)}]res-end);
+    \node[red, font=\small\bfseries, anchor=north west] at ([shift={(3pt,-5pt)}]res-end) {资源流守恒、可用性、间隔、频率};
+  }
+  \only<4>{
+    \draw[red, ultra thick, rounded corners=3pt]
+      ([shift={(-3pt,10pt)}]choice-start) rectangle ([shift={(3pt,-3pt)}]choice-end);
+    \node[red, font=\small\bfseries, anchor=north west] at ([shift={(3pt,-5pt)}]choice-end) {顾客如何分配需求};
+  }
+  \only<5>{
+    \draw[red, ultra thick, rounded corners=3pt]
+      ([shift={(-3pt,8pt)}]coupling-start) rectangle ([shift={(3pt,-3pt)}]coupling-end);
+    \node[red, font=\small\bfseries, anchor=south] at ([shift={(0pt,10pt)}]coupling-start) {$w$ 与 $x$ 的耦合 $\to$ 难点};
+  }
+\end{tikzpicture}
+\end{frame}
+
+
+% Page 5: 计算挑战
+\begin{frame}{计算挑战}
+\begin{block}{行程数量爆炸}
+\begin{itemize}
+    \item 候选行程数量随网络规模\hl{组合爆炸}增长
+    \item 60个机场、259条航段 → 可产生超过\hl{百万}条候选行程
+\end{itemize}
+\end{block}
+
+\vspace{0.15cm}
+\begin{block}{模型结构困难}
+\begin{itemize}
+    \item 二元服务变量 $x$ 与连续选择变量 $w$ 强耦合
+    \item 直接建立 MIP 的 LP 松弛极弱，商业求解器难以有效求解
+\end{itemize}
+\end{block}
+
+\vspace{0.15cm}
+\begin{block}{现有方法的局限}
+\begin{itemize}
+    \item DDD 框架能压缩物理时空网络，但\hl{无法处理行程维度的数量爆炸}
+\end{itemize}
+\end{block}
 \end{frame}
 
 
@@ -154,7 +201,7 @@ $$\min_{\tiny\text{提供的服务}} \{\text{成本}-\text{收益}\}$$
 \begin{block}{\centering 模型真实性}
 \centering
 \vspace{0.1cm}
-考虑选择模型 \\[0.2cm]
+考虑顾客选择模型 \\[0.2cm]
 供给—需求反馈耦合\\[0.2cm]
 \vspace{0.1cm}
 \end{block}
@@ -173,8 +220,12 @@ $$\min_{\tiny\text{提供的服务}} \{\text{成本}-\text{收益}\}$$
 \centering
 \vspace{0.1cm}
 全局最优性保证\\[0.2cm]
-精确方法\\[0.2cm]
+有限步收敛\\[0.2cm]
 \vspace{0.1cm}
 \end{block}
 \end{columns}
+
+\vspace{0.3cm}
+\centering
+本文提出 \hl{\algoNotation} 框架
 \end{frame}
