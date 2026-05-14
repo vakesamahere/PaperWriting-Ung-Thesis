@@ -1,0 +1,175 @@
+\documentclass[tikz,border=6pt]{standalone}
+\usepackage{ctex}
+\usepackage{amsmath}
+\usetikzlibrary{arrows.meta,calc,positioning}
+
+\definecolor{mainblue}{RGB}{0,52,170}
+\definecolor{deepgreen}{RGB}{0,116,80}
+\definecolor{softblue}{RGB}{247,250,255}
+\definecolor{softgreen}{RGB}{247,253,249}
+\definecolor{softgray}{RGB}{249,249,249}
+
+\tikzset{
+  >={Stealth[length=3mm]},
+  blockMain/.style={draw=mainblue, very thick, rounded corners=8pt, fill=softblue},
+  blockSub/.style={draw=deepgreen, very thick, rounded corners=8pt, fill=softgreen},
+  blockCheck/.style={draw=mainblue, very thick, rounded corners=8pt, fill=softblue},
+  blockAux/.style={draw=gray!60, very thick, dashed, rounded corners=8pt, fill=softgray},
+  arrowMain/.style={draw=mainblue, very thick, -{Stealth[length=3mm]}},
+  arrowDash/.style={draw=mainblue, very thick, dashed, -{Stealth[length=3mm]}},
+  titleBlue/.style={font=\bfseries\Large, text=mainblue, align=center},
+  titleGreen/.style={font=\bfseries\Large, text=deepgreen, align=center},
+  normalText/.style={font=\small, align=center},
+  strongText/.style={font=\bfseries\small, align=center},
+  num/.style={circle, fill=mainblue, text=white, minimum size=6.5mm, inner sep=0pt, font=\bfseries},
+  subbox/.style={draw=gray!35, rounded corners=5pt, fill=white, minimum width=2.25cm, minimum height=1.35cm, inner sep=2pt}
+}
+
+\begin{document}
+\begin{tikzpicture}
+
+% =====================================================
+% 1. Super-itinerary block. All internal coordinates are local.
+% =====================================================
+\begin{scope}[shift={(0,0)}]
+  \node[blockMain, minimum width=15.8cm, minimum height=4.8cm, anchor=north] (top) at (0,0) {};
+  \node[titleBlue, anchor=north] at (0,-0.1) {超级行程表示};
+
+  \draw[mainblue!25] (-2.55,-1.20) -- (-2.55,-4.25);
+  \draw[mainblue!25] ( 2.55,-1.20) -- ( 2.55,-4.25);
+
+  % Column 1
+  \begin{scope}[shift={(-5.1,-2.2)}]
+    \node[num] at (0,0.90) {1};
+    \node[strongText] at (0,0) {聚合时空网络\\诱导路径签名};
+    \node[normalText] at (0,-1) {按聚合后的时空弧序列\\定义路径签名};
+    \node[normalText] at (0,-2) {相同路径签名的原始行程\\进入同一候选聚合组};
+  \end{scope}
+
+  % Column 2
+  \begin{scope}[shift={(0,-2.2)}]
+    \node[num] at (0,0.90) {2};
+    \node[strongText] at (0,0) {将原始行程归并为\\超级行程};
+    \node[normalText] at (0,-1) {以路径签名为基础\\建立等价划分};
+    \node[normalText] at (0,-2) {用紧凑的超级行程集合\\替代庞大的原始行程集合};
+  \end{scope}
+
+  % Column 3
+  \begin{scope}[shift={(5.1,-2.2)}]
+    \node[num] at (0,0.90) {3};
+    \node[strongText] at (0,0) {构造吸引力/收入上界\\以避免不可实现收入};
+    \node[normalText] at (0,-1) {覆盖完整网络中的\\可行组合};
+    \node[normalText] at (0,-2) {抑制不可兼容行程的简单累加\\导致的收入高估};
+  \end{scope}
+\end{scope}
+
+% =====================================================
+% 2. Lower-bound model block.
+% =====================================================
+\begin{scope}[shift={(-4.5,-5.75)}]
+  \node[blockSub, minimum width=7.0cm, minimum height=3.25cm, anchor=north] (lb) at (0,0) {};
+  \node[titleGreen, anchor=north] at (0,-0.2) {聚合下界模型};
+
+  \begin{scope}[shift={(-2.25,-1.65)}]
+    \node[subbox, minimum width=2.1cm, minimum height=2cm] (a) at (0,-0.35) {};
+    \node[strongText] at (0,0.27) {聚合时空网络};
+    \node[normalText] at (0,-0.50) {在较粗粒度下\\描述服务结构};
+  \end{scope}
+
+  \begin{scope}[shift={(0,-1.65)}]
+    \node[subbox, minimum width=2.1cm, minimum height=2cm] (b) at (0,-0.35) {};
+    \node[strongText] at (0,0.27) {超级行程变量};
+    \node[normalText] at (0,-0.5) {在聚合空间中\\描述选择结构};
+  \end{scope}
+
+  \begin{scope}[shift={(2.25,-1.65)}]
+    \node[subbox, minimum width=2.1cm, minimum height=2cm] (c) at (0,-0.35) {};
+    \node[strongText] at (0,0.27) {有效下界};
+    \node[normalText] at (0,-0.5) {更小规模模型\\产生 $\mathrm{LB}$};
+  \end{scope}
+\end{scope}
+
+% =====================================================
+% 3. Upper-bound repair block.
+% =====================================================
+\begin{scope}[shift={(4.75,-5.75)}]
+  \node[blockSub, minimum width=7.6cm, minimum height=3.25cm, anchor=north] (ub) at (0,0) {};
+  \node[titleGreen, anchor=north] at (0,-0.2) {完整网络上的上界修复模型};
+
+  \begin{scope}[shift={(-2.45,-1.65)}]
+    \node[subbox, minimum width=2.1cm, minimum height=2cm] (a) at (0,-0.35) {};
+    \node[strongText] at (0,0.27) {固定聚合频率};
+    \node[normalText] at (0,-0.5) {锁定\\频率结构};
+  \end{scope}
+
+  \begin{scope}[shift={(0,-1.65)}]
+    \node[subbox, minimum width=2.1cm, minimum height=2cm] (b) at (0,-0.35) {};
+    \node[strongText] at (0,0.27) {收入约束};
+    \node[normalText] at (0,-0.5) {限制\\收入高估};
+  \end{scope}
+
+  \begin{scope}[shift={(2.45,-1.65)}]
+    \node[subbox, minimum width=2.1cm, minimum height=2cm] (c) at (0,-0.35) {};
+    \node[strongText] at (0,0.27) {可行上界};
+    \node[normalText] at (0,-0.5) {完整网络\\修复可行 $\mathrm{UB}$};
+  \end{scope}
+\end{scope}
+
+% Arrows from top to middle blocks
+\draw[arrowMain] (-2.8,-4.8) .. controls (-2.8,-5.25) and (-4.5,-5.20) .. (-4.5,-5.75);
+\draw[arrowMain] ( 2.8,-4.8) .. controls ( 2.8,-5.25) and ( 4.75,-5.20) .. (4.75,-5.75);
+
+% =====================================================
+% 4. Optimality check block and accepted solution.
+% =====================================================
+\begin{scope}[shift={(0,-9.55)}]
+  \node[blockCheck, minimum width=8.8cm, minimum height=1.95cm, anchor=north] (gap) at (0,0) {};
+  \node[titleBlue, font=\bfseries\large, anchor=north] at (0,-0.25) {最优性检验};
+  \node[strongText] at (-2.15,-1.15) {$\mathrm{LB}\leq \text{最优值}\leq \mathrm{UB}$};
+  \node[strongText] at (2.25,-1.15) {$\mathrm{Gap}=\dfrac{\mathrm{UB}-\mathrm{LB}}{\max\{1,|\mathrm{UB}|\}}$};
+\end{scope}
+
+\draw[arrowMain] (-4.5,-9.0) .. controls (-4.3,-9.40) and (-2.2,-9.25) .. (-2.0,-9.55);
+\draw[arrowMain] ( 4.75,-9.0) .. controls ( 4.2,-9.40) and ( 2.2,-9.25) .. (2.0,-9.55);
+
+\begin{scope}[shift={(7.25,-9.55)}]
+  \node[blockAux, draw=mainblue, fill=white, minimum width=3.45cm, minimum height=1.85cm, anchor=north] (accept) at (0,0) {};
+  \node[strongText, text=mainblue] at (0,-0.55) {若 $\mathrm{Gap}\leq \varepsilon$};
+  \node[strongText, text=mainblue] at (0,-1.15) {获得经认证的\\高质量解（精确解）};
+\end{scope}
+\draw[arrowDash] (4.4,-10.55) -- (5.52,-10.55);
+
+% =====================================================
+% 5. Refinement block.
+% =====================================================
+\begin{scope}[shift={(0,-12.15)}]
+  \node[blockAux, minimum width=10.7cm, minimum height=2.75cm, anchor=north] (ref) at (0,0) {};
+  \node[font=\bfseries\Large, align=center, anchor=north] at (0,-0.25) {松弛解可实现性检验与时间点更新};
+
+  \begin{scope}[shift={(-3.35,-1.8)}]
+    \node[subbox, draw=gray!40, minimum width=2.85cm, minimum height=1.25cm] (a) at (0,0) {};
+    \node[strongText] at (0,0.23) {不可能出发};
+    \node[normalText] at (0,-0.28) {恢复资源可实现性};
+  \end{scope}
+
+  \begin{scope}[shift={(0,-1.8)}]
+    \node[subbox, draw=gray!40, minimum width=2.85cm, minimum height=1.25cm] (b) at (0,0) {};
+    \node[strongText] at (0,0.23) {间隔出发违规};
+    \node[normalText] at (0,-0.28) {消除最小间隔冲突};
+  \end{scope}
+
+  \begin{scope}[shift={(3.35,-1.8)}]
+    \node[subbox, draw=gray!40, minimum width=2.85cm, minimum height=1.25cm] (c) at (0,0) {};
+    \node[strongText] at (0,0.23) {不可实现收入};
+    \node[normalText] at (0,-0.28) {改善收入约束质量};
+  \end{scope}
+\end{scope}
+
+\draw[arrowDash] (0,-11.50) -- node[right, normalText] {若 $\mathrm{Gap}>\varepsilon$} (0,-12.15);
+
+% Feedback loop
+\draw[arrowDash] (5.35,-13.2) -- (10.2,-13.2) -- (10.2,-2.4) -- (7.9,-2.4);
+\node[normalText, text=mainblue, anchor=west] at (6.65,-13.2) {更新聚合网络与\\超级行程结构};
+
+\end{tikzpicture}
+\end{document}
