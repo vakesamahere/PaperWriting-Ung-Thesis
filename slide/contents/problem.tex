@@ -121,7 +121,7 @@
 
 \column{0.48\textwidth}
 \tikz[remember picture]\coordinate(choice-start);%
-\textbf{顾客选择约束（SBLP/GAM）}
+\textbf{顾客选择约束}
 \vspace{-0.15cm}
 \begin{align*}
 & \outAttr_{mp}\shareVar_{rp\ell} \le \attr_{rp\ell}\outsideShareVar_{mp} & \forall m,p,r,\ell \\
@@ -139,18 +139,18 @@
 \begin{tikzpicture}[remember picture, overlay]
   \only<2>{
     \draw[red, ultra thick, rounded corners=3pt]
-      ([shift={(-3pt,10pt)}]obj-start) rectangle ([shift={(3pt,-3pt)}]obj-end);
-    \node[red, font=\small\bfseries, anchor=west] at ([shift={(5pt,3pt)}]obj-end) {成本 $-$ 收入};
+      ([shift={(-5.3cm,10pt)}]obj-start) rectangle ([shift={(12cm,0.3cm)}]obj-end);
+    \node[red, font=\small\bfseries, anchor=west] at ([shift={(5pt,1cm)}]obj-end) {成本 $-$ 收入};
   }
   \only<3>{
     \draw[red, ultra thick, rounded corners=3pt]
-      ([shift={(-3pt,10pt)}]res-start) rectangle ([shift={(3pt,-3pt)}]res-end);
-    \node[red, font=\small\bfseries, anchor=north west] at ([shift={(3pt,-5pt)}]res-end) {资源流守恒、可用性、间隔、频率};
+      ([shift={(-3pt,10pt)}]res-start) rectangle ([shift={(6.5cm,0.4cm)}]res-end);
+    \node[red, font=\small\bfseries, anchor=north west] at ([shift={(3pt,0.4cm)}]res-end) {资源流守恒、可用性、间隔、频率};
   }
   \only<4>{
     \draw[red, ultra thick, rounded corners=3pt]
-      ([shift={(-3pt,10pt)}]choice-start) rectangle ([shift={(3pt,-3pt)}]choice-end);
-    \node[red, font=\small\bfseries, anchor=north west] at ([shift={(3pt,-5pt)}]choice-end) {顾客如何分配需求};
+      ([shift={(-3pt,10pt)}]choice-start) rectangle ([shift={(7cm,0.4cm)}]choice-end);
+    \node[red, font=\small\bfseries, anchor=north west] at ([shift={(3pt,0.4cm)}]choice-end) {顾客如何分配需求};
   }
   \only<5>{
     \draw[red, ultra thick, rounded corners=3pt]
