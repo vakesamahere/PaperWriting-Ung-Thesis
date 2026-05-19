@@ -1,11 +1,11 @@
 \section{方法框架}
 
-% Page 6: IA-DR 总体框架
+% Page: IA-DR 总体框架
 \begin{frame}{\algoNotation{} 总体框架}
 \begin{columns}[T,totalwidth=\textwidth]
 \column{0.5\textwidth}
 \begin{center}
-\includegraphics[width=\linewidth]{../figure/img/framework.png}
+\includegraphics[width=\linewidth]{../figure/algo/main.pdf}
 \end{center}
 
 \column{0.48\textwidth}
@@ -14,14 +14,10 @@
 \begin{enumerate}
     \item<1-> \hl{超级行程表示}：压缩行程空间，构造吸引力上界
     \item<2-> \hl{聚合下界模型}：在聚合网络上给出有效下界
-    \item<2-> \hl{完整网络上界修复}：频率固定 + 超级行程收入约束 → 可行解
+    \item<2-> \hl{完整网络上界修复}：频率固定 + 超级行程收入约束 $\to$ 可行解
     \item<3-> \hl{可实现性检验}：必要时添加时间点，保证收敛
 \end{enumerate}
 \end{block}
-
-\vspace{0.15cm}
-\centering
-\small 核心创新：\hl{超级行程（行程聚合）}
 \end{columns}
 %% Overlay annotations (3-step animation)
 \begin{tikzpicture}[remember picture, overlay]
@@ -32,24 +28,22 @@
 \end{frame}
 
 
-% Page 7: 核心概念——超级行程
-\begin{frame}{核心概念——超级行程}
+% Page: 超级行程表示
+\begin{frame}{核心概念——超级行程表示}
 \begin{columns}[T,totalwidth=\textwidth]
 \column{0.55\textwidth}
-\begin{block}{构造方式}
-\begin{itemize}
-    \item 多条具有相同\hl{聚合路径签名}的原始行程 $r$ → 合并为一条超级行程 $R$
-    \item 票价：取组内乐观值（最大值）
-    \item 吸引力：不是简单求和，而是\hl{可兼容组合的乐观上界}
-\end{itemize}
+\begin{block}{路径签名与分组}
+\[r \eqRelByPathSig r' \;\Longleftrightarrow\; \pathSig{r}=\pathSig{r'}\]
+\small
+相同\hl{聚合路径签名}的原始行程归并为一个超级行程 $R$。
 \end{block}
 
 \vspace{0.2cm}
-\begin{block}{为什么是核心创新}
+\begin{block}{超级行程的作用}
 \begin{itemize}
-    \item 大幅压缩行程空间维度
-    \item 保持松弛的有效性
-    \item 限制不兼容行程的收入累加
+    \item 压缩原始行程变量规模
+    \item 保留顾客选择中的收入结构
+    \item 吸引力上界\hl{抑制不可实现收入}
 \end{itemize}
 \end{block}
 
@@ -61,132 +55,54 @@
 \end{frame}
 
 
-% Page 8: 超级行程的数学表示
-\begin{frame}{超级行程的数学表示}
-\begin{block}{路径签名等价关系}
-\vspace{-0.2cm}
-\[r\sim r' \;\Longleftrightarrow\; \pi(r)=\pi(r')\]
-\small 相同聚合路径签名的原始行程被归入同一超级行程 $R$。
-\end{block}
-
-\vspace{0.2cm}
-\begin{block}{超级行程吸引力}
-\vspace{-0.2cm}
-\[\beta_{Rp\ell}=\max_{\mathcal{I}\in\mathcal{C}(R)}\sum_{\mathcal{O}\in\mathcal{I}}\sum_{r\in\mathcal{O}}\alpha_{rp\ell}\]
-\small
-\begin{itemize}
-    \item $\mathcal{C}(R)$：超级行程 $R$ 内允许的候选组合族
-    \item $\beta_{Rp\ell}$ 不是组内全部行程吸引力的简单累加
-    \item 它是\hl{可兼容原始行程组合}吸引力总和的乐观上界
-\end{itemize}
-\end{block}
-
-\vspace{0.15cm}
-\centering
-\small 超级行程不是画图概念，而是有严格数学定义的聚合变量。
-%% Overlay annotations (2-step animation)
-\begin{tikzpicture}[remember picture, overlay]
-  \only<1>{\node[red, font=\small\bfseries, anchor=west] at ([xshift=0.5cm,yshift=1.2cm]current page.center) {$\leftarrow$ 先定义如何分组};}
-  \only<2>{\node[red, font=\small\bfseries, anchor=west] at ([xshift=0.5cm,yshift=-1.2cm]current page.center) {$\leftarrow$ 再定义吸引力上界};}
-\end{tikzpicture}
-\end{frame}
-
-
-% Page 9: 不可实现收入与行程聚合
-\begin{frame}{不可实现收入与行程聚合}
-\begin{block}{问题：简单时间聚合导致不可实现收入}
-\begin{itemize}
-    \item LP 松弛甚至整数解可能累加来自\hl{不兼容行程}的收入
-    \item 同一时段内多条行程共享同一服务弧 → 收入被重复计算
-    \item 导致下界过于乐观，间隙难以收紧
-\end{itemize}
-\end{block}
-
-\vspace{0.3cm}
-\begin{block}{解决：超级行程构造限制吸引力累加}
-\begin{itemize}
-    \item 超级行程的吸引力基于\hl{可兼容组合的乐观上界}构造
-    \item 不可同时实现的行程不会被无约束地全部累加
-    \item 结果：得到\hl{更紧的下界}，加速算法收敛
-\end{itemize}
-\end{block}
-%% Overlay annotations (2-step animation)
-\begin{tikzpicture}[remember picture, overlay]
-  \only<1>{\node[red, font=\small\bfseries, anchor=west] at ([xshift=-4cm,yshift=0.8cm]current page.east) {简单聚合会高估收入};}
-  \only<2>{\node[red, font=\small\bfseries, anchor=west] at ([xshift=-4cm,yshift=-2.2cm]current page.east) {超级行程抑制无约束累加};}
-\end{tikzpicture}
-\end{frame}
-
-
-% Page 10: 双侧界模型公式
+% Page: 双侧界模型
 \begin{frame}{双侧界模型：下界与上界}
 \begin{columns}[T,totalwidth=\textwidth]
 \column{0.48\textwidth}
 \begin{block}{聚合下界模型}
-\small
-\vspace{-0.3cm}
-\[\min\sum_{a,f} C_{af}x_{af}-\sum_{m,p,R,\ell}D_{mp}\mathit{TP}_{R\ell}w_{Rp\ell}\]
-\vspace{-0.3cm}
-
-关键替换：
-\vspace{-0.2cm}
-\[\alpha^0_{mp}w_{Rp\ell}\le \beta_{Rp\ell}w^0_{mp}\]
-\vspace{-0.3cm}
-
-\small 在聚合网络和超级行程空间上求解，得到原问题\hl{有效下界}。
+\begin{itemize}
+    \item 聚合时空网络（粗离散化）
+    \item 超级行程空间（压缩行程变量）
+    \item 吸引力上界约束
+\end{itemize}
+\vspace{0.2cm}
+\centering
+$\Downarrow$\\[3pt]
+\hl{有效下界}
 \end{block}
 
 \column{0.48\textwidth}
 \begin{block}{完整网络上界修复}
-\small
-频率固定：
-\vspace{-0.2cm}
-\[\sum_{a\in \hat{\mathcal{A}}(s)}x_{af}=n^*_{sf}\]
-\vspace{-0.3cm}
-
-超级行程收入约束：
-\vspace{-0.2cm}
-\[\sum_{r\in S(R)}D_{mp}\mathit{TP}_{r\ell}w_{rp\ell}\le D_{mp}\mathit{TP}_{R\ell}\mathit{sw}_{Rp\ell}\]
-\vspace{-0.3cm}
-
-\small 在完整时空网络上求解，生成原问题可行解，给出\hl{有效上界}。
+\begin{itemize}
+    \item 完整时空网络（原始离散化）
+    \item 频率固定（锁定下界解的服务频率）
+    \item 超级行程收入约束
+\end{itemize}
+\vspace{0.2cm}
+\centering
+$\Downarrow$\\[3pt]
+\hl{原问题可行解}（上界）
 \end{block}
 \end{columns}
 
-\vspace{0.2cm}
+\vspace{0.4cm}
 \centering
-\small 下界与上界之差 = 当前最优性间隙，指导细化方向
-%% Overlay annotations (3-step animation)
-\begin{tikzpicture}[remember picture, overlay]
-  \only<1>{\node[red, font=\small\bfseries, anchor=east] at ([xshift=-0.5cm,yshift=-0.5cm]current page.west -| current page.center) {更小模型 $\to$ 有效下界};}
-  \only<2>{\node[red, font=\small\bfseries, anchor=west] at ([xshift=0.5cm,yshift=-0.5cm]current page.center) {完整网络 $\to$ 可行上界};}
-  \only<3>{\node[red, font=\small\bfseries, anchor=north] at ([yshift=0.8cm]current page.south) {Gap 指导是否继续细化};}
-\end{tikzpicture}
+\small 下界评价理论最优水平，上界来自真实可行解，二者差距即\hl{最优性间隙}。
 \end{frame}
 
 
-% Page 11: 可实现性检验与时间点添加
-\begin{frame}{可实现性检验与时间点添加}
-\begin{block}{松弛解在完整网络中的三类非法情形}
-\begin{enumerate}
-    \item<1-> \hl{不可能出发}：聚合网络中资源过早可用，完整网络中无法实现
-    \item<2-> \hl{间隔出发违规}：同一物理路段的出发间隔不满足最小间隔约束
-    \item<3-> \hl{不可实现收入}：超级行程声称的收入无法由原始行程组合实现
-\end{enumerate}
-\end{block}
-
-\vspace{0.2cm}
-\begin{block}{定向时间点添加}
+% Page: 可实现性检验与收敛
+\begin{frame}{松弛解可实现性检验}
+\begin{block}{核心思想}
 \begin{itemize}
-    \item 针对检测到的非法情形，添加对应时间点
-    \item 更新路径签名与超级行程划分，排除当前非法松弛解
+    \item 聚合松弛解可能在完整网络中不可实现
+    \item 检测到非法情形后，添加对应时间点
+    \item 更新路径签名与超级行程划分，缩小松弛间隙
 \end{itemize}
 \end{block}
 
-\vspace{0.2cm}
-\onslide<4->{%
+\vspace{0.4cm}
 \begin{alertblock}{理论保证}
-算法在有限步内\hl{收敛到全局最优解}
+算法在有限步内闭合上下界；实际计算中以预设最优性容差停止。
 \end{alertblock}
-}
 \end{frame}

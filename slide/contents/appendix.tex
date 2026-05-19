@@ -2,54 +2,91 @@
 \section{附录}
 
 
-% ===== 附录 A：下界模型构建 =====
-\begin{frame}{附录 A：下界模型 LBM 的构建}
-\scriptsize
-\begin{columns}[T,totalwidth=\textwidth]
-\column{0.48\textwidth}
-\textbf{Step 1: 时间弧聚合}
-\begin{itemize}\setlength\itemsep{0.05cm}
-    \item 将完整离散化 $\discretizationFull$ 压缩为粗离散化 $\discretization$
-    \item 弧映射 $\Phi_{\arcSet}: \full{\arcSet}\to\arcSet\cup\{\bot\}$
-    \item 服务弧到达时间取 floor：$t'=\max\{\bar{t}\in\discretization_j\mid\bar{t}\le t+\travelTime_{ij}\}$
-    \item 资源变量变为整数：$\fleetAssignVar_{af}\in\mathbb{Z}_{\ge0}$（允许多个原始弧映射到同一聚合弧）
-\end{itemize}
+% ===== 附录 A：超级行程吸引力上界公式 =====
+\begin{frame}{附录 A：超级行程吸引力上界}
+\small 超级行程不是画图概念，而是有严格数学定义的聚合变量。
+
+\vspace{0.1cm}
+\begin{block}{路径签名等价关系}
+\vspace{-0.2cm}
+\[r \eqRelByPathSig r' \;\Longleftrightarrow\; \pathSig{r}=\pathSig{r'}\]
+\small 相同聚合路径签名的原始行程被归入同一超级行程 $R$。
+\end{block}
 
 \vspace{0.15cm}
-\textbf{约束修正}
-\begin{itemize}\setlength\itemsep{0.05cm}
-    \item 资源可用性：减去逆弧修正项 $-\sum_{a\in\invertArcTc{\checkTime}}\fleetAssignVar_{af}$
-    \item 最小间隔：RHS 放松为 $\departLimit_{ijt}=\lceil\frac{\Delta t}{\minInterdepTime_{ij}}\rceil$
-\end{itemize}
-
-\column{0.48\textwidth}
-\textbf{Step 2: 行程聚合}
-\begin{itemize}\setlength\itemsep{0.05cm}
-    \item 按聚合路径签名 $\pathSig{r}=(o_k,d_k,\bar{t}_k)$ 分组
-    \item 同签名的原始 itineraries $\to$ 一个 super-itinerary $R$
-    \item Attraction 取合法组合的 optimistic 上界（见附录 D）
-\end{itemize}
-
-\vspace{0.15cm}
-\textbf{Step 3: 初始离散化策略}
-\begin{itemize}\setlength\itemsep{0.05cm}
-    \item 拓扑自适应：$\initStep_i = \min_{j:(j,i)\in\segSet}\travelTime_{ji}$
-    \item Hub 节点自动获得细网格，spoke 节点获得粗网格
-    \item 消除逆弧，初始松弛即物理可行
-\end{itemize}
-
-\vspace{0.15cm}
-\textbf{结果}
+\begin{block}{吸引力上界}
+\vspace{-0.2cm}
+\[\attrSuper_{Rp\ell}=\max_{\itinCombSet\in\compatSet{R}}\sum_{\eqClassByOrigPath\in\itinCombSet}\sum_{r\in\eqClassByOrigPath}\attr_{rp\ell}\]
+\small
 \begin{itemize}
-    \item 模型 $\model{\discretization,\itinSetSuper}$ 是原始模型的 valid relaxation
-    \item 最优值 $\le$ 原始模型最优值（下界）
+    \item $\compatSet{R}$：覆盖可兼容原始行程组合的候选组合族
+    \item $\attrSuper_{Rp\ell}$：可兼容组合吸引力总和的乐观上界
 \end{itemize}
-\end{columns}
+\end{block}
+
+\vspace{0.1cm}
+\centering
+\small 该构造避免同一超级行程内所有原始行程被无约束累加，从而\hl{抑制不可实现收入}。
 \end{frame}
 
 
-% ===== 附录 B：上界模型的强化约束 =====
-\begin{frame}{附录 B：上界修复模型的强化约束}
+% ===== 附录 A（续）：Attraction 聚合详细公式 =====
+\begin{frame}{附录 A（续）：Attraction 聚合详细公式}
+\tiny
+\begin{block}{路径签名分组}
+原始行程 $r$ 的聚合路径签名：$\pathSig{r}=(o_1,d_1,\bar{t}_1),\ldots,(o_k,d_k,\bar{t}_k)$。
+按 $\pathSig{r}$ 分组得到等价类 $\eqClassByPathSig$，每个等价类构造一个超级行程 $R$。
+\end{block}
+\vspace{0.05cm}
+\begin{block}{组内再按原始路径签名分组}
+$\eqClassByPathSig_{(R)}$ 内按原始路径 $\origPath{r}$ 再分组得 $\eqClassByOrigPath^R$。
+同一 $\eqClassByOrigPath^R_r$ 内的行程使用完全相同的物理路径，可同时运营。
+\end{block}
+\vspace{0.05cm}
+\begin{block}{Attraction 计算}
+\vspace{-0.15cm}
+\begin{equation*}
+\attrSuper_{Rp\ell} = \max_{\itinCombSet \subseteq \eqClassByPathSig_{(R)}/\eqRelByOrigPath,\;|\itinCombSet|\le\combLimit_R}
+\sum_{\mathscr{O}\in\itinCombSet}\sum_{r\in\mathscr{O}}\attr_{rp\ell}
+\qquad
+\combLimit_R = \prod_{(o,d,\bar{t})\in\pathSig{R}} \min\{\departLimit_{od\bar{t}},\;\freq_{od}\}
+\end{equation*}
+\end{block}
+\vspace{0.05cm}
+\begin{alertblock}{}
+\centering\scriptsize
+$\combLimit_R$ 是合法共存服务数的上界 $\Rightarrow$ $\attrSuper_{Rp\ell} \ge$ 任何可行整数解的吸引力 $\Rightarrow$ \textbf{下界有效}
+\end{alertblock}
+\end{frame}
+
+
+% ===== 附录 B：聚合下界模型 formulation =====
+\begin{frame}{附录 B：聚合下界模型}
+\small
+\begin{block}{目标函数}
+\vspace{-0.3cm}
+\[\min\sum_{a\in\arcSet^F}\sum_{f\in\fleetSet} C_{af}x_{af}-\sum_{m,p,R,\ell}D_{mp}\mathit{TP}_{R\ell}w_{Rp\ell}\]
+\end{block}
+\vspace{0.1cm}
+\begin{block}{关键约束}
+\begin{itemize}
+    \item 资源流守恒、资源可用性、最小间隔（聚合网络版本）
+    \item 超级行程选择约束：$\alpha^0_{mp}w_{Rp\ell}\le \beta_{Rp\ell}w^0_{mp}$
+    \item 聚合容量约束
+\end{itemize}
+\end{block}
+\vspace{0.1cm}
+\begin{block}{性质}
+\begin{itemize}
+    \item 模型 $\model{\discretization,\itinSetSuper}$ 是原始模型的有效松弛
+    \item 最优值 $\le$ 原始模型最优值（下界）
+\end{itemize}
+\end{block}
+\end{frame}
+
+
+% ===== 附录 C：上界修复模型的强化约束 =====
+\begin{frame}{附录 C：上界修复模型的强化约束}
 \scriptsize
 \begin{block}{核心思想}
 在完整网络 $\full{\net}$ 上求解，锁定 LBM 的资源分配频率，注入超级行程收入约束加速收敛。
@@ -86,8 +123,8 @@
 \end{frame}
 
 
-% ===== 附录 C：三类非法情形 =====
-\begin{frame}{附录 C：松弛解可实现性检验——三类非法情形}
+% ===== 附录 D：三类非法情形详细 =====
+\begin{frame}{附录 D：松弛解可实现性检验——三类非法情形}
 \scriptsize
 \begin{columns}[T,totalwidth=\textwidth]
 \column{0.32\textwidth}
@@ -121,13 +158,13 @@
 \vspace{0.2cm}
 \begin{alertblock}{}
 \centering\small
-定理：松弛解非法 $\Leftrightarrow$ 存在至少一类非法情形。持续消除 $\Rightarrow$ 有限步收敛到全局最优。
+定理：松弛解非法 $\Leftrightarrow$ 存在至少一类非法情形。持续消除 $\Rightarrow$ 有限步收敛。
 \end{alertblock}
 \end{frame}
 
 
-% ===== 附录 E-1：行程聚合图示 =====
-\begin{frame}{附录 D：行程聚合抑制不可实现收入}
+% ===== 附录 E：行程聚合图示 =====
+\begin{frame}{附录 E：行程聚合抑制不可实现收入}
 \begin{center}
     \includegraphics[width=0.5\linewidth]{../figure/illustrate_valid_combinations/valid_combinations.pdf}
 \end{center}
@@ -135,33 +172,4 @@
 \centering\scriptsize
 同一超级行程内的原始行程可能因最小间隔约束互斥。\\
 聚合吸引力通过候选组合上界进行计算，避免将同一超级行程内所有原始行程无约束累加。
-\end{frame}
-
-% ===== 附录 E-2：行程聚合公式 =====
-\begin{frame}{附录 D（续）：Attraction 聚合公式}
-\tiny
-\begin{block}{路径签名分组}
-原始 itinerary $r$ 的聚合路径签名：$\pathSig{r}=(o_1,d_1,\bar{t}_1),\ldots,(o_k,d_k,\bar{t}_k)$。
-按 $\pathSig{r}$ 分组得到等价类 $\eqClassByPathSig$，每个等价类构造一个 super-itinerary $R$。
-\end{block}
-\vspace{0.05cm}
-\begin{block}{组内再按原始路径签名分组}
-$\eqClassByPathSig_{(R)}$ 内按原始路径 $\origPath{r}$ 再分组得 $\eqClassByOrigPath^R$。
-同一 $\eqClassByOrigPath^R_r$ 内的 itineraries 使用完全相同的物理路径，可同时运营。
-\end{block}
-\vspace{0.05cm}
-\begin{block}{Attraction 计算}
-\vspace{-0.15cm}
-\begin{equation*}
-\attrSuper_{Rp\ell} = \max_{\itinCombSet \subseteq \eqClassByPathSig_{(R)}/\eqRelByOrigPath,\;|\itinCombSet|\le\combLimit_R}
-\sum_{\mathscr{O}\in\itinCombSet}\sum_{r\in\mathscr{O}}\attr_{rp\ell}
-\qquad
-\combLimit_R = \prod_{(o,d,\bar{t})\in\pathSig{R}} \min\{\departLimit_{od\bar{t}},\;\freq_{od}\}
-\end{equation*}
-\end{block}
-\vspace{0.05cm}
-\begin{alertblock}{}
-\centering\scriptsize
-$\combLimit_R$ 是合法共存服务数的上界 $\Rightarrow$ $\attrSuper_{Rp\ell} \ge$ 任何可行整数解的 attraction $\Rightarrow$ \textbf{下界有效}
-\end{alertblock}
 \end{frame}

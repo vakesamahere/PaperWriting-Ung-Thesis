@@ -1,22 +1,29 @@
 \section{实验结果}
 
-% Page 10: 实验设置
-\begin{frame}{实验设置}
-\tiny 数据来自DB1B\cite{DOT_DB1B_2025}和AOTP\cite{DOT_OTP_2025}，经过合成得到 Frontier Airlines 的实例。
+% Page 14: 实验数据与实例构建
+\begin{frame}{实验数据与实例构建}
 \begin{columns}[T,totalwidth=\textwidth]
 \column{0.55\textwidth}
-\begin{block}{Frontier Airlines (F9)}
+\begin{block}{数据来源}
 \begin{itemize}
-    \item 美国超低成本航空公司（ULCC）
-    \item 60 个机场，259 条有向航段
-    \item 382 个 OD 市场（起点-终点对）
-    \item Airbus A320 系列机队（4 个子类型）
-    \item 座位容量 186--228 座
-    \item 最多 2 次中转，最大 3 小时中转时间
+    \item 基于 \hl{DB1B} 和 \hl{AOTP} 构建 Frontier Airlines 实例
+    \item AOTP：航班时刻、机场、航段、飞行时间
+    \item DB1B：OD 市场、需求、票价
 \end{itemize}
 \end{block}
 
-\column{0.38\textwidth}
+\vspace{0.15cm}
+\begin{block}{样本航司：Frontier Airlines (F9)}
+\begin{itemize}
+    \item 60 个机场，259 条有向航段
+    \item 382 个 OD 市场
+    \item 4 个资源子类型（Airbus A320 系列）
+    \item 15 分钟离散化粒度
+    \item 最多 2 次中转，最大 3h 中转窗口
+\end{itemize}
+\end{block}
+
+\column{0.4\textwidth}
 \begin{block}{实例规模}
 \centering
 \small
@@ -31,66 +38,38 @@ F9-2.5x & 60h & 1,032,804 \\
 F9-3.0x & 72h & 1,427,328 \\
 \bottomrule
 \end{tabular}
-\vspace{0.1cm}
 \end{block}
-
-\vspace{0.1cm}
-\tiny
-离散化粒度为 15 分钟\\
-所有实例均在相同硬件配置进行\\
-AMD EPYC 9654 96-Core Processor，512GB RAM
 \end{columns}
 \end{frame}
 
 
-% Page 11: 计算性能对比
+% Page 15: 计算性能对比
 \begin{frame}{计算性能对比}
-\tiny
-Raw Model：使用 Gurobi 直接求解原始模型\\
-\algoNotation：使用本文提出的行程聚合与动态细化框架\\
-Gap 按求解器最优性间隙口径计算
+\scriptsize
+\algoNotation：本文框架 \quad Raw：Gurobi 直接求解 \quad 最优性间隙按求解器口径计算
 
-\begin{block}{Raw Model vs. \algoNotation}
+\vspace{0.2cm}
+\begin{block}{}
 \centering
 \small
-\begin{tabular}{llccc}
+\begin{tabular}{lccc}
 \toprule
-实例 & 方法 & 时限 & 最优性间隙 & 实际用时 \\
+实例 & \algoNotation{} (间隙 / 用时) & Raw 5h 间隙 & Raw 12h 间隙 \\
 \midrule
-\multirow{3}{*}{F9-1.0x}
- & \algoNotation & 5h & $<$1\% & 0.92h \\
- & Raw & 5h & 13.62\% & 5h \\
- & Raw & 12h & 11.60\% & 12h \\
-\midrule
-\multirow{3}{*}{F9-1.5x}
- & \algoNotation & 5h & $<$1\% & 1.14h \\
- & Raw & 5h & 7.57\% & 5h \\
- & Raw & 12h & 7.37\% & 12h \\
-\midrule
-\multirow{3}{*}{F9-2.0x}
- & \algoNotation & 5h & $<$1\% & 1.39h \\
- & Raw & 5h & 8.39\% & 5h \\
- & Raw & 12h & 8.38\% & 12h \\
-\midrule
-\multirow{3}{*}{F9-2.5x}
- & \algoNotation & 5h & $<$1\% & 4.13h \\
- & Raw & 5h & -- & -- \\
- & Raw & 12h & -- & -- \\
-\midrule
-\multirow{3}{*}{F9-3.0x}
- & \algoNotation & 5h & $<$1\% & 2.46h \\
- & Raw & 5h & -- & -- \\
- & Raw & 12h & -- & -- \\
+F9-1.0x & $<$1\% / 0.92h & 13.62\% & 11.60\% \\
+F9-1.5x & $<$1\% / 1.14h & 7.57\% & 7.37\% \\
+F9-2.0x & $<$1\% / 1.39h & 8.39\% & 8.38\% \\
+F9-2.5x & $<$1\% / 4.13h & -- & -- \\
+F9-3.0x & $<$1\% / 2.46h & -- & -- \\
 \bottomrule
 \end{tabular}
 \vspace{0.1cm}
 
-\footnotesize\tiny ``--'' 表示 Raw Model 在时限内未返回可用结果。
+\scriptsize ``--'' 表示 Raw Model 在时限内未返回可用结果。
 \end{block}
 
-\vspace{0.1cm}
-\small
-\only<1>{\textcolor{red}{\small $\to$ 所有实例均于 5h 内达到 $<$1\% 间隙}}
-\only<2>{\textcolor{red}{\small $\to$ 百万级行程实例：Raw Model 无法返回可用结果}}
-\only<3>{\textcolor{red}{\small $\to$ 最大实例 F9-3.0x：\algoNotation{} 仅需 2.46h}}
+\vspace{0.2cm}
+\only<1>{\textcolor{red}{\small $\to$ 所有实例 \algoNotation{} 均达到预设最优性容差（$<$1\%）}}
+\only<2>{\textcolor{red}{\small $\to$ 最大实例 F9-3.0x：\algoNotation{} 仅需 2.46h}}
+\only<3>{\textcolor{red}{\small $\to$ F9-2.5x / F9-3.0x：Raw Model 无法返回可用最优性间隙}}
 \end{frame}

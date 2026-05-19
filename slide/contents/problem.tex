@@ -1,41 +1,21 @@
 \section{问题背景}
 
-% Page 1: 服务网络设计
-\begin{frame}{服务网络设计}
-\begin{block}{定义}
-\justifying
-服务网络设计是指在给定物理网络上，决定\hl{开设哪些服务}（路线、频率、时刻、资源分配），以最优化运营目标的规划问题。
-\end{block}
-
-\vspace{0.2cm}
-\begin{block}{应用场景}
+% Page 1: 研究背景：服务网络设计与顾客选择
+\begin{frame}{研究背景：服务网络设计与顾客选择}
+\begin{columns}[T,totalwidth=\textwidth]
+\column{0.45\textwidth}
+\begin{block}{服务网络设计}
 \begin{itemize}
-    \item \hl{航空}：航班时刻表与机队分配
-    \item \hl{铁路}：列车开行方案与编组计划
-    \item \hl{城际客运}：线路频率与车辆调度
+    \item 航空、铁路、城际客运需决定路线、时刻、资源配置
+    \item 传统方法将需求视为\hl{外生固定}输入
 \end{itemize}
 \end{block}
 
 \vspace{0.2cm}
-\begin{block}{核心目标}
-\centering
-在满足运营约束下：$\min_{\text{服务方案}} \{\text{运营成本}-\text{服务收益}\}$
-\end{block}
-\end{frame}
-
-
-% Page 2: 为什么要考虑顾客选择
-\begin{frame}{为什么要考虑顾客选择}
-\begin{columns}[T,totalwidth=\textwidth]
-\column{0.45\textwidth}
-传统服务网络设计将需求视为\hl{外生固定输入}。
-
-\vspace{0.2cm}
-\begin{block}{客运场景的特殊性}
-\justifying
+\begin{block}{顾客选择的影响}
 \begin{itemize}
-    \item 服务方案决定了可选行程
-    \item 顾客选择决定了实际收益
+    \item 服务方案决定可选行程集合
+    \item 顾客选择决定实际收益
     \item \hl{供给}与\hl{需求}存在反馈耦合
 \end{itemize}
 \end{block}
@@ -45,57 +25,55 @@
 \begin{tikzpicture}[node distance=0.5cm, every node/.style={font=\small}]
     \node[draw=structure,rounded corners,thick,fill=structure!8,minimum width=4.2cm,minimum height=1cm,align=center] (supply) {供给决策\\开哪些服务？分配什么资源？};
     \node[draw=structure,rounded corners,thick,fill=structure!8,below=1.2cm of supply,minimum width=4.2cm,minimum height=1cm,align=center] (demand) {需求分配\\顾客如何选择？};
-    \draw[-{Latex[length=2.5mm]},thick] (supply.east) to[bend left=40] node[right,font=\scriptsize]{服务方案} (demand.east);
-    \draw[-{Latex[length=2.5mm]},thick] (demand.west) to[bend left=40] node[left,font=\scriptsize]{盈利结果} (supply.west);
+    \draw[-{Latex[length=2.5mm]},thick] (supply.east) to[bend left=40] node[right,font=\scriptsize]{服务方案决定可选行程} (demand.east);
+    \draw[-{Latex[length=2.5mm]},thick] (demand.west) to[bend left=40] node[left,font=\scriptsize]{选择结果决定收益} (supply.west);
 \end{tikzpicture}
 \end{center}
 \end{columns}
 \end{frame}
 
 
-% Page 3: 基准模型
-\begin{frame}{基准模型：运营决策与顾客选择的耦合}
+% Page 2: 相关研究与不足
+\begin{frame}{相关研究与不足}
 \begin{columns}[T,totalwidth=\textwidth]
-\column{0.55\textwidth}
-\begin{block}{目标函数}
-\small
-\vspace{-0.3cm}
-\[\min \sum_{a\in \hat{\mathcal{A}}^F}\sum_{f\in\mathcal{F}} C_{af}x_{af}-\sum_{m,p,r,\ell}D_{mp}\mathit{TP}_{r\ell}w_{rp\ell}\]
-\end{block}
-\vspace{-0.1cm}
-\begin{block}{关键耦合约束}
-\small
-选择约束：
-\vspace{-0.2cm}
-\[\alpha^0_{mp} w_{rp\ell} \le \alpha_{rp\ell} w^0_{mp}\]
-\vspace{-0.4cm}
-
-容量约束：
-\vspace{-0.2cm}
-\[\sum_{m,p,\ell}\sum_{r\in R_m(a)} D_{mp}w_{rp\ell}\le \sum_f Q_f x_{af}\]
-\end{block}
-
-\column{0.42\textwidth}
-\begin{block}{变量含义}
+\column{0.32\textwidth}
+\begin{block}{传统服务网络设计}
 \small
 \begin{itemize}
-    \item $x_{af}\in\{0,1\}$：服务弧 $a$ 是否由资源 $f$ 运营
-    \item $w_{rp\ell}\ge 0$：顾客选择行程 $r$ 的需求份额
-    \item 目标 = 运营成本 $-$ 票务收入
+    \item 擅长服务开行、频率设置和资源配置
+    \item 需求外生，无法刻画供需反馈
 \end{itemize}
 \end{block}
 
-\vspace{0.2cm}
-\begin{alertblock}{\small 耦合是难点}
+\column{0.32\textwidth}
+\begin{block}{顾客选择模型}
 \small
-选择约束刻画顾客如何分配需求；容量约束把 $w$ 与 $x$ 连接起来。这种耦合是模型难求解的根源。
-\end{alertblock}
+\begin{itemize}
+    \item 能刻画内生需求
+    \item 嵌入SND后产生大量行程变量
+\end{itemize}
+\end{block}
+
+\column{0.32\textwidth}
+\begin{block}{动态离散化方法}
+\small
+\begin{itemize}
+    \item 能压缩物理时空网络
+    \item 难以处理行程空间爆炸和不可实现收入
+\end{itemize}
+\end{block}
 \end{columns}
+
+\vspace{0.4cm}
+\begin{alertblock}{\centering 本文切入点}
+\centering
+从行程空间入手，提出基于\hl{超级行程}的行程聚合与动态细化框架。
+\end{alertblock}
 \end{frame}
 
 
-% Page 4: 完整模型
-\begin{frame}{完整模型 SN-CC$(\hat{\discretization})$}
+% Pages 3-7: 基准模型 SN-CC (multi-page overlay on ONE frame)
+\begin{frame}{完整模型 \problemNotation$(\hat{\discretization})$}
 \scriptsize
 \textbf{目标函数}（最小化 运营成本 $-$ 票务收入）
 \vspace{-0.2cm}
@@ -135,97 +113,54 @@
 \tikz[remember picture]\coordinate(coupling-start);%
 \textbf{变量域：} $\fleetAssignVar_{af}\in\{0,1\}$（服务弧），$\fleetAssignVar_{af}\ge0$（持有弧），$\shareVar_{rp\ell}\ge0$，$\outsideShareVar_{mp}\ge0$
 \tikz[remember picture]\coordinate(coupling-end);%
-%% Overlay annotations (4-step animation)
+%% Overlay annotations (5-step animation)
 \begin{tikzpicture}[remember picture, overlay]
   \only<2>{
     \draw[red, ultra thick, rounded corners=3pt]
       ([shift={(-5.3cm,10pt)}]obj-start) rectangle ([shift={(12cm,0.3cm)}]obj-end);
-    \node[red, font=\small\bfseries, anchor=west] at ([shift={(5pt,1cm)}]obj-end) {成本 $-$ 收入};
+    \node[red, font=\small\bfseries, anchor=south west] at ([shift={(-5.3cm,12pt)}]obj-start) {目标函数 = 运营成本 $-$ 服务收入};
   }
   \only<3>{
     \draw[red, ultra thick, rounded corners=3pt]
       ([shift={(-3pt,10pt)}]res-start) rectangle ([shift={(6.5cm,0.4cm)}]res-end);
-    \node[red, font=\small\bfseries, anchor=north west] at ([shift={(3pt,0.4cm)}]res-end) {资源流守恒、可用性、间隔、频率};
+    \node[red, font=\small\bfseries, anchor=north west] at ([shift={(3pt,0.4cm)}]res-end) {资源约束：保证服务计划运营可行};
   }
   \only<4>{
     \draw[red, ultra thick, rounded corners=3pt]
       ([shift={(-3pt,10pt)}]choice-start) rectangle ([shift={(7cm,0.4cm)}]choice-end);
-    \node[red, font=\small\bfseries, anchor=north west] at ([shift={(3pt,0.4cm)}]choice-end) {顾客如何分配需求};
+    \node[red, font=\small\bfseries, anchor=north west] at ([shift={(3pt,0.4cm)}]choice-end) {选择约束：刻画顾客需求分配};
   }
   \only<5>{
     \draw[red, ultra thick, rounded corners=3pt]
       ([shift={(-3pt,8pt)}]coupling-start) rectangle ([shift={(3pt,-3pt)}]coupling-end);
-    \node[red, font=\small\bfseries, anchor=south] at ([shift={(0pt,10pt)}]coupling-start) {$w$ 与 $x$ 的耦合 $\to$ 难点};
+    \node[red, font=\small\bfseries, anchor=north] at ([shift={(0pt,-5pt)}]coupling-end) {强耦合：$x$ 与 $w$ 相互影响 $\to$ 计算困难来源};
   }
 \end{tikzpicture}
 \end{frame}
 
 
-% Page 5: 计算挑战
-\begin{frame}{计算挑战}
-\begin{block}{行程数量爆炸}
+% Page 8: 计算挑战与本文目标
+\begin{frame}{计算挑战与本文目标}
+\begin{block}{计算挑战}
 \begin{itemize}
-    \item 候选行程数量随网络规模\hl{组合爆炸}增长
-    \item 60个机场、259条航段 → 可产生超过\hl{百万}条候选行程
+    \item 候选行程数最高超过 \hl{142 万}条
+    \item 服务变量 $x$、选择变量 $w$ 和容量约束强耦合
+    \item 直接求解完整 MIP 难以证明最优性
+    \item 时间聚合可能导致\hl{不可实现收入}
 \end{itemize}
-\end{block}
-
-\vspace{0.15cm}
-\begin{block}{模型结构困难}
-\begin{itemize}
-    \item 二元服务变量 $x$ 与连续选择变量 $w$ 强耦合
-    \item 直接建立 MIP 的 LP 松弛极弱，商业求解器难以有效求解
-\end{itemize}
-\end{block}
-
-\vspace{0.15cm}
-\begin{block}{现有方法的局限}
-\begin{itemize}
-    \item DDD 框架能压缩物理时空网络，但\hl{无法处理行程维度的数量爆炸}
-\end{itemize}
-\end{block}
-\end{frame}
-
-
-% Page 5: 研究目标
-\begin{frame}{研究目标}
-\begin{block}{本文要解决的核心问题}
-\centering
-\large
-设计一种精确优化方法，使得：
 \end{block}
 
 \vspace{0.3cm}
-\begin{columns}[T,totalwidth=\textwidth]
-\column{0.32\textwidth}
-\begin{block}{\centering 模型真实性}
-\centering
-\vspace{0.1cm}
-考虑顾客选择模型 \\[0.2cm]
-供给—需求反馈耦合\\[0.2cm]
-\vspace{0.1cm}
+\begin{block}{本文目标}
+\begin{enumerate}
+    \item 压缩行程空间，降低模型规模
+    \item 构造有效\hl{双侧界}（下界 + 上界）
+    \item 在完整网络上恢复可行解
+    \item 保证有限步达到预设最优性容差
+\end{enumerate}
 \end{block}
 
-\column{0.32\textwidth}
-\begin{block}{\centering 计算可行性}
+\vspace{0.2cm}
 \centering
-\vspace{0.1cm}
-模型规模可控\\[0.2cm]
-实际可求解\\[0.2cm]
-\vspace{0.1cm}
-\end{block}
-
-\column{0.32\textwidth}
-\begin{block}{\centering 理论保证}
-\centering
-\vspace{0.1cm}
-全局最优性保证\\[0.2cm]
-有限步收敛\\[0.2cm]
-\vspace{0.1cm}
-\end{block}
-\end{columns}
-
-\vspace{0.3cm}
-\centering
-本文提出 \hl{\algoNotation} 框架
+本文提出 \hl{\algoNotation} 框架：行程聚合与动态细化
 \end{frame}
