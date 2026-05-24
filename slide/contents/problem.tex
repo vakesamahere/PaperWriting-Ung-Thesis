@@ -1,5 +1,12 @@
 \section{问题背景}
 
+\begin{frame}
+  \frametitle{服务网络设计}
+  \begin{center}
+    \includegraphics[width=0.8\linewidth]{figure/snd.png}
+  \end{center}
+\end{frame}
+
 % Page 1: 研究背景：服务网络设计与顾客选择
 \begin{frame}{研究背景：服务网络设计与顾客选择}
 \begin{columns}[T,totalwidth=\textwidth]
@@ -131,9 +138,9 @@
     \node[red, font=\small\bfseries, anchor=north west] at ([shift={(3pt,0.4cm)}]choice-end) {选择约束：刻画顾客需求分配};
   }
   \only<5>{
-    \draw[red, ultra thick, rounded corners=3pt]
-      ([shift={(-3pt,8pt)}]coupling-start) rectangle ([shift={(3pt,-3pt)}]coupling-end);
-    \node[red, font=\small\bfseries, anchor=north] at ([shift={(0pt,-5pt)}]coupling-end) {强耦合：$x$ 与 $w$ 相互影响 $\to$ 计算困难来源};
+    % \draw[red, ultra thick, rounded corners=3pt]
+    %   ([shift={(-3pt,8pt)}]coupling-start) rectangle ([shift={(3pt,-3pt)}]coupling-end);
+    \node[red, font=\small\bfseries, anchor=north] at ([shift={(-3cm,1cm)}]coupling-end) {强耦合：规模巨大的 $w$ 与整数变量 $x$ 相互影响 $\to$ 计算困难来源};
   }
 \end{tikzpicture}
 \end{frame}
@@ -143,15 +150,14 @@
 \begin{frame}{计算挑战与本文目标}
 \begin{block}{计算挑战}
 \begin{itemize}
-    \item 候选行程数最高超过 \hl{142 万}条
+    \item NP-难问题
+    \item 实际场景中候选行程数超过 \hl{百万}条
     \item 服务变量 $x$、选择变量 $w$ 和容量约束强耦合
-    \item 直接求解完整 MIP 难以证明最优性
-    \item 时间聚合可能导致\hl{不可实现收入}
 \end{itemize}
 \end{block}
 
 \vspace{0.3cm}
-\begin{block}{本文目标}
+\begin{block}{本文贡献}
 \begin{enumerate}
     \item 压缩行程空间，降低模型规模
     \item 构造有效\hl{双侧界}（下界 + 上界）
@@ -159,8 +165,4 @@
     \item 保证有限步达到预设最优性容差
 \end{enumerate}
 \end{block}
-
-\vspace{0.2cm}
-\centering
-本文提出 \hl{\algoNotation} 框架：行程聚合与动态细化
 \end{frame}
